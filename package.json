@@ -1,0 +1,61 @@
+{
+  "name": "build-basket-ecommerce",
+  "version": "1.0.0",
+  "description": "BUILD BASKET - Construction Materials E-commerce Platform",
+  "main": "index.js",
+  "scripts": {
+    "dev": "./start-all.sh",
+    "start": "./start-all.sh",
+    "build": "npm run build:frontend && npm run build:dashboard",
+    "build:frontend": "cd frontend && npm run build",
+    "build:dashboard": "cd dashboard && npm run build",
+    "install:all": "npm run install:backend && npm run install:frontend && npm run install:dashboard",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install", 
+    "install:dashboard": "cd dashboard && npm install",
+    "test": "./test-all.sh",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "test:dashboard": "cd dashboard && npm test",
+    "seed": "cd backend && npm run seed",
+    "deploy": "./deploy.sh",
+    "deploy:docker": "docker-compose up -d",
+    "deploy:production": "./master-deploy.sh",
+    "setup": "node setup-production.js",
+    "setup:env": "./setup-environment.sh",
+    "validate": "node validate-deployment.js",
+    "stop": "./stop-all.sh",
+    "logs": "docker-compose logs -f",
+    "clean": "rm -rf */node_modules */build */dist",
+    "reset": "npm run clean && npm run install:all",
+    "production": "NODE_ENV=production npm start"
+  },
+  "keywords": [
+    "ecommerce",
+    "construction",
+    "materials",
+    "react",
+    "nodejs",
+    "mongodb",
+    "stripe",
+    "build-basket"
+  ],
+  "author": "BUILD BASKET Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/build-basket.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/build-basket/issues"
+  },
+  "homepage": "https://buildbasket.com",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
+

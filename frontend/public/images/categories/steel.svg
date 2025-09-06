@@ -1,0 +1,11 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradSteel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34495e;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#eba834;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+  <rect width="300" height="200" fill="url(#gradSteel)"/>
+  <text x="150" y="120" font-family="Inter, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">Steel</text>
+  <text x="150" y="160" font-family="Inter, sans-serif" font-size="48" fill="white" text-anchor="middle" opacity="0.7">🔩</text>
+</svg>

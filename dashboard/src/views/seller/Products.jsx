@@ -1,0 +1,251 @@
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { FaEdit, FaTrash, FaEye, FaPlus } from 'react-icons/fa';
+import { MdProductionQuantityLimits } from 'react-icons/md';
+import { get_seller_products } from '../../store/Reducers/productReducer';
+import { messageClear } from '../../store/Reducers/authReducer';
+
+const Products = () => {
+    const dispatch = useDispatch();
+    const { products, loading, errorMessage } = useSelector(state => state.product);
+    const { userInfo } = useSelector(state => state.auth);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
+
+    useEffect(() => {
+        dispatch(get_seller_products());
+        return () => {
+            dispatch(messageClear());
+        };
+    }, [dispatch]);
+
+    // Filter products based on search term and status
+    const filteredProducts = products?.filter(product => {
+        const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            product.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            product.brand?.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesStatus = filterStatus === 'all' || product.status === filterStatus;
+        
+        return matchesSearch && matchesStatus;
+    });
+
+    const getStatusBadge = (status) => {
+        const statusClasses = {
+            active: 'bg-green-500 text-white',
+            inactive: 'bg-red-500 text-white',
+            pending: 'bg-yellow-500 text-white'
+        };
+        
+        return (
+            <span className={`px-2 py-1 rounded text-xs ${statusClasses[status] || 'bg-gray-500 text-white'}`}>
+                {status}
+            </span>
+        );
+    };
+
+    if (loading) {
+        return (
+            <div className='px-2 md:px-7 py-5'>
+                <div className='w-full bg-white rounded-md p-4'>
+                    <div className='flex justify-between items-center mb-4'>
+                        <h2 className='text-xl font-semibold'>Products</h2>
+                        <div className='h-8 w-32 bg-gray-200 rounded animate-pulse'></div>
+                    </div>
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <div key={i} className='bg-gray-100 rounded-lg p-4 animate-pulse'>
+                                <div className='h-32 bg-gray-200 rounded mb-3'></div>
+                                <div className='h-4 bg-gray-200 rounded mb-2'></div>
+                                <div className='h-3 bg-gray-200 rounded mb-2'></div>
+                                <div className='h-3 bg-gray-200 rounded w-1/2'></div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className='px-2 md:px-7 py-5'>
+            <div className='w-full bg-white rounded-md p-4'>
+                {/* Header */}
+                <div className='flex justify-between items-center mb-6'>
+                    <div className='flex items-center gap-2'>
+                        <MdProductionQuantityLimits className='text-2xl text-blue-600' />
+                        <h2 className='text-xl font-semibold'>My Products</h2>
+                        <span className='bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded'>
+                            {filteredProducts?.length || 0} products
+                        </span>
+                    </div>
+                    <Link 
+                        to='/seller/dashboard/add-product'
+                        className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors'
+                    >
+                        <FaPlus className='text-sm' />
+                        Add Product
+                    </Link>
+                </div>
+
+                {/* Search and Filter */}
+                <div className='flex flex-col md:flex-row gap-4 mb-6'>
+                    <div className='flex-1'>
+                        <input
+                            type="text"
+                            placeholder="Search products by name, category, or brand..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        />
+                    </div>
+                    <div className='flex gap-2'>
+                        <select
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                            className='px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        >
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Error Message */}
+                {errorMessage && (
+                    <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'>
+                        {errorMessage}
+                    </div>
+                )}
+
+                {/* Products Grid */}
+                {filteredProducts && filteredProducts.length > 0 ? (
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+                        {filteredProducts.map((product) => (
+                            <div key={product._id} className='bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow'>
+                                {/* Product Image */}
+                                <div className='relative h-48 bg-gray-100'>
+                                    <img
+                                        src={product.images?.[0] || '/images/placeholder.jpg'}
+                                        alt={product.name}
+                                        className='w-full h-full object-cover'
+                                        onError={(e) => {
+                                            e.target.src = '/images/placeholder.jpg';
+                                        }}
+                                    />
+                                    <div className='absolute top-2 right-2'>
+                                        {getStatusBadge(product.status)}
+                                    </div>
+                                    {product.discount > 0 && (
+                                        <div className='absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded'>
+                                            {product.discount}% OFF
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Product Info */}
+                                <div className='p-4'>
+                                    <h3 className='font-semibold text-gray-800 mb-2 line-clamp-2'>
+                                        {product.name}
+                                    </h3>
+                                    <div className='flex items-center justify-between mb-2'>
+                                        <span className='text-sm text-gray-600'>{product.category}</span>
+                                        <span className='text-sm text-gray-500'>{product.brand}</span>
+                                    </div>
+                                    <div className='flex items-center justify-between mb-3'>
+                                        <div className='flex items-center gap-1'>
+                                            <span className='text-lg font-bold text-green-600'>
+                                                ${product.price?.toFixed(2)}
+                                            </span>
+                                            {product.discount > 0 && (
+                                                <span className='text-sm text-gray-500 line-through'>
+                                                    ${(product.price / (1 - product.discount / 100)).toFixed(2)}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className='text-sm text-gray-600'>
+                                            Stock: {product.stock}
+                                        </span>
+                                    </div>
+
+                                    {/* Rating */}
+                                    {product.rating && (
+                                        <div className='flex items-center gap-1 mb-3'>
+                                            <div className='flex text-yellow-400'>
+                                                {[...Array(5)].map((_, i) => (
+                                                    <svg
+                                                        key={i}
+                                                        className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'fill-current' : 'fill-gray-300'}`}
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                                    </svg>
+                                                ))}
+                                            </div>
+                                            <span className='text-sm text-gray-600'>({product.rating})</span>
+                                        </div>
+                                    )}
+
+                                    {/* Action Buttons */}
+                                    <div className='flex gap-2'>
+                                        <Link
+                                            to={`/seller/dashboard/product/edit/${product._id}`}
+                                            className='flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg text-sm flex items-center justify-center gap-1 transition-colors'
+                                        >
+                                            <FaEdit className='text-xs' />
+                                            Edit
+                                        </Link>
+                                        <Link
+                                            to={`/seller/dashboard/product/view/${product._id}`}
+                                            className='flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-2 rounded-lg text-sm flex items-center justify-center gap-1 transition-colors'
+                                        >
+                                            <FaEye className='text-xs' />
+                                            View
+                                        </Link>
+                                        <button
+                                            onClick={() => {
+                                                // Handle delete functionality
+                                                if (window.confirm('Are you sure you want to delete this product?')) {
+                                                    // dispatch(delete_product(product._id));
+                                                }
+                                            }}
+                                            className='flex-1 bg-red-600 hover:bg-red-700 text-white text-center py-2 rounded-lg text-sm flex items-center justify-center gap-1 transition-colors'
+                                        >
+                                            <FaTrash className='text-xs' />
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className='text-center py-12'>
+                        <MdProductionQuantityLimits className='text-6xl text-gray-300 mx-auto mb-4' />
+                        <h3 className='text-lg font-medium text-gray-600 mb-2'>No products found</h3>
+                        <p className='text-gray-500 mb-4'>
+                            {searchTerm || filterStatus !== 'all' 
+                                ? 'Try adjusting your search or filter criteria'
+                                : 'Start by adding your first product'
+                            }
+                        </p>
+                        {!searchTerm && filterStatus === 'all' && (
+                            <Link
+                                to='/seller/dashboard/add-product'
+                                className='bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg inline-flex items-center gap-2'
+                            >
+                                <FaPlus />
+                                Add Your First Product
+                            </Link>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default Products;
