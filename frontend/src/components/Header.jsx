@@ -91,19 +91,19 @@ const Header = () => {
             <div className="flex justify-start items-center gap-2 md:gap-4 lg:gap-6 flex-wrap ml-[40px]">
               <button
                 onClick={() => navigate("/about")}
-                className="flex justify-center items-center gap-1 text-lg md:text-xl text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10"
+                className="flex justify-center items-center gap-1 text-sm md:text-base text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10"
               >
                 <span>About Us</span>
               </button>
               <button
                 onClick={() => navigate("/prices")}
-                className="flex justify-center items-center gap-1 text-lg md:text-xl text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10"
+                className="flex justify-center items-center gap-1 text-sm md:text-base text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10"
               >
                 <span>Prices</span>
               </button>
               <button
                 onClick={() => navigate("/track-order")}
-                className="flex justify-center items-center gap-1 text-lg md:text-xl text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10"
+                className="flex justify-center items-center gap-1 text-sm md:text-base text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10"
               >
                 <span>Track Order</span>
               </button>
@@ -114,7 +114,7 @@ const Header = () => {
               {userInfo ? (
                 <>
                   <Link
-                    className="flex cursor-pointer justify-center items-center gap-2 text-lg text-white hover:text-gray-200 transition-colors"
+                    className="flex cursor-pointer justify-center items-center gap-2 text-sm text-white hover:text-gray-200 transition-colors"
                     to="/dashboard"
                   >
                     <span>
@@ -125,7 +125,7 @@ const Header = () => {
                   </Link>
                   <button
                     onClick={logout}
-                    className="flex justify-center items-center gap-1 text-lg text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10 mr-[-93.5px]"
+                    className="flex justify-center items-center gap-1 text-sm text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10 mr-[-93.5px]"
                   >
                     <IoMdLogOut />
                     <span>Logout</span>
@@ -134,7 +134,7 @@ const Header = () => {
               ) : (
                 <Link
                   to="/login"
-                  className="flex cursor-pointer justify-center items-center gap-2 text-lg text-white hover:text-gray-200 transition-colors mr-[-75px]"
+                  className="flex cursor-pointer justify-center items-center gap-2 text-sm text-white hover:text-gray-200 transition-colors mr-[-75px]"
                 >
                   <span>
                     {" "}
@@ -164,7 +164,7 @@ const Header = () => {
                     />
                   </div>
                   <div className="flex items-center">
-                    <span className="text-dark font-bold text-2xl tracking-wide">
+                    <span className="text-dark font-bold text-xl tracking-wide">
                       BUILD
                       <FaLock className="inline-block mx-1 text-primary" />
                       BASKET
@@ -226,29 +226,29 @@ const Header = () => {
             <div className="flex justify-center items-center gap-1 mr-[-100px]">
               {/* All Categories Button */}
               <div
-                className="flex justify-center items-center gap-1 text-lg text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
+                className="flex justify-center items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
                 onClick={() => setCategoryShow(!categoryShow)}
               >
-                <FaList className="text-lg" />
+                <FaList className="text-sm" />
                 <span>All Categories</span>
-                <IoMdArrowDropdown className="text-sm" />
+                <IoMdArrowDropdown className="text-xs" />
               </div>
 
               {/* My Orders Button */}
               {userInfo ? (
                 <Link
                   to="/dashboard/my-orders"
-                  className="flex justify-center items-center gap-1 text-lg text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
+                  className="flex justify-center items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
                 >
-                  <FaShoppingBag className="text-lg" />
+                  <FaShoppingBag className="text-sm" />
                   <span>My Orders</span>
                 </Link>
               ) : (
                 <Link
                   to="/login"
-                  className="flex justify-center items-center gap-1 text-lg text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
+                  className="flex justify-center items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
                 >
-                  <FaShoppingBag className="text-lg" />
+                  <FaShoppingBag className="text-sm" />
                   <span>My Orders</span>
                 </Link>
               )}
@@ -257,17 +257,17 @@ const Header = () => {
               {userInfo ? (
                 <Link
                   to="/dashboard/my-wishlist"
-                  className="flex justify-center items-center gap-1 text-lg text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
+                  className="flex justify-center items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
                 >
-                  <FaHeart className="text-lg" />
+                  <FaHeart className="text-sm" />
                   <span>Wishlist</span>
                 </Link>
               ) : (
                 <Link
                   to="/login"
-                  className="flex justify-center items-center gap-1 text-lg text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
+                  className="flex justify-center items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
                 >
-                  <FaHeart className="text-lg" />
+                  <FaHeart className="text-sm" />
                   <span>Wishlist</span>
                 </Link>
               )}
@@ -277,14 +277,14 @@ const Header = () => {
                 to="/"
                 className="flex justify-center items-center gap-1 text-lg text-primary hover:text-primary-light transition-colors cursor-pointer px-6 py-2 rounded hover:bg-white/10"
               >
-                <FaHome className="text-lg" />
+                <FaHome className="text-sm" />
                 <span>Home</span>
               </Link> */}
               <Link
                 to="/shops"
-                className="flex justify-center items-center gap-1 text-lg text-primary hover:text-primary-dark transition-colors cursor-pointer px-6 py-2 rounded hover:bg-primary/10"
+                className="flex justify-center items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors cursor-pointer px-6 py-2 rounded hover:bg-primary/10"
               >
-                <FaStore className="text-lg" />
+                <FaStore className="text-sm" />
                 <span>Shop</span>
               </Link>
             </div>
@@ -318,7 +318,7 @@ const Header = () => {
                 />
               </div>
               <div className="flex items-center">
-                <span className="text-dark font-bold text-2xl tracking-wide">
+                <span className="text-dark font-bold text-xl tracking-wide">
                   BUILD
                   <FaLock className="inline-block mx-1 text-primary" />
                   BASKET
@@ -330,28 +330,28 @@ const Header = () => {
               {userInfo ? (
                 <>
                   <Link
-                    className="flex cursor-pointer justify-center items-center gap-3 text-lg font-semibold text-dark hover:text-primary transition-colors"
+                    className="flex cursor-pointer justify-center items-center gap-3 text-sm font-semibold text-dark hover:text-primary transition-colors"
                     to="/dashboard"
                   >
-                    <span className="text-xl">
+                    <span className="text-sm">
                       <FaUser />
                     </span>
                     <span>{userInfo.name}</span>
                   </Link>
                   <button
                     onClick={logout}
-                    className="py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-red-500 hover:bg-red-50 flex items-center gap-3"
+                    className="py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-red-500 hover:bg-red-50 flex items-center gap-3"
                   >
-                    <IoMdLogOut className="text-lg" />
+                    <IoMdLogOut className="text-sm" />
                     Logout
                   </button>
                 </>
               ) : (
                 <Link
-                  className="flex cursor-pointer justify-center items-center gap-3 text-lg font-semibold text-dark hover:text-primary transition-colors"
+                  className="flex cursor-pointer justify-center items-center gap-3 text-sm font-semibold text-dark hover:text-primary transition-colors"
                   to="/login"
                 >
-                  <span className="text-xl">
+                  <span className="text-sm">
                     <FaLock />
                   </span>
                   <span>Login</span>
@@ -359,27 +359,27 @@ const Header = () => {
               )}
             </div>
 
-            <ul className="flex flex-col justify-start items-start text-lg font-bold uppercase gap-2">
+            <ul className="flex flex-col justify-start items-start text-sm font-bold uppercase gap-2">
               {/* My Orders */}
               <li>
                 {userInfo ? (
                   <Link
                     to="/dashboard/my-orders"
-                    className={`py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 flex items-center gap-3 ${
+                    className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 flex items-center gap-3 ${
                       pathname === "/dashboard/my-orders"
                         ? "text-primary bg-primary/10 border-l-4 border-primary"
                         : "text-slate-600 hover:text-primary hover:bg-gray-50"
                     }`}
                   >
-                    <FaShoppingBag className="text-lg" />
+                    <FaShoppingBag className="text-sm" />
                     My Orders
                   </Link>
                 ) : (
                   <Link
                     to="/login"
-                    className="py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-primary hover:bg-gray-50 flex items-center gap-3"
+                    className="py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-primary hover:bg-gray-50 flex items-center gap-3"
                   >
-                    <FaShoppingBag className="text-lg" />
+                    <FaShoppingBag className="text-sm" />
                     My Orders
                   </Link>
                 )}
@@ -390,21 +390,21 @@ const Header = () => {
                 {userInfo ? (
                   <Link
                     to="/dashboard/my-wishlist"
-                    className={`py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 flex items-center gap-3 ${
+                    className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 flex items-center gap-3 ${
                       pathname === "/dashboard/my-wishlist"
                         ? "text-primary bg-primary/10 border-l-4 border-primary"
                         : "text-slate-600 hover:text-primary hover:bg-gray-50"
                     }`}
                   >
-                    <FaHeart className="text-lg" />
+                    <FaHeart className="text-sm" />
                     Wishlist
                   </Link>
                 ) : (
                   <Link
                     to="/login"
-                    className="py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-primary hover:bg-gray-50 flex items-center gap-3"
+                    className="py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-primary hover:bg-gray-50 flex items-center gap-3"
                   >
-                    <FaHeart className="text-lg" />
+                    <FaHeart className="text-sm" />
                     Wishlist
                   </Link>
                 )}
@@ -414,13 +414,13 @@ const Header = () => {
               <li>
                 <Link
                   to="/"
-                  className={`py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 flex items-center gap-3 ${
+                  className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 flex items-center gap-3 ${
                     pathname === "/"
                       ? "text-primary bg-primary/10 border-l-4 border-primary"
                       : "text-slate-600 hover:text-primary hover:bg-gray-50"
                   }`}
                 >
-                  <FaHome className="text-lg" />
+                  <FaHome className="text-sm" />
                   Home
                 </Link>
               </li>
@@ -429,20 +429,20 @@ const Header = () => {
               <li>
                 <Link
                   to="/shops"
-                  className={`py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 flex items-center gap-3 ${
+                  className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 flex items-center gap-3 ${
                     pathname === "/shops"
                       ? "text-primary bg-primary/10 border-l-4 border-primary"
                       : "text-slate-600 hover:text-primary hover:bg-gray-50"
                   }`}
                 >
-                  <FaStore className="text-lg" />
+                  <FaStore className="text-sm" />
                   Shop
                 </Link>
               </li>
               <li>
                 <Link
                   to="/about"
-                  className={`py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 ${
+                  className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 ${
                     pathname === "/about"
                       ? "text-primary bg-primary/10 border-l-4 border-primary"
                       : "text-slate-600 hover:text-primary hover:bg-gray-50"
@@ -454,7 +454,7 @@ const Header = () => {
               <li>
                 <Link
                   to="/prices"
-                  className={`py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 ${
+                  className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 ${
                     pathname === "/prices"
                       ? "text-primary bg-primary/10 border-l-4 border-primary"
                       : "text-slate-600 hover:text-primary hover:bg-gray-50"
@@ -466,7 +466,7 @@ const Header = () => {
               <li>
                 <Link
                   to="/track-order"
-                  className={`py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 ${
+                  className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 ${
                     pathname === "/track-order"
                       ? "text-primary bg-primary/10 border-l-4 border-primary"
                       : "text-slate-600 hover:text-primary hover:bg-gray-50"
@@ -481,9 +481,9 @@ const Header = () => {
                 <li>
                   <button
                     onClick={logout}
-                    className="w-full py-3 px-4 block text-lg font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-primary hover:bg-gray-50 flex items-center gap-3"
+                    className="w-full py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-primary hover:bg-gray-50 flex items-center gap-3"
                   >
-                    <IoMdLogOut className="text-lg" />
+                    <IoMdLogOut className="text-sm" />
                     Logout
                   </button>
                 </li>
@@ -495,25 +495,25 @@ const Header = () => {
                 href="#"
                 className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300"
               >
-                <FaFacebookF className="text-lg" />
+                <FaFacebookF className="text-sm" />
               </a>
               <a
                 href="#"
                 className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300"
               >
-                <FaTwitter className="text-lg" />
+                <FaTwitter className="text-sm" />
               </a>
               <a
                 href="#"
                 className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300"
               >
-                <FaLinkedin className="text-lg" />
+                <FaLinkedin className="text-sm" />
               </a>
               <a
                 href="#"
                 className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300"
               >
-                <FaGithub className="text-lg" />
+                <FaGithub className="text-sm" />
               </a>
             </div>
 
@@ -524,7 +524,7 @@ const Header = () => {
                 </span>
               </div>
               <div className="flex justify-end flex-col gap-1">
-                <h2 className="text-lg font-semibold text-slate-700">
+                <h2 className="text-sm font-semibold text-slate-700">
                   +134343455
                 </h2>
                 <span className="text-sm text-slate-500">Support 24/7</span>

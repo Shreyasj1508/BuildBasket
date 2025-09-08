@@ -5,6 +5,8 @@ import Categorys from "../components/Categorys";
 import FeatureProducts from "../components/products/FeatureProducts";
 import Products from "../components/products/Products";
 import WhyChooseUs from "../components/WhyChooseUs";
+import CustomerTestimonials from "../components/CustomerTestimonials";
+import StatisticsSection from "../components/StatisticsSection";
 import Footer from "../components/Footer";
 import { useDispatch } from "react-redux";
 import { get_products } from "../store/reducers/homeReducer";
@@ -194,6 +196,9 @@ const Home = () => {
         </div>
       </div>
 
+      {/* Statistics Section */}
+      <StatisticsSection />
+
       <Banner />
       <Categorys />
       <div className="py-[45px]">
@@ -239,6 +244,9 @@ const Home = () => {
       
       {/* Why Choose Us Section */}
       <WhyChooseUs />
+      
+      {/* Customer Testimonials Section */}
+      <CustomerTestimonials />
       
       <Footer />
     </div>
