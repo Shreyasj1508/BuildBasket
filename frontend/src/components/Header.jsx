@@ -156,7 +156,7 @@ const Header = () => {
             <div className="md-lg:w-full w-3/12 md-lg:pt-4">
               <div className="flex justify-between items-center">
                 <Link to="/" className="flex items-center gap-4">
-                  <div className="w-[110px] h-[110px] rounded-full flex items-center justify-center shadow-lg overflow-hidden ml-[-70px] mt-[-30px]">
+                  <div className="w-[97px] h-[97px] rounded-full flex items-center justify-center shadow-lg overflow-hidden ml-[-70px] mt-[-40px]">
                     <img
                       src={logoImage}
                       alt="SG Logo"
@@ -164,7 +164,7 @@ const Header = () => {
                     />
                   </div>
                   <div className="flex items-center">
-                    <span className="text-dark font-bold text-xl tracking-wide">
+                    <span className="text-dark font-bold text-xl tracking-wide ml-[10px]">
                       BUILD
                       <FaLock className="inline-block mx-1 text-primary" />
                       BASKET
