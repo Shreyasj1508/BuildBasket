@@ -70,7 +70,7 @@ const Shops = () => {
                 rating,
                 sortPrice,
                 pageNumber,
-                search: urlSearch
+                searchValue: urlSearch
             })
          )
     },[state.values[0],state.values[1],category,rating,sortPrice,pageNumber,urlSearch])
@@ -85,7 +85,7 @@ const Shops = () => {
                 rating: '',
                 sortPrice,
                 pageNumber,
-                search: urlSearch
+                searchValue: urlSearch
             })
          )
     }
