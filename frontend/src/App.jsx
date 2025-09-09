@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Shops from "./pages/Shops";
 import Card from "./pages/Card";
@@ -43,6 +43,12 @@ function App() {
         if (dispatch && typeof dispatch === "function") {
           dispatch(get_category());
         }
+
+        // Check if current path is admin dashboard and redirect to login
+        const currentPath = window.location.pathname;
+        if (currentPath.startsWith('/admin')) {
+          window.location.href = '/login';
+        }
       } catch (error) {
         console.error("Error initializing app:", error);
       }
@@ -81,6 +87,12 @@ function App() {
               <Route path="chat/:sellerId" element={<Chat />} />
             </Route>
           </Route>
+
+          {/* Admin routes - redirect to login */}
+          <Route path="/admin/*" element={<Navigate to="/login" replace />} />
+
+          {/* Catch-all route for undefined paths - redirect to login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
     </ReduxErrorBoundary>

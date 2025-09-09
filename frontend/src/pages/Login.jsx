@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { FaFacebookF } from "react-icons/fa6";
 import { FaGoogle } from "react-icons/fa6";
 import { FaUser, FaStore, FaUserPlus } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { customer_login, messageClear } from "../store/reducers/authReducer";
 import toast from "react-hot-toast";
@@ -13,6 +13,7 @@ import logoImage from "../assets/cropped_circle_image.png";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { loader, errorMessage, successMessage, userInfo } = useSelector(
     (state) => state.auth
   );
@@ -51,7 +52,12 @@ const Login = () => {
       dispatch(messageClear());
     }
     if (userInfo) {
-      navigate("/");
+      // Get redirect URL from query parameters
+      const searchParams = new URLSearchParams(location.search);
+      const redirectUrl = searchParams.get('redirect');
+      
+      // Navigate to redirect URL or default to home
+      navigate(redirectUrl || "/");
     }
   }, [successMessage, errorMessage]);
 

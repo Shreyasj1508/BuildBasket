@@ -56,27 +56,27 @@ const Home = () => {
   const search = () => {
     // Build search parameters
     const params = new URLSearchParams();
-    if (category && category.trim() !== '') {
-      params.append('category', category);
+    if (category && category.trim() !== "") {
+      params.append("category", category);
     }
-    if (searchValue && searchValue.trim() !== '') {
-      params.append('search', searchValue);
+    if (searchValue && searchValue.trim() !== "") {
+      params.append("search", searchValue);
     }
-    
+
     // Navigate to shops with search parameters
     const queryString = params.toString();
-    navigate(`/shops${queryString ? `?${queryString}` : ''}`);
+    navigate(`/shops${queryString ? `?${queryString}` : ""}`);
   };
 
   // Handle category selection
   const handleCategoryChange = (selectedCategory) => {
     setCategory(selectedCategory);
     // If a category is selected, automatically navigate to shops page
-    if (selectedCategory && selectedCategory.trim() !== '') {
+    if (selectedCategory && selectedCategory.trim() !== "") {
       const params = new URLSearchParams();
-      params.append('category', selectedCategory);
-      if (searchValue && searchValue.trim() !== '') {
-        params.append('search', searchValue);
+      params.append("category", selectedCategory);
+      if (searchValue && searchValue.trim() !== "") {
+        params.append("search", searchValue);
       }
       navigate(`/shops?${params.toString()}`);
     }
@@ -96,7 +96,7 @@ const Home = () => {
       <div
         className="w-full min-h-[70vh] relative overflow-hidden"
         style={{
-          backgroundImage: "url(/images/image.jpg)",
+          backgroundImage: "url(/images/landing_page_bg.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -114,9 +114,11 @@ const Home = () => {
                 textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
                 padding: "15px 25px",
                 borderRadius: "15px",
-                background: "linear-gradient(45deg, rgba(235, 143, 52, 0.2), rgba(255, 255, 255, 0.1))",
+                background:
+                  "linear-gradient(45deg, rgba(235, 143, 52, 0.2), rgba(255, 255, 255, 0.1))",
                 border: "1px solid rgba(255, 255, 255, 0.2)",
-                animation: "slideInFromLeft 1s ease-out, float 3s ease-in-out infinite 2s"
+                animation:
+                  "slideInFromLeft 1s ease-out, float 3s ease-in-out infinite 2s",
               }}
             >
               Join the Finest Community of
@@ -128,9 +130,11 @@ const Home = () => {
                 textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
                 padding: "15px 25px",
                 borderRadius: "15px",
-                background: "linear-gradient(45deg, rgba(235, 143, 52, 0.3), rgba(255, 255, 255, 0.2))",
+                background:
+                  "linear-gradient(45deg, rgba(235, 143, 52, 0.3), rgba(255, 255, 255, 0.2))",
                 border: "1px solid rgba(255, 255, 255, 0.3)",
-                animation: "slideInFromRight 1s ease-out 0.5s both, glow 2s ease-in-out infinite alternate 1.5s"
+                animation:
+                  "slideInFromRight 1s ease-out 0.5s both, glow 2s ease-in-out infinite alternate 1.5s",
               }}
             >
               25,000+ Construction Material Suppliers
@@ -144,9 +148,11 @@ const Home = () => {
               textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
               padding: "20px 30px",
               borderRadius: "15px",
-              background: "linear-gradient(45deg, rgba(235, 143, 52, 0.1), rgba(255, 255, 255, 0.05))",
+              background:
+                "linear-gradient(45deg, rgba(235, 143, 52, 0.1), rgba(255, 255, 255, 0.05))",
               border: "1px solid rgba(255, 255, 255, 0.1)",
-              animation: "fadeInUp 1s ease-out 1s both, pulse 3s ease-in-out infinite 2.5s"
+              animation:
+                "fadeInUp 1s ease-out 1s both, pulse 3s ease-in-out infinite 2.5s",
             }}
           >
             Shop Products at Wholesale Price | Directly from Verified Sellers
@@ -187,15 +193,25 @@ const Home = () => {
               onClick={search}
               className="bg-primary hover:bg-primary-dark text-white px-8 py-4 font-semibold text-lg transition-colors flex items-center gap-2"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
               Search Material
             </button>
           </div>
         </div>
       </div>
-    
+
       {/* Statistics Section */}
       <StatisticsSection />
 
@@ -241,13 +257,13 @@ const Home = () => {
           </div>
         </div>
       )}
-      
+
       {/* Why Choose Us Section */}
       <WhyChooseUs />
-      
+
       {/* Customer Testimonials Section */}
       <CustomerTestimonials />
-      
+
       <Footer />
     </div>
   );
