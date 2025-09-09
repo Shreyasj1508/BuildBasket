@@ -18,10 +18,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (token) {
+    if (token && token.trim() !== '') {
       dispatch(get_user_info());
     }
-  }, [token]);
+  }, [token, dispatch]);
 
   return <Router allRoutes={allRoutes} />;
 }

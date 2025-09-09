@@ -9,7 +9,7 @@ import CustomerTestimonials from "../components/CustomerTestimonials";
 import StatisticsSection from "../components/StatisticsSection";
 import Footer from "../components/Footer";
 import { useDispatch } from "react-redux";
-import { get_products } from "../store/reducers/homeReducer";
+import { get_products, get_category } from "../store/reducers/homeReducer";
 import { useNavigate } from "react-router-dom";
 import { useHomeState } from "../hooks/useSafeSelector";
 
@@ -23,6 +23,7 @@ const Home = () => {
   const latest_product = homeState?.latest_product || [];
   const topRated_product = homeState?.topRated_product || [];
   const discount_product = homeState?.discount_product || [];
+  const categorys = homeState?.categorys || [];
   const [searchValue, setSearchValue] = useState("");
   const [category, setCategory] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -37,6 +38,7 @@ const Home = () => {
         // Check if dispatch is available
         if (dispatch && typeof dispatch === "function") {
           await dispatch(get_products());
+          await dispatch(get_category());
         } else {
           console.error("Dispatch function is not available");
         }
@@ -47,28 +49,37 @@ const Home = () => {
       }
     };
 
-    // Only fetch if we have a valid homeState
-    if (homeState) {
-      fetchData();
-    } else {
-      console.warn("Home state not available, skipping data fetch");
-      setIsLoading(false);
-    }
-  }, [dispatch, homeState]);
+    // Fetch data on component mount only
+    fetchData();
+  }, [dispatch]);
 
   const search = () => {
     // Build search parameters
     const params = new URLSearchParams();
-    if (category) {
+    if (category && category.trim() !== '') {
       params.append('category', category);
     }
-    if (searchValue) {
+    if (searchValue && searchValue.trim() !== '') {
       params.append('search', searchValue);
     }
     
     // Navigate to shops with search parameters
     const queryString = params.toString();
     navigate(`/shops${queryString ? `?${queryString}` : ''}`);
+  };
+
+  // Handle category selection
+  const handleCategoryChange = (selectedCategory) => {
+    setCategory(selectedCategory);
+    // If a category is selected, automatically navigate to shops page
+    if (selectedCategory && selectedCategory.trim() !== '') {
+      const params = new URLSearchParams();
+      params.append('category', selectedCategory);
+      if (searchValue && searchValue.trim() !== '') {
+        params.append('search', searchValue);
+      }
+      navigate(`/shops?${params.toString()}`);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -149,30 +160,16 @@ const Home = () => {
           <div className="flex w-full bg-white rounded-lg shadow-lg overflow-hidden">
             {/* Category Dropdown */}
             <select
-              onChange={(e) => setCategory(e.target.value)}
+              value={category}
+              onChange={(e) => handleCategoryChange(e.target.value)}
               className="w-[200px] text-slate-600 font-semibold bg-transparent px-4 py-4 outline-0 border-none border-r border-gray-200"
             >
               <option value="">All Categories</option>
-              <option value="Cement & Concrete">Cement & Concrete</option>
-              <option value="Steel & Iron">Steel & Iron</option>
-              <option value="Bricks & Blocks">Bricks & Blocks</option>
-              <option value="Tiles & Flooring">Tiles & Flooring</option>
-              <option value="Electrical">Electrical</option>
-              <option value="Plumbing">Plumbing</option>
-              <option value="Tools & Equipment">Tools & Equipment</option>
-              <option value="Paint & Chemicals">Paint & Chemicals</option>
-              <option value="Hardware & Fasteners">Hardware & Fasteners</option>
-              <option value="Safety & Security">Safety & Security</option>
-              <option value="Doors & Windows">Doors & Windows</option>
-              <option value="Roofing Materials">Roofing Materials</option>
-              <option value="Insulation">Insulation</option>
-              <option value="Garden & Outdoor">Garden & Outdoor</option>
-              <option value="Kitchen & Bathroom">Kitchen & Bathroom</option>
-              <option value="Lumber & Wood">Lumber & Wood</option>
-              <option value="Glass & Mirrors">Glass & Mirrors</option>
-              <option value="HVAC & Ventilation">HVAC & Ventilation</option>
-              <option value="Landscaping">Landscaping</option>
-              <option value="Lighting & Fixtures">Lighting & Fixtures</option>
+              {categorys.map((cat, index) => (
+                <option key={index} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
 
             {/* Search Input */}
@@ -188,14 +185,17 @@ const Home = () => {
             {/* Search Button */}
             <button
               onClick={search}
-              className="bg-primary hover:bg-primary-dark text-white px-8 py-4 font-semibold text-lg transition-colors"
+              className="bg-primary hover:bg-primary-dark text-white px-8 py-4 font-semibold text-lg transition-colors flex items-center gap-2"
             >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
               Search Material
             </button>
           </div>
         </div>
       </div>
-
+    
       {/* Statistics Section */}
       <StatisticsSection />
 

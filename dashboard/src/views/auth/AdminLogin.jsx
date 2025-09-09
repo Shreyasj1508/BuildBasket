@@ -45,9 +45,12 @@ const AdminLogin = () => {
         if (successMessage) {
             toast.success(successMessage)
             dispatch(messageClear())  
-            navigate('/')          
+            // Use setTimeout to ensure navigation happens after the current render cycle
+            setTimeout(() => {
+                navigate('/', { replace: true })
+            }, 100)
         }
-    },[errorMessage,successMessage])
+    },[errorMessage,successMessage, dispatch, navigate])
 
     return (
         <div className='min-w-screen min-h-screen bg-[#cdcae9] flex justify-center items-center' >

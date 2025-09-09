@@ -28,8 +28,14 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem('accessToken')
-            window.location.href = '/login'
+            // Check if this is a logout request to avoid conflicts
+            const isLogoutRequest = error.config?.url?.includes('/logout')
+            
+            if (!isLogoutRequest) {
+                localStorage.removeItem('accessToken')
+                // Use replace to avoid adding to history
+                window.location.replace('/login')
+            }
         }
         return Promise.reject(error)
     }

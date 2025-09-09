@@ -5,10 +5,7 @@ const ReduxErrorBoundary = ({ children }) => {
     // Check if Redux store is accessible using safe selector
     const storeState = useSafeSelector(state => state, {});
     
-    // Check if home state exists
-    const homeState = useSafeSelector(state => state.home, {});
-    
-    // If we can't access the store or home state, show error
+    // If we can't access the store, show error
     if (!storeState || Object.keys(storeState).length === 0) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">

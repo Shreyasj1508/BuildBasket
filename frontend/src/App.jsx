@@ -49,7 +49,7 @@ function App() {
     };
 
     initializeApp();
-  }, [dispatch]);
+  }, []); // Remove dispatch from dependencies to prevent re-runs
 
   return (
     <ReduxErrorBoundary>

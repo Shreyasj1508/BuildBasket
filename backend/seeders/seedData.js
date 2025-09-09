@@ -11,6 +11,7 @@ const sellerCustomerModel = require('../models/chat/sellerCustomerModel');
 const customerModel = require('../models/customerModel');
 
 const seedData = async () => {
+    console.log('🌱 Starting database seeding...');
     try {
         // Connect to database
         await mongoose.connect(process.env.DB_URL || 'mongodb://localhost:27017/almaMate');
@@ -1347,6 +1348,150 @@ const seedData = async () => {
                 ],
                 rating: 4.4
             },
+            // More Cement & Concrete Products
+            {
+                name: 'Rapid Setting Cement 25kg',
+                category: 'Cement & Concrete',
+                brand: 'RapidSet',
+                price: 320,
+                stock: 75,
+                discount: 8,
+                description: 'Fast-setting cement for quick repairs and emergency construction work.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.6
+            },
+            {
+                name: 'Concrete Mixer 1 Cubic Yard',
+                category: 'Cement & Concrete',
+                brand: 'MixMaster',
+                price: 2800,
+                stock: 25,
+                discount: 15,
+                description: 'Professional concrete mixer for large construction projects. High efficiency.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.7
+            },
+            {
+                name: 'Concrete Vibrator 2HP',
+                category: 'Cement & Concrete',
+                brand: 'VibroMax',
+                price: 450,
+                stock: 40,
+                discount: 10,
+                description: 'Heavy-duty concrete vibrator for removing air bubbles and ensuring proper compaction.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.5
+            },
+            {
+                name: 'Concrete Curing Compound 20L',
+                category: 'Cement & Concrete',
+                brand: 'CurePro',
+                price: 220,
+                stock: 50,
+                discount: 12,
+                description: 'Water-based curing compound for proper concrete hydration and strength development.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.4
+            },
+            {
+                name: 'Concrete Repair Mortar 25kg',
+                category: 'Cement & Concrete',
+                brand: 'RepairMax',
+                price: 180,
+                stock: 90,
+                discount: 8,
+                description: 'High-strength repair mortar for fixing cracks and damaged concrete surfaces.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.3
+            },
+            {
+                name: 'Concrete Formwork Panels 4x8',
+                category: 'Cement & Concrete',
+                brand: 'FormPro',
+                price: 85,
+                stock: 120,
+                discount: 5,
+                description: 'Reusable concrete formwork panels for creating smooth concrete surfaces.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.2
+            },
+            {
+                name: 'Concrete Anchor Bolts M12',
+                category: 'Cement & Concrete',
+                brand: 'AnchorMax',
+                price: 12,
+                stock: 500,
+                discount: 8,
+                description: 'Heavy-duty anchor bolts for securing structures to concrete foundations.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.5
+            },
+            {
+                name: 'Concrete Expansion Joint 10m',
+                category: 'Cement & Concrete',
+                brand: 'JointPro',
+                price: 35,
+                stock: 200,
+                discount: 10,
+                description: 'Flexible expansion joint material for preventing concrete cracking due to thermal expansion.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.4
+            },
+            {
+                name: 'Concrete Fiber Reinforcement 1kg',
+                category: 'Cement & Concrete',
+                brand: 'FiberMax',
+                price: 25,
+                stock: 300,
+                discount: 12,
+                description: 'Polypropylene fibers for concrete reinforcement to reduce cracking and improve durability.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.3
+            },
+            {
+                name: 'Concrete Leveling Compound 20kg',
+                category: 'Cement & Concrete',
+                brand: 'LevelPro',
+                price: 95,
+                stock: 80,
+                discount: 8,
+                description: 'Self-leveling compound for creating smooth, flat concrete surfaces before flooring.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.6
+            },
+            {
+                name: 'Concrete Stain Remover 5L',
+                category: 'Cement & Concrete',
+                brand: 'CleanMax',
+                price: 65,
+                stock: 100,
+                discount: 10,
+                description: 'Heavy-duty stain remover for cleaning oil, grease, and other stains from concrete.',
+                images: [
+                    'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=400&fit=crop'
+                ],
+                rating: 4.2
+            },
             // Additional Steel & Iron Products
             {
                 name: 'Steel Rods 8mm',
@@ -2128,6 +2273,7 @@ const seedData = async () => {
         console.error('❌ Error seeding database:', error);
     } finally {
         mongoose.connection.close();
+        console.log('Database connection closed');
     }
 };
 

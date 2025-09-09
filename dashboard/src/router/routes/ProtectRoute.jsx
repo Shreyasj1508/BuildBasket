@@ -49,7 +49,13 @@ const ProtectRoute = ({route,children}) => {
             } 
         } 
     }else {
-        return <Navigate to='/login' replace />
+        // Check if we're in admin routes and redirect accordingly
+        const isAdminRoute = route.path && route.path.includes('/admin')
+        if (isAdminRoute) {
+            return <Navigate to='/admin/login' replace />
+        } else {
+            return <Navigate to='/login' replace />
+        }
     }
  
 

@@ -23,6 +23,7 @@ import {
   get_card_products,
   get_wishlist_products,
 } from "../store/reducers/cardReducer";
+import { get_category } from "../store/reducers/homeReducer";
 import { user_reset } from "../store/reducers/authReducer";
 import { reset_count } from "../store/reducers/cardReducer";
 import api from "../api/api";
@@ -49,7 +50,32 @@ const Header = () => {
   const [category, setCategory] = useState("");
 
   const search = () => {
-    navigate(`/products/search?category=${category}&&value=${searchValue}`);
+    // Build search parameters
+    const params = new URLSearchParams();
+    if (category && category.trim() !== '') {
+      params.append('category', category);
+    }
+    if (searchValue && searchValue.trim() !== '') {
+      params.append('search', searchValue);
+    }
+    
+    // Navigate to shops with search parameters
+    const queryString = params.toString();
+    navigate(`/shops${queryString ? `?${queryString}` : ''}`);
+  };
+
+  // Handle category selection
+  const handleCategoryChange = (selectedCategory) => {
+    setCategory(selectedCategory);
+    // If a category is selected, automatically navigate to shops page
+    if (selectedCategory && selectedCategory.trim() !== '') {
+      const params = new URLSearchParams();
+      params.append('category', selectedCategory);
+      if (searchValue && searchValue.trim() !== '') {
+        params.append('search', searchValue);
+      }
+      navigate(`/shops?${params.toString()}`);
+    }
   };
 
   const redirect_card_page = () => {
@@ -75,11 +101,13 @@ const Header = () => {
   };
 
   useEffect(() => {
-    if (userInfo) {
+    if (userInfo && userInfo.id) {
       dispatch(get_card_products(userInfo.id));
       dispatch(get_wishlist_products(userInfo.id));
     }
-  }, [userInfo]);
+    // Load categories
+    dispatch(get_category());
+  }, [userInfo?.id, dispatch]); // Only depend on userInfo.id, not the entire userInfo object
 
   return (
     <div className="w-full bg-white shadow-md sticky top-0 z-50">
@@ -185,12 +213,12 @@ const Header = () => {
             </div>
 
             {/* Search Section */}
-
             <div className="md-lg:hidden flex justify-center items-center text-white bg-primary relative">
               <div className="w-[95%] mx-auto ">
                 <div className="flex justify-end items-center h-[70px] w-full">
-                  {/* Empty space where categories button was */}
-                </div>
+                
+                  
+                </div> 
 
                 {/* Categories Dropdown */}
                 <div
@@ -202,10 +230,10 @@ const Header = () => {
                     <div className="w-full grid grid-cols-3 md-lg:grid-cols-3 md:grid-cols-2 gap-3">
                       {categorys?.map((c, i) => {
                         return (
-                          <Link
+                          <button
                             key={i}
-                            to={`/products?category=${c.name}`}
-                            className="flex items-center gap-2 text-gray-700 px-3 py-2 hover:bg-primary hover:text-white rounded-md transition-all duration-200 text-sm font-medium"
+                            onClick={() => handleCategoryChange(c.name)}
+                            className="flex items-center gap-2 text-gray-700 px-3 py-2 hover:bg-primary hover:text-white rounded-md transition-all duration-200 text-sm font-medium w-full text-left"
                           >
                             <img
                               src={c.image}
@@ -213,7 +241,7 @@ const Header = () => {
                               alt=""
                             />
                             <span className="text-xs truncate">{c.name}</span>
-                          </Link>
+                          </button>
                         );
                       })}
                     </div>

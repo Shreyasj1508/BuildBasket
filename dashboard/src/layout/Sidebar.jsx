@@ -5,6 +5,7 @@ import { BiLogOutCircle } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from '../store/Reducers/authReducer';
 import { FaLock } from "react-icons/fa";
+import api from '../api/api';
 
 const Sidebar = ({showSidebar, setShowSidebar}) => {
 
@@ -19,6 +20,26 @@ const Sidebar = ({showSidebar, setShowSidebar}) => {
         setAllNav(navs)
     },[role])
     // console.log(allNav)
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Logout button clicked, role:', role);
+        
+        // Clear everything immediately
+        localStorage.removeItem('accessToken');
+        
+        // Clear Redux state
+        dispatch(logout());
+        
+        // Force navigation using window.location to avoid React Router issues
+        if (role === 'admin') {
+            window.location.href = '/admin/login';
+        } else {
+            window.location.href = '/login';
+        }
+    };
 
 
     return (
@@ -49,7 +70,10 @@ const Sidebar = ({showSidebar, setShowSidebar}) => {
                 }
 
             <li className="mt-4 pt-4 border-t border-gray-200">
-                <button onClick={() => dispatch(logout({navigate,role }))} className='text-red-600 hover:text-red-700 hover:bg-red-50 font-bold duration-200 px-[12px] py-[9px] rounded-lg flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1'>
+                <button 
+                    onClick={handleLogout}
+                    className='text-red-600 hover:text-red-700 hover:bg-red-50 font-bold duration-200 px-[12px] py-[9px] rounded-lg flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1'
+                >
                 <span><BiLogOutCircle /></span>
                 <span>Logout</span>
                 </button>

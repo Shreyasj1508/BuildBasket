@@ -107,9 +107,18 @@ query_products = async (req, res) => {
     req.query.parPage = parPage
 
     try {
+        // Decode URL parameters
+        if (req.query.category) {
+            req.query.category = decodeURIComponent(req.query.category);
+        }
+        if (req.query.searchValue) {
+            req.query.searchValue = decodeURIComponent(req.query.searchValue);
+        }
+        
         const products = await productModel.find({}).sort({
             createdAt: -1
         })
+        
         const totalProduct = new queryProducts(products, req.query).categoryQuery().ratingQuery().searchQuery().priceQuery().sortByPrice().countProducts();
 
         const result = new queryProducts(products, req.query).categoryQuery().ratingQuery().priceQuery().searchQuery().sortByPrice().skip().limit().getProducts();
@@ -122,7 +131,7 @@ query_products = async (req, res) => {
 
         
     } catch (error) {
-        console.log(error.message)
+        console.log('❌ Query Products Error:', error.message)
     }
  
 }

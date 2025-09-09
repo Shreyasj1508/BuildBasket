@@ -196,9 +196,11 @@ class authControllers{
 
  logout = async (req, res) => {
     try {
-        res.cookie('accessToken',null,{
+        res.cookie('accessToken','',{
             expires : new Date(Date.now()),
-            httpOnly: true
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
         })
         responseReturn(res, 200,{ message : 'logout Success' })
     } catch (error) {

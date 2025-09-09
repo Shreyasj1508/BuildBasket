@@ -121,20 +121,14 @@ export const profile_info_add = createAsyncThunk(
 
     export const logout = createAsyncThunk(
         'auth/logout',
-        async({navigate,role},{rejectWithValue, fulfillWithValue}) => {
+        async(_,{rejectWithValue, fulfillWithValue}) => {
              
             try {
-                const {data} = await api.get('/logout', {withCredentials: true}) 
-                localStorage.removeItem('accessToken') 
-                if (role === 'admin') {
-                    navigate('/admin/login')
-                } else {
-                    navigate('/login')
-                }
-                return fulfillWithValue(data)
+                // Just clear the token and return success
+                localStorage.removeItem('accessToken')
+                return fulfillWithValue({ message: 'Logout successful' })
             } catch (error) {
-                // console.log(error.response.data)
-                return rejectWithValue(error.response?.data || { error: 'Logout failed' })
+                return rejectWithValue({ error: 'Logout failed' })
             }
         }
     )
@@ -256,6 +250,22 @@ export const authReducer = createSlice({
         .addCase(change_password.fulfilled, (state,action) => {
             state.loader = false;
             state.successMessage = action.payload 
+        })
+
+        // Logout reducers
+        .addCase(logout.pending, (state) => {
+            state.loader = true;
+        })
+        .addCase(logout.rejected, (state, { payload }) => {
+            state.loader = false;
+            state.errorMessage = payload?.error || 'Logout failed'
+        })
+        .addCase(logout.fulfilled, (state, { payload }) => {
+            state.loader = false;
+            state.successMessage = payload.message
+            state.token = ''
+            state.role = ''
+            state.userInfo = ''
         });
 
 

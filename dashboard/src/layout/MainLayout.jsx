@@ -14,10 +14,10 @@ const MainLayout = () => {
     useEffect(() => {
         if (userInfo && userInfo.role === 'seller') {
             socket.emit('add_seller', userInfo._id,userInfo)
-        } else {
+        } else if (userInfo && userInfo.role === 'admin') {
             socket.emit('add_admin', userInfo)
         }
-    },[userInfo])
+    },[userInfo?.role, userInfo?._id]) // Only depend on specific properties
 
     useEffect(() => {
         socket.on('activeCustomer',(customers)=>{
@@ -26,7 +26,13 @@ const MainLayout = () => {
         socket.on('activeSeller',(sellers)=>{
             dispatch(updateSellers(sellers))
         })
-    })
+        
+        // Cleanup function to prevent memory leaks
+        return () => {
+            socket.off('activeCustomer')
+            socket.off('activeSeller')
+        }
+    }, [dispatch]) // Add dispatch as dependency
 
     const [showSidebar, setShowSidebar] = useState(false)
 

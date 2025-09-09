@@ -39,7 +39,10 @@ const Login = () => {
             toast.success(successMessage)
             dispatch(messageClear()) 
             console.log('Navigating to seller dashboard...')
-            navigate('/seller/dashboard') 
+            // Use setTimeout to ensure navigation happens after the current render cycle
+            setTimeout(() => {
+                navigate('/seller/dashboard', { replace: true })
+            }, 100)
         }
         if (errorMessage) {
             toast.error(errorMessage)
@@ -47,7 +50,7 @@ const Login = () => {
         }
         
 
-    },[successMessage,errorMessage])
+    },[successMessage,errorMessage, dispatch, navigate])
 
 
     return (

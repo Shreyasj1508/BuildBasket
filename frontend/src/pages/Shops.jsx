@@ -53,41 +53,66 @@ const Shops = () => {
 
     const [sortPrice, setSortPrice] = useState('')
     const [category, setCategory] = useState(urlCategory)
+    const [isLoading, setIsLoading] = useState(false)
     const queryCategory = (e, value) => {
         if (e.target.checked) {
             setCategory(value)
+            setPageNumber(1) // Reset to first page when changing category
         } else {
             setCategory('')
+            setPageNumber(1) // Reset to first page when clearing category
         }
     }
 
+    // Clear all filters function
+    const clearAllFilters = () => {
+        setCategory('')
+        setRating('')
+        setSortPrice('')
+        setState({values: [priceRange.low, priceRange.high]})
+        setPageNumber(1)
+    }
+
+    // Clear individual filters
+    const clearCategoryFilter = () => {
+        setCategory('')
+        setPageNumber(1)
+    }
+
+    const clearRatingFilter = () => {
+        setRating('')
+        setPageNumber(1)
+    }
+
+    const clearSortFilter = () => {
+        setSortPrice('')
+        setPageNumber(1)
+    }
+
     useEffect(() => { 
+        setIsLoading(true)
+        const queryParams = {
+            low: state.values[0],
+            high: state.values[1],
+            category: category || '',
+            rating: rating || '',
+            sortPrice: sortPrice || '',
+            pageNumber,
+            searchValue: urlSearch || ''
+        }
+        
+        // console.log('Querying products with params:', queryParams)
+        
         dispatch(
-            query_products({
-                low: state.values[0],
-                high: state.values[1],
-                category,
-                rating,
-                sortPrice,
-                pageNumber,
-                searchValue: urlSearch
-            })
-         )
+            query_products(queryParams)
+         ).finally(() => {
+             setIsLoading(false)
+         })
     },[state.values[0],state.values[1],category,rating,sortPrice,pageNumber,urlSearch])
 
     const resetRating = () => {
         setRating('')
-        dispatch(
-            query_products({
-                low: state.values[0],
-                high: state.values[1],
-                category,
-                rating: '',
-                sortPrice,
-                pageNumber,
-                searchValue: urlSearch
-            })
-         )
+        setPageNumber(1) // Reset to first page when clearing rating
     }
     
 
@@ -122,10 +147,27 @@ const Shops = () => {
                     <h2 className='text-3xl font-bold mb-3 text-slate-600'>Category </h2>
         <div className='py-2'>
             {
-                categorys.map((c,i) => <div key={i} className='flex justify-start items-center gap-2 py-1'>
-                    <input checked={category === c.name ? true : false} onChange={(e)=>queryCategory(e,c.name)} type="checkbox" id={c.name} />
-                    <label className='text-slate-600 block cursor-pointer' htmlFor={c.name}>{c.name}</label>
-                </div>)
+                categorys.map((c,i) => (
+                    <div key={i} className='flex justify-between items-center gap-2 py-2 px-2 rounded-md hover:bg-gray-50 transition-colors'>
+                        <div className='flex justify-start items-center gap-2'>
+                            <input 
+                                checked={category === c.name ? true : false} 
+                                onChange={(e)=>queryCategory(e,c.name)} 
+                                type="checkbox" 
+                                id={c.name}
+                                className='w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary focus:ring-2'
+                            />
+                            <label className='text-slate-600 block cursor-pointer font-medium' htmlFor={c.name}>
+                                {c.name}
+                            </label>
+                        </div>
+                        {category === c.name && (
+                            <span className='text-xs bg-primary text-white px-2 py-1 rounded-full'>
+                                Active
+                            </span>
+                        )}
+                    </div>
+                ))
             }
         </div>
 
@@ -209,6 +251,16 @@ const Shops = () => {
         
         <div className='py-5 flex flex-col gap-4 md:hidden'>
             <Products title='Latest Product'  products={latest_product} />
+        </div>
+
+        {/* Clear Filters Button */}
+        <div className='py-4 border-t border-gray-200'>
+            <button 
+                onClick={clearAllFilters}
+                className='w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors font-medium'
+            >
+                Clear All Filters
+            </button>
         </div> 
           </div>
 
@@ -229,8 +281,56 @@ const Shops = () => {
                         {category && (
                             <div className='flex items-center gap-2'>
                                 <span className='text-sm text-gray-500'>Category:</span>
-                                <span className='bg-primary text-white px-3 py-1 rounded-full text-sm font-medium'>
+                                <span className='bg-primary text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1'>
                                     {category}
+                                    <button 
+                                        onClick={clearCategoryFilter}
+                                        className='ml-1 hover:bg-primary-dark rounded-full p-0.5'
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            </div>
+                        )}
+                        {rating && (
+                            <div className='flex items-center gap-2'>
+                                <span className='text-sm text-gray-500'>Rating:</span>
+                                <span className='bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1'>
+                                    {rating}+ Stars
+                                    <button 
+                                        onClick={clearRatingFilter}
+                                        className='ml-1 hover:bg-yellow-600 rounded-full p-0.5'
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            </div>
+                        )}
+                        {sortPrice && (
+                            <div className='flex items-center gap-2'>
+                                <span className='text-sm text-gray-500'>Sort:</span>
+                                <span className='bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1'>
+                                    {sortPrice === 'low-to-high' ? 'Low to High' : 'High to Low'}
+                                    <button 
+                                        onClick={clearSortFilter}
+                                        className='ml-1 hover:bg-blue-600 rounded-full p-0.5'
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            </div>
+                        )}
+                        {(state.values[0] !== priceRange.low || state.values[1] !== priceRange.high) && (
+                            <div className='flex items-center gap-2'>
+                                <span className='text-sm text-gray-500'>Price:</span>
+                                <span className='bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1'>
+                                    ${Math.floor(state.values[0])} - ${Math.floor(state.values[1])}
+                                    <button 
+                                        onClick={() => setState({values: [priceRange.low, priceRange.high]})}
+                                        className='ml-1 hover:bg-green-600 rounded-full p-0.5'
+                                    >
+                                        ×
+                                    </button>
                                 </span>
                             </div>
                         )}
@@ -253,7 +353,51 @@ const Shops = () => {
                 </div> 
 
          <div className='pb-8'>
-                  <ShopProducts products={products} styles={styles} />  
+                  {isLoading ? (
+                      <div className='w-full flex justify-center items-center py-16'>
+                          <div className='text-center'>
+                              <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4'></div>
+                              <p className='text-gray-600'>Loading products...</p>
+                          </div>
+                      </div>
+                  ) : products && products.length > 0 ? (
+                      <ShopProducts products={products} styles={styles} />
+                  ) : (
+                      <div className='w-full flex flex-col justify-center items-center py-16'>
+                          <div className='text-center'>
+                              <div className='mb-4'>
+                                  <svg className='mx-auto h-24 w-24 text-gray-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1} d='M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4' />
+                                  </svg>
+                              </div>
+                              <h3 className='text-xl font-semibold text-gray-900 mb-2'>
+                                  {category ? `No products found in "${category}" category` : 'No products found'}
+                              </h3>
+                              <p className='text-gray-600 mb-6'>
+                                  {category 
+                                      ? `We don't have any products in the "${category}" category at the moment. Try selecting a different category or browse all products.`
+                                      : 'No products match your current filters. Try adjusting your search criteria.'
+                                  }
+                              </p>
+                              <div className='flex flex-col sm:flex-row gap-3 justify-center'>
+                                  {category && (
+                                      <button 
+                                          onClick={clearCategoryFilter}
+                                          className='px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors'
+                                      >
+                                          Clear Category Filter
+                                      </button>
+                                  )}
+                                  <button 
+                                      onClick={clearAllFilters}
+                                      className='px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors'
+                                  >
+                                      Clear All Filters
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  )}
          </div>
 
          <div>

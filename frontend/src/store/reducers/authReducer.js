@@ -34,21 +34,30 @@ export const customer_login = createAsyncThunk(
 
 const decodeToken = (token) => {
     if (token) {
-        const userInfo = jwtDecode(token)
-        return userInfo
+        try {
+            const userInfo = jwtDecode(token)
+            return userInfo
+        } catch (error) {
+            console.error('Error decoding token:', error)
+            return null
+        }
     } else {
-        return ''
+        return null
     }
 }
 // End Method 
 
-
+// Initialize userInfo once to prevent re-creation on every render
+const initialUserInfo = (() => {
+    const token = localStorage.getItem('customerToken')
+    return decodeToken(token)
+})()
 
 export const authReducer = createSlice({
     name: 'auth',
     initialState:{
         loader : false,
-        userInfo : decodeToken(localStorage.getItem('customerToken')),
+        userInfo : initialUserInfo,
         errorMessage : '',
         successMessage: '', 
     },

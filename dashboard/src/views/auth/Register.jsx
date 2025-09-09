@@ -39,7 +39,10 @@ const Register = () => {
         if (successMessage) {
             toast.success(successMessage)
             dispatch(messageClear())
-            navigate('/')  
+            // Use setTimeout to ensure navigation happens after the current render cycle
+            setTimeout(() => {
+                navigate('/', { replace: true })
+            }, 100)
         }
         if (errorMessage) {
             toast.error(errorMessage)
@@ -47,7 +50,7 @@ const Register = () => {
         }
         
 
-    },[successMessage,errorMessage])
+    },[successMessage,errorMessage, dispatch, navigate])
 
     
 
