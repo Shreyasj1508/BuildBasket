@@ -1,6 +1,7 @@
 import React from "react";
 import { FaEye, FaRegHeart } from "react-icons/fa";
 import { RiShoppingCartLine } from "react-icons/ri";
+import { Link } from "react-router-dom";
 import Rating from "../Rating";
 
 const ShopProducts = ({ styles, products }) => {
@@ -13,8 +14,9 @@ const ShopProducts = ({ styles, products }) => {
       } gap-3 `}
     >
       {products.map((p, i) => (
-        <div
+        <Link
           key={i}
+          to={`/product/details/${p.slug}`}
           className={`flex transition-all duration-1000 hover:shadow-md hover:-translate-y-3 ${
             styles === "grid"
               ? "flex-col justify-start items-start"
@@ -56,7 +58,7 @@ const ShopProducts = ({ styles, products }) => {
               </div>
             </div>
           </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

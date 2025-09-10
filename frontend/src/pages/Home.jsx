@@ -56,9 +56,13 @@ const Home = () => {
   const search = () => {
     // Build search parameters
     const params = new URLSearchParams();
+    
+    // Only include category parameter if a specific category is selected
+    // When "All Categories" is selected (empty string), don't include category parameter
     if (category && category.trim() !== "") {
       params.append("category", category);
     }
+    
     if (searchValue && searchValue.trim() !== "") {
       params.append("search", searchValue);
     }
@@ -71,15 +75,7 @@ const Home = () => {
   // Handle category selection
   const handleCategoryChange = (selectedCategory) => {
     setCategory(selectedCategory);
-    // If a category is selected, automatically navigate to shops page
-    if (selectedCategory && selectedCategory.trim() !== "") {
-      const params = new URLSearchParams();
-      params.append("category", selectedCategory);
-      if (searchValue && searchValue.trim() !== "") {
-        params.append("search", searchValue);
-      }
-      navigate(`/shops?${params.toString()}`);
-    }
+    // No automatic navigation - user must click search button to search
   };
 
   const handleKeyPress = (e) => {
