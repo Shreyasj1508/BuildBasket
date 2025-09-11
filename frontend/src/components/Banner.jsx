@@ -99,9 +99,9 @@ const Banner = () => {
                         </div>
                       </div>
                       <div className="ml-16">
-                        <img 
-                          src="/images/cement.png" 
-                          alt="Cement & Concrete" 
+                        <img
+                          src="/images/cement.png"
+                          alt="Cement & Concrete"
                           className="w-48 h-48 lg:w-64 lg:h-64 object-contain opacity-90 hover:opacity-100 transition-opacity duration-300"
                         />
                       </div>
@@ -147,9 +147,9 @@ const Banner = () => {
                         </div>
                       </div>
                       <div className="ml-8">
-                        <img 
-                          src="/images/steel.png" 
-                          alt="Steel & Iron" 
+                        <img
+                          src="/images/steel.png"
+                          alt="Steel & Iron"
                           className="w-48 h-48 lg:w-64 lg:h-64 object-contain opacity-90 hover:opacity-100 transition-opacity duration-300"
                         />
                       </div>
@@ -195,9 +195,9 @@ const Banner = () => {
                         </div>
                       </div>
                       <div className="ml-8">
-                        <img 
-                          src="/images/bricks.png" 
-                          alt="Bricks & Blocks" 
+                        <img
+                          src="/images/bricks.png"
+                          alt="Bricks & Blocks"
                           className="w-48 h-48 lg:w-64 lg:h-64 object-contain opacity-90 hover:opacity-100 transition-opacity duration-300"
                         />
                       </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { FaEye, FaRegHeart } from "react-icons/fa";
+import { FaEye, FaRegHeart, FaChartLine } from "react-icons/fa";
 import { RiShoppingCartLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import Rating from "../Rating";
@@ -46,6 +46,9 @@ const ShopProducts = ({ styles, products }) => {
               <li className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md">
                 <RiShoppingCartLine />
               </li>
+              <Link to={`/price-detail/${p._id}`} className="w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md">
+                <FaChartLine />
+              </Link>
             </ul>
           </div>
 

@@ -33,9 +33,32 @@ const Login = () => {
     });
   };
 
-  const login = (e) => {
+  const login = async (e) => {
     e.preventDefault();
-    dispatch(customer_login(state));
+
+    // Basic validation
+    if (!state.email || !state.password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(state.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    // Clear previous messages
+    dispatch(messageClear());
+
+    // Dispatch login action
+    try {
+      await dispatch(customer_login(state)).unwrap();
+    } catch (error) {
+      // Show backend error if available
+      toast.error(error?.error || error?.message || "Login failed");
+    }
   };
 
   const handleSectionChange = (section) => {
@@ -55,11 +78,11 @@ const Login = () => {
       // Get redirect URL from query parameters
       const searchParams = new URLSearchParams(location.search);
       const redirectUrl = searchParams.get('redirect');
-      
+
       // Navigate to redirect URL or default to home
       navigate(redirectUrl || "/");
     }
-  }, [successMessage, errorMessage]);
+  }, [successMessage, errorMessage, userInfo, dispatch, navigate, location.search]);
 
   return (
     <div>

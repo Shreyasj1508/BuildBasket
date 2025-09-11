@@ -28,6 +28,8 @@ import Wishlist from "./components/dashboard/Wishlist";
 import OrderDetails from "./components/dashboard/OrderDetails";
 import Chat from "./components/dashboard/Chat";
 import ConfirmOrder from "./pages/ConfirmOrder";
+import PriceDetail from "./pages/PriceDetail";
+import PriceHistory from "./pages/PriceHistory";
 import ReduxErrorBoundary from "./components/ReduxErrorBoundary";
 
 function App() {
@@ -74,6 +76,8 @@ function App() {
           <Route path="/products?" element={<CategoryShop />} />
           <Route path="/products/search?" element={<SearchProducts />} />
           <Route path="/product/details/:slug" element={<Details />} />
+          <Route path="/price-detail/:productId" element={<PriceDetail />} />
+          <Route path="/price-history/:productId" element={<PriceHistory />} />
           <Route path="/order/confirm?" element={<ConfirmOrder />} />
 
           <Route path="/dashboard" element={<ProtectUser />}>

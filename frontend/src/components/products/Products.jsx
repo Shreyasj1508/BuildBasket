@@ -3,6 +3,7 @@ import Carousel from 'react-multi-carousel';
 import { Link } from 'react-router-dom';
 import 'react-multi-carousel/lib/styles.css' 
 import { IoIosArrowBack,IoIosArrowForward } from "react-icons/io";
+import { FaChartLine } from "react-icons/fa";
   
 const Products = ({title, products = []}) => {
     
@@ -61,13 +62,18 @@ const Products = ({title, products = []}) => {
             return(
                 <div key={i} className='flex flex-col justify-start gap-2'>
                {
-                p.map((pl, j) =>  <Link key={j} className='flex justify-start items-start' to='#'>
+                p.map((pl, j) =>  <div key={j} className='flex justify-start items-start relative group'>
+                <Link className='flex justify-start items-start flex-1' to='#'>
                 <img className='w-[110px] h-[110px]' src={pl.images[0]} alt="" />
                 <div className='px-3 flex justify-start items-start gap-1 flex-col text-slate-600'>
                     <h2>{pl.name} </h2>
                     <span className='text-lg font-bold'>${pl.price}</span> 
                 </div>  
-            </Link>
+                </Link>
+                <Link to={`/price-detail/${pl._id}`} className='absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-primary hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100'>
+                    <FaChartLine className='text-sm' />
+                </Link>
+            </div>
                  )
                }
             </div>   

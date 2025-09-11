@@ -299,6 +299,25 @@ get_reviews = async (req, res) => {
 }
 // end method
 
+get_product_by_id = async (req, res) => {
+    const {productId} = req.params
+    try {
+        const product = await productModel.findById(productId).populate('category')
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            })
+        }
+        res.status(200).json({
+            success: true,
+            product
+        })
+    } catch (error) {
+        responseReturn(res,500,{error: error.message})
+    }
+}
+// end method
 
 }
 

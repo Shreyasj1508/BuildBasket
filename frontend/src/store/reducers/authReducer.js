@@ -11,7 +11,7 @@ export const customer_register = createAsyncThunk(
            // console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            return rejectWithValue(error.response.data)
+            return rejectWithValue(error.response?.data || { error: 'Registration failed' })
         }
     }
 )
@@ -23,10 +23,10 @@ export const customer_login = createAsyncThunk(
         try {
             const {data} = await api.post('/customer/customer-login',info)
             localStorage.setItem('customerToken',data.token)
-           // console.log(data) 
+           // console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            return rejectWithValue(error.response.data)
+            return rejectWithValue(error.response?.data || { error: 'Login failed' })
         }
     }
 )
@@ -78,7 +78,7 @@ export const authReducer = createSlice({
             state.loader = true;
         })
         .addCase(customer_register.rejected, (state, { payload }) => {
-            state.errorMessage = payload.error;
+            state.errorMessage = payload?.error || payload?.message || 'Registration failed';
             state.loader = false;
         })
         .addCase(customer_register.fulfilled, (state, { payload }) => {
@@ -92,7 +92,7 @@ export const authReducer = createSlice({
             state.loader = true;
         })
         .addCase(customer_login.rejected, (state, { payload }) => {
-            state.errorMessage = payload.error;
+            state.errorMessage = payload?.error || payload?.message || 'Login failed';
             state.loader = false;
         })
         .addCase(customer_login.fulfilled, (state, { payload }) => {

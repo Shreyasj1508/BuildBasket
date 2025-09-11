@@ -10,6 +10,8 @@ const sellerModel = require('../models/sellerModel');
 const sellerCustomerModel = require('../models/chat/sellerCustomerModel');
 const customerModel = require('../models/customerModel');
 
+const priceDetailModel = require('../models/priceDetailModel');
+
 const seedData = async () => {
     console.log('🌱 Starting database seeding...');
     try {
@@ -2266,6 +2268,54 @@ const seedData = async () => {
         console.log(`   - ${sellers.length} Sellers`);
         console.log('   - 1 Admin');
         console.log(`   - ${customers.length} Customers`);
+
+        // Create Price Details for Products
+        console.log('📊 Creating price details for products...');
+        const allProducts = await productModel.find({});
+        
+        for (const product of allProducts) {
+            // Generate sample price history
+            const priceHistory = [];
+            const basePrice = product.price;
+            const currentDate = new Date();
+            
+            for (let i = 30; i >= 0; i--) {
+                const date = new Date(currentDate);
+                date.setDate(date.getDate() - i);
+                
+                const variation = (Math.random() - 0.5) * 0.15; // ±7.5% variation
+                const price = Math.round(basePrice * (1 + variation));
+                const change = i === 0 ? 0 : price - (priceHistory[priceHistory.length - 1]?.price || basePrice);
+                const changePercent = i === 0 ? 0 : ((change / (priceHistory[priceHistory.length - 1]?.price || basePrice)) * 100);
+                
+                priceHistory.push({
+                    price,
+                    date,
+                    change,
+                    changePercent: Math.round(changePercent * 100) / 100
+                });
+            }
+
+            const currentPrice = priceHistory[priceHistory.length - 1].price;
+            const weeklyChange = currentPrice - priceHistory[priceHistory.length - 7].price;
+            const monthlyChange = currentPrice - priceHistory[0].price;
+            
+            await priceDetailModel.create({
+                productId: product._id,
+                currentPrice,
+                priceHistory,
+                marketTrend: weeklyChange > 0 ? 'up' : weeklyChange < 0 ? 'down' : 'stable',
+                priceRange: {
+                    min: Math.min(...priceHistory.map(p => p.price)),
+                    max: Math.max(...priceHistory.map(p => p.price))
+                },
+                weeklyChange,
+                monthlyChange
+            });
+        }
+        
+        console.log(`   - ${allProducts.length} Price Details`);
+
         console.log('');
         console.log('🚀 You can now start testing the application!');
 

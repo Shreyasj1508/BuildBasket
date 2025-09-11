@@ -148,49 +148,49 @@ export const cardReducer = createSlice({
         builder
          
         .addCase(add_to_card.rejected, (state, { payload }) => {
-            state.errorMessage = payload.error; 
+            state.errorMessage = payload?.error || 'Something went wrong'; 
         })
         .addCase(add_to_card.fulfilled, (state, { payload }) => { 
-            state.successMessage = payload.message; 
+            state.successMessage = payload?.message || 'Product added to cart'; 
             state.card_product_count = state.card_product_count + 1
         })
 
         .addCase(get_card_products.fulfilled, (state, { payload }) => { 
-            state.card_products = payload.card_products; 
-            state.price = payload.price
-            state.card_product_count = payload.card_product_count
-            state.shipping_fee = payload.shipping_fee
-            state.outofstock_products = payload.outOfStockProduct
-            state.buy_product_item = payload.buy_product_item 
+            state.card_products = payload?.card_products || []; 
+            state.price = payload?.price || 0
+            state.card_product_count = payload?.card_product_count || 0
+            state.shipping_fee = payload?.shipping_fee || 0
+            state.outofstock_products = payload?.outOfStockProduct || []
+            state.buy_product_item = payload?.buy_product_item || 0
         })
 
         .addCase(delete_card_product.fulfilled, (state, { payload }) => { 
-            state.successMessage = payload.message;  
+            state.successMessage = payload?.message || 'Product removed from cart';  
         })
         .addCase(quantity_inc.fulfilled, (state, { payload }) => { 
-            state.successMessage = payload.message;  
+            state.successMessage = payload?.message || 'Quantity increased';  
         })
         .addCase(quantity_dec.fulfilled, (state, { payload }) => { 
-            state.successMessage = payload.message;  
+            state.successMessage = payload?.message || 'Quantity decreased';  
         })
 
         .addCase(add_to_wishlist.rejected, (state, { payload }) => {
-            state.errorMessage = payload.error; 
+            state.errorMessage = payload?.error || 'Something went wrong'; 
         })
         .addCase(add_to_wishlist.fulfilled, (state, { payload }) => { 
-            state.successMessage = payload.message; 
+            state.successMessage = payload?.message || 'Product added to wishlist'; 
             state.wishlist_count = state.wishlist_count > 0 ? state.wishlist_count + 1 : 1   
             
         })
 
         .addCase(get_wishlist_products.fulfilled, (state, { payload }) => { 
-            state.wishlist = payload.wishlists; 
-            state.wishlist_count = payload.wishlistCount 
+            state.wishlist = payload?.wishlists || []; 
+            state.wishlist_count = payload?.wishlistCount || 0
         })
 
         .addCase(remove_wishlist.fulfilled, (state, { payload }) => { 
-            state.successMessage = payload.message; 
-            state.wishlist = state.wishlist.filter(p => p._id !== payload.wishlistId); 
+            state.successMessage = payload?.message || 'Product removed from wishlist'; 
+            state.wishlist = state.wishlist.filter(p => p._id !== payload?.wishlistId); 
             state.wishlist_count = state.wishlist_count - 1
         })
         

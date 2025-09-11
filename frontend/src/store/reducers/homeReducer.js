@@ -28,9 +28,8 @@ export const get_products = createAsyncThunk(
         }
     }
 )
+
 // End Method 
-
-
 export const price_range_product = createAsyncThunk(
     'product/price_range_product',
     async(_, { fulfillWithValue }) => {
@@ -43,7 +42,9 @@ export const price_range_product = createAsyncThunk(
         }
     }
 )
+
 // End Method 
+
 
 export const query_products = createAsyncThunk(
     'product/query_products',
@@ -70,9 +71,10 @@ export const product_details = createAsyncThunk(
             console.log(error.response)
         }
     }
-)
-// End Method 
 
+)
+
+// End Method 
 export const customer_review = createAsyncThunk(
     'review/customer_review',
     async(info, { fulfillWithValue }) => {
@@ -85,8 +87,8 @@ export const customer_review = createAsyncThunk(
         }
     }
 )
-// End Method 
 
+// End Method 
 
 export const get_reviews = createAsyncThunk(
     'review/get_reviews',
@@ -156,46 +158,46 @@ export const homeReducer = createSlice({
     extraReducers: (builder) => {
         builder
         .addCase(get_category.fulfilled, (state, { payload }) => {
-            state.categorys = payload.categorys;
+            state.categorys = payload?.categorys || [];
         })
         .addCase(get_products.fulfilled, (state, { payload }) => {
-            state.products = payload.products || [];
-            state.latest_product = payload.latest_product || [];
-            state.topRated_product = payload.topRated_product || [];
-            state.discount_product = payload.discount_product || [];
+            state.products = payload?.products || [];
+            state.latest_product = payload?.latest_product || [];
+            state.topRated_product = payload?.topRated_product || [];
+            state.discount_product = payload?.discount_product || [];
         })
         .addCase(get_products.rejected, (state, { payload }) => {
             console.error('Failed to fetch products:', payload);
             state.errorMessage = 'Failed to load products';
         })
         .addCase(price_range_product.fulfilled, (state, { payload }) => { 
-            state.latest_product = payload.latest_product;
-            state.priceRange = payload.priceRange; 
+            state.latest_product = payload?.latest_product || [];
+            state.priceRange = payload?.priceRange || { low: 0, high: 100000 }; 
         })
         .addCase(query_products.fulfilled, (state, { payload }) => { 
-            state.products = payload.products;
-            state.totalProduct = payload.totalProduct;
-            state.parPage = payload.parPage; 
+            state.products = payload?.products || [];
+            state.totalProduct = payload?.totalProduct || 0;
+            state.parPage = payload?.parPage || 10; 
         })
 
         .addCase(product_details.fulfilled, (state, { payload }) => { 
-            state.product = payload.product;
-            state.relatedProducts = payload.relatedProducts;
-            state.moreProducts = payload.moreProducts; 
+            state.product = payload?.product || {};
+            state.relatedProducts = payload?.relatedProducts || [];
+            state.moreProducts = payload?.moreProducts || []; 
         })
 
         .addCase(customer_review.fulfilled, (state, { payload }) => {
-            state.successMessage = payload.message;
+            state.successMessage = payload?.message || 'Review submitted successfully';
         })
 
         .addCase(get_reviews.fulfilled, (state, { payload }) => {
-            state.reviews = payload.reviews;
-            state.totalReview = payload.totalReview;
-            state.rating_review = payload.rating_review;
+            state.reviews = payload?.reviews || [];
+            state.totalReview = payload?.totalReview || 0;
+            state.rating_review = payload?.rating_review || {};
         })
 
         .addCase(get_banners.fulfilled, (state, { payload }) => {
-            state.banners = payload.banners || []; 
+            state.banners = payload?.banners || []; 
         })
         .addCase(get_banners.rejected, (state, { payload }) => {
             console.error('Failed to fetch banners:', payload);

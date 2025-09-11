@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FaEye, FaRegHeart } from "react-icons/fa";
+import { FaEye, FaRegHeart, FaChartLine } from "react-icons/fa";
 import { RiShoppingCartLine } from "react-icons/ri";
 import Rating from '../Rating';
 import { Link, useNavigate } from 'react-router-dom';
@@ -9,7 +9,6 @@ import toast from 'react-hot-toast';
 import { useAuthState, useCardState } from '../../hooks/useSafeSelector';
 
 const FeatureProducts = ({products = []}) => {
-
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const {userInfo} = useAuthState()
@@ -72,7 +71,7 @@ const FeatureProducts = ({products = []}) => {
             p.discount ? <div className='flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2'>{p.discount}% </div> : ''
         }
 
-        <img className='sm:w-full w-full h-[240px]' src={p.images[0]} alt="" />  
+    <img className='sm:w-full w-full h-full max-w-[350px]  mx-auto object-cover rounded-lg' src={p.images[0]} alt="" />  
 
         <ul className='flex transition-all duration-700 -bottom-10 justify-center items-center gap-2 absolute w-full group-hover:bottom-3'>
             <li onClick={() => add_wishlist(p)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md'>
@@ -83,6 +82,9 @@ const FeatureProducts = ({products = []}) => {
             </Link> 
             <li onClick={() => add_card(p._id)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md'>
             <RiShoppingCartLine />
+            </li>
+            <li onClick={() => navigate(`/price-history/${p._id}`)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md'>
+            <FaChartLine />
             </li>
         </ul>    
             </div>
@@ -106,7 +108,6 @@ const FeatureProducts = ({products = []}) => {
     }
 
         </div>
-
             
         </div>
     );

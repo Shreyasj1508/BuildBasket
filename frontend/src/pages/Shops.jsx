@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
+import FeatureProducts from "../components/products/FeatureProducts";
 import Footer from "../components/Footer";
 import { Link, useLocation } from "react-router-dom";
 import { IoIosArrowForward } from "react-icons/io";
@@ -9,7 +10,7 @@ import { CiStar } from "react-icons/ci";
 import Products from "../components/products/Products";
 import { BsFillGridFill } from "react-icons/bs";
 import { FaThList } from "react-icons/fa";
-import ShopProducts from "../components/products/ShopProducts";
+import ShopProductsWithGraph from "../components/products/ShopProductsWithGraph";
 import Pagination from "../components/Pagination";
 import { useDispatch } from "react-redux";
 import {
@@ -52,7 +53,6 @@ const Shops = () => {
   }, [urlCategory]);
 
   const [filter, setFilter] = useState(true);
-
   const [state, setState] = useState({
     values: [priceRange.low, priceRange.high],
   });
@@ -501,7 +501,7 @@ const Shops = () => {
                       </div>
                     </div>
                   ) : products && products.length > 0 ? (
-                    <ShopProducts products={products} styles={styles} />
+                    <FeatureProducts products={products} />
                   ) : (
                     <div className="w-full flex flex-col justify-center items-center py-16">
                       <div className="text-center">

@@ -35,38 +35,38 @@ class customerAuthController{
                 responseReturn(res,201,{message: "User Register Success", token})
             }
         } catch (error) {
-            console.log(error.message)
+            console.log('Registration error:', error.message)
+            responseReturn(res, 500, { error: 'Server error occurred during registration' })
         }
     }
     // End Method
 
     customer_login = async(req, res) => {
-       const { email, password } =req.body
+       const { email, password } = req.body;
        try {
-        const customer = await customerModel.findOne({email}).select('+password')
+        const customer = await customerModel.findOne({email}).select('+password');
         if (customer) {
-            const match = await bcrypt.compare(password, customer.password)
+            const match = await bcrypt.compare(password, customer.password);
             if (match) {
                 const token = await createToken({
                     id : customer._id,
                     name: customer.name,
                     email: customer.email,
                     method: customer.method 
-                })
+                });
                 res.cookie('customerToken',token,{
                     expires : new Date(Date.now() + 7*24*60*60*1000 )
-                })
-                responseReturn(res, 201,{ message :  'User Login Success',token})
-                
+                });
+                responseReturn(res, 201,{ message :  'User Login Success',token});
             } else {
-                responseReturn(res, 404,{ error :  'Password Wrong'})
+                responseReturn(res, 404,{ error :  'Password Wrong'});
             }
         } else {
-            responseReturn(res, 404,{ error :  'Email Not Found'})
+            responseReturn(res, 404,{ error :  'Email Not Found'});
         }
-        
        } catch (error) {
-        console.log(error.message)
+        console.error('Login error:', error);
+        responseReturn(res, 500, { error: `Server error occurred during login: ${error.message}` });
        }
     }
   // End Method
