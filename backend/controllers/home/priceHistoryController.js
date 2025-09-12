@@ -27,12 +27,22 @@ class priceHistoryController {
             // Calculate additional metrics
             const metrics = this.calculateMetrics(filteredData, priceHistory.currentPrice);
 
-            responseReturn(res, 200, { 
-                message: 'Price history retrieved successfully',
+            // Flatten metrics into priceHistory object for frontend compatibility
+            const phObj = priceHistory.toObject();
+            // Ensure priceRange is always present
+            const safePriceRange = phObj.priceRange && typeof phObj.priceRange === 'object'
+                ? phObj.priceRange
+                : { min: 0, max: 0, avg: 0 };
+            responseReturn(res, 200, {
+                success: true,
                 priceHistory: {
-                    ...priceHistory.toObject(),
                     priceHistory: filteredData,
-                    metrics
+                    currentPrice: phObj.currentPrice,
+                    marketTrend: phObj.marketTrend,
+                    changes: phObj.changes,
+                    priceRange: safePriceRange,
+                    marketIndicators: phObj.marketIndicators,
+                    ...metrics // add metrics if needed
                 }
             });
 

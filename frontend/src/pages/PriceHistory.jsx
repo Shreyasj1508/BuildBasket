@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import PriceGraph from '../components/PriceGraph';
+import PriceRangeDetails from '../components/PriceRangeDetails';
 import { FaArrowLeft, FaChartLine, FaRupeeSign, FaCalendarAlt } from 'react-icons/fa';
 import { get_products } from '../store/reducers/homeReducer';
 import api from '../api/api';
@@ -41,6 +42,22 @@ const PriceHistory = () => {
         return () => clearTimeout(timeout);
     }, [productId, products, dispatch]);
 
+
+    const fetchProductFromAPI = React.useCallback(async () => {
+        try {
+            const { data } = await api.get(`/home/product-by-id/${productId}`);
+            if (data.success) {
+                setProduct(data.product);
+            } else {
+                console.error('Product not found via API:', data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching product from API:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [productId]);
+
     // Update product when products are loaded
     useEffect(() => {
         if (products && products.length > 0 && !product) {
@@ -54,23 +71,7 @@ const PriceHistory = () => {
                 fetchProductFromAPI();
             }
         }
-    }, [products, productId, product]);
-
-    const fetchProductFromAPI = async () => {
-        try {
-            const { data } = await api.get(`/home/product-by-id/${productId}`);
-            
-            if (data.success) {
-                setProduct(data.product);
-            } else {
-                console.error('Product not found via API:', data.message);
-            }
-        } catch (error) {
-            console.error('Error fetching product from API:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    }, [products, productId, product, fetchProductFromAPI]);
 
     if (loading) {
         return (
@@ -176,44 +177,23 @@ const PriceHistory = () => {
                     </div>
                 </div>
 
+
                 {/* Price Graph Section */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center space-x-3">
-                            <FaChartLine className="text-primary text-xl" />
-                            <h3 className="text-xl font-semibold text-gray-900">Price Trend Analysis</h3>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
-                            <FaCalendarAlt />
-                            <span>Last updated: {new Date().toLocaleDateString()}</span>
-                        </div>
-                    </div>
-                    
+                    {/* Removed Price Trend Analysis and Last updated */}
                     <PriceGraph
                         productId={productId}
                         productName={product.name}
                         onClose={() => {}} // No close functionality needed on this page
                     />
-                </div>
-
-                {/* Additional Info */}
-                <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0">
-                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                <FaChartLine className="text-blue-600 text-sm" />
-                            </div>
-                        </div>
-                        <div>
-                            <h4 className="text-sm font-semibold text-blue-900 mb-1">Price History Information</h4>
-                            <p className="text-sm text-blue-700">
-                                This graph shows the historical price data for {product.name}. 
-                                You can view price trends over different time periods (7 days, 1 month, 3 months, 6 months, 1 year) 
-                                to make informed purchasing decisions.
-                            </p>
-                        </div>
+                    {/* Price Range Details */}
+                    <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h4 className="text-md font-semibold text-gray-800 mb-2">Price Range</h4>
+                        <PriceRangeDetails productId={productId} />
                     </div>
                 </div>
+
+                {/* Additional Info Removed */}
             </div>
 
             <Footer />

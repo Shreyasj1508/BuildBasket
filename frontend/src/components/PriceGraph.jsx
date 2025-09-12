@@ -11,7 +11,7 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { FaChartLine, FaArrowUp, FaArrowDown, FaMinus, FaRupeeSign, FaCalendarAlt } from 'react-icons/fa';
+import { FaChartLine, FaRupeeSign, FaCalendarAlt } from 'react-icons/fa';
 import api from '../api/api';
 
 ChartJS.register(
@@ -27,8 +27,9 @@ ChartJS.register(
 
 const PriceGraph = ({ productId, productName, onClose }) => {
   const [priceData, setPriceData] = useState(null);
+  
   const [loading, setLoading] = useState(true);
-  const [selectedPeriod, setSelectedPeriod] = useState('1M');
+  const [selectedPeriod, setSelectedPeriod] = useState('7D');
   const [error, setError] = useState(null);
 
   const periods = [
@@ -39,64 +40,56 @@ const PriceGraph = ({ productId, productName, onClose }) => {
     { key: '1Y', label: '1 Year', days: 365 }
   ];
 
-  useEffect(() => {
-    fetchPriceData();
-  }, [productId, selectedPeriod]);
 
-  const fetchPriceData = async () => {
+  // Fetch price data for selected product and period
+  const fetchPriceData = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const { data } = await api.get(`/home/price-history/${productId}?period=${selectedPeriod}`);
-      
       if (data.success) {
         setPriceData(data.priceHistory.priceHistory);
       } else {
         setError(data.message || 'Failed to fetch price data');
       }
     } catch (error) {
-      console.error('Error fetching price data:', error);
       setError('Failed to fetch price data');
     } finally {
       setLoading(false);
     }
-  };
+  }, [productId, selectedPeriod]);
 
+  // Refetch data when product or period changes
+  useEffect(() => {
+    fetchPriceData();
+  }, [fetchPriceData]);
+
+  // Format price as INR currency
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(price);
   };
 
-  const getTrendIcon = (trend) => {
-    switch (trend) {
-      case 'up':
-        return <FaArrowUp className="text-green-500" />;
-      case 'down':
-        return <FaArrowDown className="text-red-500" />;
-      default:
-        return <FaMinus className="text-gray-500" />;
-    }
-  };
 
-  const getTrendColor = (trend) => {
-    switch (trend) {
-      case 'up':
-        return 'text-green-500';
-      case 'down':
-        return 'text-red-500';
-      default:
-        return 'text-gray-500';
-    }
-  };
-
+  // Prepare chart data for Chart.js
   const getChartData = () => {
     if (!priceData) return null;
 
-    const data = priceData;
+    let data = priceData;
+    // Sample data for longer periods to reduce points
+    if (Array.isArray(data)) {
+      let step = 1;
+      if (selectedPeriod === '3M') step = 3; // every 3rd day
+      if (selectedPeriod === '6M') step = 7; // every 7th day
+      if (selectedPeriod === '1Y') step = 15; // every 15th day
+      if (step > 1) {
+        data = data.filter((_, idx) => idx % step === 0 || idx === data.length - 1);
+      }
+    }
     const trend = priceData.marketTrend || 'stable';
     
     // Determine colors based on trend
@@ -154,11 +147,14 @@ const PriceGraph = ({ productId, productName, onClose }) => {
         borderWidth: 1,
         callbacks: {
           label: function(context) {
-            const item = priceData.priceHistory[context.dataIndex];
+            const item = priceData?.priceHistory?.[context.dataIndex];
+            if (!item) {
+              return [`Price: ${formatPrice(context.parsed.y)}`];
+            }
             return [
               `Price: ${formatPrice(context.parsed.y)}`,
               `Change: ${item.change >= 0 ? '+' : ''}${formatPrice(item.change)}`,
-              `Change %: ${item.changePercent >= 0 ? '+' : ''}${item.changePercent.toFixed(2)}%`
+              `Change %: ${item.changePercent >= 0 ? '+' : ''}${item.changePercent?.toFixed(2) ?? '0.00'}%`
             ];
           }
         }
@@ -216,8 +212,8 @@ const PriceGraph = ({ productId, productName, onClose }) => {
 
   if (error) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <>
+        <div className="bg-white rounded-2xl p-8 max-w-4xl w-full mx-4 my-8 shadow-md">
           <div className="text-center">
             <div className="text-red-500 text-6xl mb-4">⚠️</div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Price Data</h2>
@@ -229,84 +225,45 @@ const PriceGraph = ({ productId, productName, onClose }) => {
               >
                 Try Again
               </button>
-              <button
-                onClick={onClose}
-                className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors"
-              >
-                Close
-              </button>
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-8 max-w-6xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-3">
-            <FaChartLine className="text-2xl text-primary" />
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">{productName}</h2>
-              <p className="text-gray-600">Price History & Market Analysis</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
-          >
-            ×
-          </button>
-        </div>
-
-        {/* Current Price & Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center space-x-2 mb-2">
+    <>
+      <div className="bg-white rounded-2xl p-8 max-w-6xl w-full mx-4 my-4 shadow-md">
+        {/* Current Price Only */}
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-2">
+          <div className="bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-2">
               <FaRupeeSign className="text-primary" />
               <span className="text-sm text-gray-600">Current Price</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
-              {formatPrice(priceData.currentPrice)}
-            </div>
+              <div className="flex items-center space-x-4">
+                <span className="text-2xl font-bold text-gray-900">
+                  {Array.isArray(priceData) && priceData.length > 0
+                    ? formatPrice(priceData[priceData.length - 1].price)
+                    : formatPrice(0)}
+                </span>
+                <span className="text-xs text-gray-500">
+                  Last updated: {
+                    Array.isArray(priceData) && priceData.length > 0 && priceData[priceData.length - 1].date
+                      ? new Date(priceData[priceData.length - 1].date).toLocaleDateString('en-IN')
+                      : 'N/A'
+                  }
+                </span>
+              </div>
           </div>
+        </div>
 
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              {getTrendIcon(priceData.marketTrend)}
-              <span className="text-sm text-gray-600">Market Trend</span>
-            </div>
-            <div className={`text-lg font-semibold capitalize ${getTrendColor(priceData.marketTrend)}`}>
-              {priceData.marketTrend}
-            </div>
-          </div>
-
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <FaCalendarAlt className="text-primary" />
-              <span className="text-sm text-gray-600">Weekly Change</span>
-            </div>
-            <div className={`text-lg font-semibold ${
-              (priceData.changes?.weekly?.value || 0) >= 0 ? 'text-green-500' : 'text-red-500'
-            }`}>
-              {(priceData.changes?.weekly?.value || 0) >= 0 ? '+' : ''}{formatPrice(priceData.changes?.weekly?.value || 0)}
-            </div>
-          </div>
-
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <FaArrowUp className="text-primary" />
-              <span className="text-sm text-gray-600">Monthly Change</span>
-            </div>
-            <div className={`text-lg font-semibold ${
-              (priceData.changes?.monthly?.value || 0) >= 0 ? 'text-green-500' : 'text-red-500'
-            }`}>
-              {(priceData.changes?.monthly?.value || 0) >= 0 ? '+' : ''}{formatPrice(priceData.changes?.monthly?.value || 0)}
-            </div>
-          </div>
+        {/* Chart */}
+        <div className="h-96 mb-6">
+          {getChartData() && (
+            <Line data={getChartData()} options={chartOptions} />
+          )}
         </div>
 
         {/* Period Selector */}
@@ -326,84 +283,48 @@ const PriceGraph = ({ productId, productName, onClose }) => {
           ))}
         </div>
 
-        {/* Chart */}
-        <div className="h-96 mb-6">
-          {getChartData() && (
-            <Line data={getChartData()} options={chartOptions} />
-          )}
-        </div>
-
-        {/* Price Range & Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Price Range for selected period */}
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="font-semibold text-gray-900 mb-2">Price Range</h3>
             <div className="space-y-1">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Highest:</span>
-                <span className="font-semibold">{formatPrice(priceData.priceRange.max)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Lowest:</span>
-                <span className="font-semibold">{formatPrice(priceData.priceRange.min)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Average:</span>
-                <span className="font-semibold">{formatPrice(priceData.priceRange.avg)}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-gray-900 mb-2">Market Indicators</h3>
-            <div className="space-y-1">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Volatility:</span>
-                <span className="font-semibold">{priceData.marketIndicators?.volatility?.toFixed(2) || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Support:</span>
-                <span className="font-semibold">{formatPrice(priceData.marketIndicators?.supportLevel || 0)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Resistance:</span>
-                <span className="font-semibold">{formatPrice(priceData.marketIndicators?.resistanceLevel || 0)}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-gray-900 mb-2">Time Period Changes</h3>
-            <div className="space-y-1">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Daily:</span>
-                <span className={`font-semibold ${
-                  priceData.changes.daily.value >= 0 ? 'text-green-500' : 'text-red-500'
-                }`}>
-                  {priceData.changes.daily.value >= 0 ? '+' : ''}{formatPrice(priceData.changes.daily.value)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Quarterly:</span>
-                <span className={`font-semibold ${
-                  priceData.changes.quarterly.value >= 0 ? 'text-green-500' : 'text-red-500'
-                }`}>
-                  {priceData.changes.quarterly.value >= 0 ? '+' : ''}{formatPrice(priceData.changes.quarterly.value)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Yearly:</span>
-                <span className={`font-semibold ${
-                  priceData.changes.yearly.value >= 0 ? 'text-green-500' : 'text-red-500'
-                }`}>
-                  {priceData.changes.yearly.value >= 0 ? '+' : ''}{formatPrice(priceData.changes.yearly.value)}
-                </span>
-              </div>
+              {Array.isArray(priceData) && priceData.length > 0 ? (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Highest:</span>
+                    <span className="font-semibold">{formatPrice(Math.max(...priceData.map(item => item.price)))}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Lowest:</span>
+                    <span className="font-semibold">{formatPrice(Math.min(...priceData.map(item => item.price)))}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Average:</span>
+                    <span className="font-semibold">{formatPrice(priceData.reduce((sum, item) => sum + item.price, 0) / priceData.length)}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Highest:</span>
+                    <span className="font-semibold">{formatPrice(0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Lowest:</span>
+                    <span className="font-semibold">{formatPrice(0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Average:</span>
+                    <span className="font-semibold">{formatPrice(0)}</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-};
+}
 
 export default PriceGraph;
