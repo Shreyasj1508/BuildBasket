@@ -300,6 +300,30 @@ const Header = () => {
                 </Link>
               )}
 
+              {/* My Cart Button */}
+              {userInfo ? (
+                <button
+                  onClick={redirect_card_page}
+                  className="flex justify-center items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10 relative"
+                >
+                  <FaCartShopping className="text-sm" />
+                  <span>My Cart</span>
+                  {card_product_count > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                      {card_product_count}
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={() => navigate("/login")}
+                  className="flex justify-center items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10"
+                >
+                  <FaCartShopping className="text-sm" />
+                  <span>My Cart</span>
+                </button>
+              )}
+
               {/* Home Button */}
               {/* <Link
                 to="/"
@@ -435,6 +459,36 @@ const Header = () => {
                     <FaHeart className="text-sm" />
                     Wishlist
                   </Link>
+                )}
+              </li>
+
+              {/* My Cart */}
+              <li>
+                {userInfo ? (
+                  <button
+                    onClick={redirect_card_page}
+                    className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 flex items-center gap-3 w-full text-left ${
+                      pathname === "/card"
+                        ? "text-primary bg-primary/10 border-l-4 border-primary"
+                        : "text-slate-600 hover:text-primary hover:bg-gray-50"
+                    }`}
+                  >
+                    <FaCartShopping className="text-sm" />
+                    My Cart
+                    {card_product_count > 0 && (
+                      <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                        {card_product_count}
+                      </span>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => navigate("/login")}
+                    className="py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 text-slate-600 hover:text-primary hover:bg-gray-50 flex items-center gap-3 w-full text-left"
+                  >
+                    <FaCartShopping className="text-sm" />
+                    My Cart
+                  </button>
                 )}
               </li>
 

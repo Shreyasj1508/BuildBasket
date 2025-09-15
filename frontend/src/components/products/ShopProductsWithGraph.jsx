@@ -256,10 +256,10 @@ const ShopProductsWithGraph = ({ products = [], grid }) => {
                                     <div className="flex space-x-2">
                                         <button
                                             onClick={() => add_card(product._id)}
-                                            className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-2"
+                                            className="flex-1 bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2 font-semibold"
                                         >
                                             <FaShoppingCart />
-                                            <span>Add to Cart</span>
+                                            <span>ADD TO CART</span>
                                         </button>
                                         <button
                                             onClick={() => add_wishlist(product._id)}
@@ -346,10 +346,10 @@ const ShopProductsWithGraph = ({ products = [], grid }) => {
                                     <div className="flex space-x-2">
                                         <button
                                             onClick={() => add_card(product._id)}
-                                            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center space-x-2"
+                                            className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors flex items-center space-x-2 font-semibold"
                                         >
                                             <FaShoppingCart />
-                                            <span>Add to Cart</span>
+                                            <span>ADD TO CART</span>
                                         </button>
                                         <button
                                             onClick={() => add_wishlist(product._id)}

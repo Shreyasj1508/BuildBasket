@@ -158,10 +158,10 @@ const ProductCardWithGraph = ({ product, add_card, add_wishlist }) => {
             <div className="flex space-x-1">
               <button
                 onClick={() => add_card && add_card(product._id)}
-                className="flex-1 bg-green-500 text-white py-1 px-2 rounded text-xs hover:bg-green-600 transition-colors flex items-center justify-center space-x-1"
+                className="flex-1 bg-orange-500 text-white py-1 px-2 rounded text-xs hover:bg-orange-600 transition-colors flex items-center justify-center space-x-1 font-semibold"
               >
                 <FaShoppingCart className="text-xs" />
-                <span>Cart</span>
+                <span>ADD TO CART</span>
               </button>
               <button
                 onClick={() => add_wishlist && add_wishlist(product._id)}

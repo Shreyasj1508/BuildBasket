@@ -80,7 +80,7 @@ const FeatureProducts = ({products = []}) => {
             <Link to={`/product/details/${p.slug}`} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md'>
             <FaEye />
             </Link> 
-            <li onClick={() => add_card(p._id)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md'>
+            <li onClick={() => add_card(p._id)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-orange-500 hover:text-white hover:rotate-[720deg] transition-all shadow-md'>
             <RiShoppingCartLine />
             </li>
             <li onClick={() => navigate(`/price-history/${p._id}`)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md'>

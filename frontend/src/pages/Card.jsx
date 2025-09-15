@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link, useNavigate } from 'react-router-dom';
@@ -11,13 +11,21 @@ const Card = () => {
 
     const dispatch = useDispatch()
     const {userInfo} = useSelector(state => state.auth) 
-    const {card_products,successMessage,price,buy_product_item,shipping_fee,outofstock_products} = useSelector(state => state.card) 
+    const {card_products = [], successMessage, price = 0, buy_product_item = 0, shipping_fee = 0, outofstock_products = []} = useSelector(state => state.card) 
+    const [loading, setLoading] = useState(true)
 
     const navigate = useNavigate()  
 
     useEffect(() => {
-        dispatch(get_card_products(userInfo.id))
-    },[])
+        if (userInfo && userInfo.id) {
+            setLoading(true)
+            dispatch(get_card_products(userInfo.id)).finally(() => {
+                setLoading(false)
+            })
+        } else {
+            setLoading(false)
+        }
+    },[userInfo])
 
     const redirect = () => {
         navigate('/shipping',{
@@ -56,7 +64,10 @@ const Card = () => {
     return (
         <div>
            <Header/>
-           <section className='bg-[url("http://localhost:3000/images/banner/shop.png")] h-[220px] mt-6 bg-cover bg-no-repeat relative bg-left'>
+           <section 
+             className='h-[220px] mt-6 relative bg-cover bg-no-repeat bg-center'
+             style={{ backgroundImage: 'url(/images/landing_page_bg.jpg)' }}
+           >
             <div className='absolute left-0 top-0 w-full h-full bg-[#2422228a]'>
                 <div className='w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto'>
                     <div className='flex flex-col justify-center gap-1 items-center h-full w-full text-white'>
@@ -76,8 +87,17 @@ const Card = () => {
     <section className='bg-[#eeeeee]'>
     <div className='w-[85%] lg:w-[90%] md:w-[90%] sm:w-[90%] mx-auto py-16'>
 
+        {loading ? (
+            <div className='flex justify-center items-center h-64'>
+                <div className='text-center'>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4'></div>
+                    <p className='text-gray-600'>Loading your cart...</p>
+                </div>
+            </div>
+        ) : (
+            <>
         {
-            card_products.length > 0 || outofstock_products > 0 ? <div className='flex flex-wrap'>
+            card_products.length > 0 || outofstock_products.length > 0 ? <div className='flex flex-wrap'>
                 <div className='w-[67%] md-lg:w-full'>
                     <div className='pr-3 md-lg:pr-0'>
                         <div className='flex flex-col gap-3'>
@@ -215,6 +235,8 @@ const Card = () => {
                 <Link className='btn-primary inline-block' to='/shops' > Shop Now</Link>
             </div>
         }
+            </>
+        )}
 
     </div>
 
