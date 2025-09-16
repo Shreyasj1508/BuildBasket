@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaEye, FaRegHeart, FaChartLine } from "react-icons/fa";
 import { RiShoppingCartLine } from "react-icons/ri";
 import Rating from '../Rating';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { add_to_card,add_to_wishlist,messageClear } from '../../store/reducers/cardReducer';
+import { useDispatch, useSelector } from 'react-redux';
+import { add_to_card,add_to_wishlist,messageClear, get_card_products } from '../../store/reducers/cardReducer';
 import toast from 'react-hot-toast';
 import { useAuthState, useCardState } from '../../hooks/useSafeSelector';
 
@@ -13,17 +13,56 @@ const FeatureProducts = ({products = []}) => {
     const dispatch = useDispatch()
     const {userInfo} = useAuthState()
     const {errorMessage, successMessage} = useCardState()
+    const {card_products = [], card_product_count = 0, outofstock_products = []} = useSelector(state => state.card)
 
     const add_card = (id) => {
         if (userInfo) {
+           console.log('Adding product to cart:', id)
+           // Clear any previous error messages
+           dispatch(messageClear())
            dispatch(add_to_card({
             userId: userInfo.id,
             quantity : 1,
             productId : id
-           }))
+           })).then(() => {
+               console.log('Product added, refreshing cart')
+               dispatch(get_card_products(userInfo.id))
+           }).catch((error) => {
+               console.error('Error adding to cart:', error)
+           })
         } else {
             navigate('/login')
         }
+    }
+
+    const getProductQuantity = (productId) => {
+        console.log('Looking for product:', productId)
+        console.log('Cart products:', card_products)
+        console.log('Out of stock products:', outofstock_products)
+        
+        // Handle the complex structure from backend
+        let totalQuantity = 0
+        
+        // Check in regular cart products
+        card_products.forEach(sellerGroup => {
+            if (sellerGroup.products) {
+                sellerGroup.products.forEach(product => {
+                    if (product.productInfo && product.productInfo._id === productId) {
+                        totalQuantity += product.quantity
+                    }
+                })
+            }
+        })
+        
+        // Check in out of stock products
+        outofstock_products.forEach(product => {
+            if (product.productId === productId) {
+                totalQuantity += product.quantity
+            }
+        })
+        
+        console.log('Total quantity for product', productId, ':', totalQuantity)
+        return totalQuantity
     }
 
     useEffect(() => { 
@@ -37,6 +76,12 @@ const FeatureProducts = ({products = []}) => {
         } 
         
     },[successMessage,errorMessage])
+
+    useEffect(() => {
+        if (userInfo && userInfo.id) {
+            dispatch(get_card_products(userInfo.id))
+        }
+    }, [userInfo, dispatch])
 
 
     const add_wishlist = (pro) => {
@@ -80,8 +125,13 @@ const FeatureProducts = ({products = []}) => {
             <Link to={`/product/details/${p.slug}`} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md'>
             <FaEye />
             </Link> 
-            <li onClick={() => add_card(p._id)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-orange-500 hover:text-white hover:rotate-[720deg] transition-all shadow-md'>
+            <li onClick={() => add_card(p._id)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-orange-500 hover:text-white hover:rotate-[720deg] transition-all shadow-md relative'>
             <RiShoppingCartLine />
+            {getProductQuantity(p._id) > 0 && (
+                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold border-2 border-white">
+                    {getProductQuantity(p._id)}
+                </span>
+            )}
             </li>
             <li onClick={() => navigate(`/price-history/${p._id}`)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md'>
             <FaChartLine />

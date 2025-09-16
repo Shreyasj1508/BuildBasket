@@ -42,28 +42,31 @@ const CustomerTestimonials = () => {
   const currentData = testimonials[currentTestimonial];
 
   return (
-    <section className="py-16 bg-white relative overflow-hidden">
-      {/* Background Pattern - Matching WhyChooseUs */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-5">
-        <div className="absolute top-8 left-8 w-32 h-32 bg-primary rounded-full blur-3xl"></div>
-        <div className="absolute top-20 right-20 w-24 h-24 bg-primary-light rounded-full blur-2xl"></div>
-        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-primary-dark rounded-full blur-3xl"></div>
+    <section className="py-20 bg-gradient-to-br from-gray-50 via-primary/10 to-gray-100 relative overflow-hidden">
+      {/* Enhanced Background Pattern */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-10">
+        <div className="absolute top-8 left-8 w-32 h-32 bg-gradient-to-br from-primary to-primary-dark rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-20 right-20 w-24 h-24 bg-gradient-to-br from-primary-light to-primary rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-primary-dark to-primary rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
 
       <div className="relative z-10 container-custom">
-        {/* Section Header */}
+        {/* Enhanced Section Header */}
         <div className="text-left mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            What Our Customers Say
-          </h2>
+          <div className="inline-block">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+              What Our Customers Say
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-primary to-primary-dark rounded-full"></div>
+          </div>
         </div>
 
-        {/* Testimonial Card */}
+        {/* Enhanced Testimonial Card */}
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+          <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 hover:border-primary/30 transition-all duration-300">
             <div className="flex">
-              {/* Customer Image - Left Side */}
-              <div className="w-1/3 p-8 lg:p-12 flex items-center justify-center bg-gray-50">
+              {/* Enhanced Customer Image - Left Side */}
+              <div className="w-1/3 p-8 lg:p-12 flex items-center justify-center bg-gradient-to-br from-primary/10 to-white">
                 <div className="relative">
                   <div className="w-48 h-48 lg:w-56 lg:h-56 rounded-full overflow-hidden border-4 border-white shadow-lg">
                     <img
@@ -75,27 +78,27 @@ const CustomerTestimonials = () => {
                       }}
                     />
                   </div>
-                  {/* Decorative elements */}
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm">✓</span>
+                  {/* Enhanced Decorative elements */}
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-white text-sm font-bold">✓</span>
                   </div>
                 </div>
               </div>
 
-              {/* Testimonial Content - Right Side */}
+              {/* Enhanced Testimonial Content - Right Side */}
               <div className="w-2/3 p-8 lg:p-12 flex flex-col justify-center">
-                {/* Quote Icons - Using your primary colors */}
+                {/* Enhanced Quote Icons */}
                 <div className="flex items-start mb-6">
-                  <FaQuoteLeft className="text-6xl text-primary mr-4 mt-1" />
-                  <FaQuoteLeft className="text-6xl text-primary-light mr-4 mt-1" />
+                  <FaQuoteLeft className="text-6xl text-primary mr-4 mt-1 opacity-80" />
+                  <FaQuoteLeft className="text-6xl text-primary-light mr-4 mt-1 opacity-60" />
                 </div>
 
-                {/* Testimonial Text */}
+                {/* Enhanced Testimonial Text */}
                 <blockquote className="text-lg lg:text-xl text-gray-700 leading-relaxed mb-8 font-medium">
                   "{currentData.testimonial}"
                 </blockquote>
 
-                {/* Customer Info */}
+                {/* Enhanced Customer Info */}
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-xl font-bold text-primary mb-1">
@@ -103,22 +106,22 @@ const CustomerTestimonials = () => {
                     </h4>
                   </div>
 
-                  {/* Navigation Controls - Bottom Right */}
+                  {/* Enhanced Navigation Controls */}
                   <div className="flex items-center gap-2">
                     <button
                       onClick={prevTestimonial}
-                      className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center group"
+                      className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white transition-all duration-300 flex items-center justify-center group shadow-lg hover:shadow-xl"
                       aria-label="Previous testimonial"
                     >
-                      <FaChevronLeft className="text-sm text-gray-600 group-hover:text-white" />
+                      <FaChevronLeft className="text-sm group-hover:text-white" />
                     </button>
 
                     <button
                       onClick={nextTestimonial}
-                      className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center group"
+                      className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white transition-all duration-300 flex items-center justify-center group shadow-lg hover:shadow-xl"
                       aria-label="Next testimonial"
                     >
-                      <FaChevronRight className="text-sm text-gray-600 group-hover:text-white" />
+                      <FaChevronRight className="text-sm group-hover:text-white" />
                     </button>
                   </div>
                 </div>

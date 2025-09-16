@@ -23,7 +23,12 @@ class cardController{
             })
 
             if (product) {
-                responseReturn(res,404,{error: "Product Already Added To Card" })
+                // If product already exists, increment the quantity
+                const newQuantity = product.quantity + quantity
+                await cardModel.findByIdAndUpdate(product._id, {
+                    quantity: newQuantity
+                })
+                responseReturn(res,201,{message: "Product quantity updated in cart" })
             } else {
                 const product = await cardModel.create({
                     userId,

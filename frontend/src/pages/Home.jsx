@@ -218,21 +218,38 @@ const Home = () => {
       </div>
 
       {isLoading ? (
-        <div className="py-10 flex justify-center items-center">
-          <div className="text-[#eba834] text-xl">Loading products...</div>
+        <div className="py-20 flex justify-center items-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <div className="text-primary text-xl font-semibold">Loading products...</div>
+          </div>
         </div>
       ) : (
-        <div className="py-10">
-          <div className="w-[85%] flex flex-wrap mx-auto">
-            <div className="grid w-full grid-cols-3 md-lg:grid-cols-2 md:grid-cols-1 gap-7">
-              <div className="overflow-hidden">
+        <section className="py-16 bg-gradient-to-br from-gray-50 via-primary/5 to-gray-100">
+          <div className="w-[85%] mx-auto">
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <div className="inline-block">
+                <h2 className="text-4xl font-bold text-gray-800 mb-3 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent uppercase">
+                  Product Collections
+                </h2>
+                <div className="w-24 h-1 bg-gradient-to-r from-primary to-primary-dark mx-auto rounded-full"></div>
+              </div>
+              <p className="text-gray-600 text-lg mt-4 font-medium">
+                Discover our curated selection of premium products
+              </p>
+            </div>
+
+            {/* Enhanced Product Sections Grid */}
+            <div className="grid w-full grid-cols-3 md-lg:grid-cols-2 md:grid-cols-1 gap-8">
+              <div className="transform hover:scale-105 transition-all duration-300">
                 <Products
                   title="Latest Product"
                   products={Array.isArray(latest_product) ? latest_product : []}
                 />
               </div>
 
-              <div className="overflow-hidden">
+              <div className="transform hover:scale-105 transition-all duration-300">
                 <Products
                   title="Top Rated Product"
                   products={
@@ -241,7 +258,7 @@ const Home = () => {
                 />
               </div>
 
-              <div className="overflow-hidden">
+              <div className="transform hover:scale-105 transition-all duration-300">
                 <Products
                   title="Discount Product"
                   products={
@@ -251,7 +268,7 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Why Choose Us Section */}

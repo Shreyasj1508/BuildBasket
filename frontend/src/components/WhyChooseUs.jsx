@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaShoppingCart,
   FaWallet,
@@ -16,6 +16,26 @@ import {
 
 const WhyChooseUs = () => {
   const [activeTab, setActiveTab] = useState("buyer");
+  const [isVisible, setIsVisible] = useState(false);
+  const [animateCards, setAnimateCards] = useState(false);
+
+  useEffect(() => {
+    // Trigger animations when component mounts
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+      setAnimateCards(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // Reset and trigger animations when tab changes
+    setAnimateCards(false);
+    const timer = setTimeout(() => {
+      setAnimateCards(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
 
   const buyerFeatures = [
     {
@@ -75,41 +95,44 @@ const WhyChooseUs = () => {
     activeTab === "buyer" ? buyerFeatures : supplierFeatures;
 
   return (
-    <div className="w-full bg-white relative overflow-hidden">
-      {/* Background Pattern - Subtle */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-5">
-        <div className="absolute top-8 left-8 w-32 h-32 bg-primary rounded-full blur-3xl"></div>
-        <div className="absolute top-20 right-20 w-24 h-24 bg-primary-light rounded-full blur-2xl"></div>
-        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-primary-dark rounded-full blur-3xl"></div>
+    <div className="w-full bg-gradient-to-br from-gray-50 via-primary/10 to-gray-100 relative overflow-hidden">
+      {/* Enhanced Background Pattern */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-10">
+        <div className="absolute top-8 left-8 w-32 h-32 bg-gradient-to-br from-primary to-primary-dark rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-20 right-20 w-24 h-24 bg-gradient-to-br from-primary-light to-primary rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-gradient-to-br from-primary-dark to-primary rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
 
-      <div className="relative z-10 w-full px-4 py-16">
+      <div className="relative z-10 w-full px-4 py-20">
         <div className="max-w-7xl mx-auto">
           {/* Title - Left Aligned */}
           <div className="text-left mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Why {activeTab === "buyer" ? "Buyers" : "Suppliers"} Choose Us
-            </h2>
+            <div className={`inline-block transition-all duration-1000 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+              <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
+                Why {activeTab === "buyer" ? "Buyers" : "Suppliers"} Choose Us
+              </h2>
+              <div className={`w-24 h-1 bg-gradient-to-r from-primary to-primary-dark rounded-full transition-all duration-1000 delay-300 ${isVisible ? 'scale-x-100' : 'scale-x-0'}`}></div>
+            </div>
 
-            {/* Toggle Switch - Below Title */}
-            <div className="flex justify-start mb-10">
-              <div className="bg-gray-200 rounded-full p-1 flex border border-gray-300">
+            {/* Enhanced Toggle Switch */}
+            <div className={`flex justify-start mb-10 mt-6 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
+              <div className="bg-white rounded-full p-1 flex border-2 border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300">
                 <button
                   onClick={() => setActiveTab("buyer")}
-                  className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-300 ${
+                  className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-500 transform ${
                     activeTab === "buyer"
-                      ? "bg-primary text-white shadow-lg transform scale-105"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg scale-105 rotate-1"
+                      : "text-gray-600 hover:text-primary hover:bg-primary/10 hover:scale-105"
                   }`}
                 >
                   Buyer
                 </button>
                 <button
                   onClick={() => setActiveTab("supplier")}
-                  className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-300 ${
+                  className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-500 transform ${
                     activeTab === "supplier"
-                      ? "bg-primary text-white shadow-lg transform scale-105"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg scale-105 rotate-1"
+                      : "text-gray-600 hover:text-primary hover:bg-primary/10 hover:scale-105"
                   }`}
                 >
                   Supplier
@@ -118,28 +141,38 @@ const WhyChooseUs = () => {
             </div>
           </div>
 
-          {/* Features in Single Row - Square boxes */}
+          {/* Enhanced Features Grid */}
           <div className="flex flex-wrap justify-start gap-4">
             {currentFeatures.map((feature, index) => {
               const IconComponent = feature.icon;
               return (
                 <div
-                  key={index}
-                  className="group bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-xl border border-gray-200 hover:border-primary hover:border-opacity-50 w-[280px] h-[280px] flex flex-col justify-start items-start text-left"
+                  key={`${activeTab}-${index}`}
+                  className={`group bg-white rounded-xl p-6 hover:bg-gradient-to-br hover:from-primary/10 hover:to-white transition-all duration-700 hover:transform hover:scale-105 hover:shadow-xl border border-gray-200 hover:border-primary/30 w-[280px] h-[280px] flex flex-col justify-start items-start text-left ${
+                    animateCards 
+                      ? 'opacity-100 translate-y-0 scale-100' 
+                      : 'opacity-0 translate-y-10 scale-95'
+                  }`}
                   style={{
-                    animationDelay: `${index * 0.1}s`,
+                    transitionDelay: `${index * 150}ms`,
                   }}
                 >
-                  {/* Icon - Primary Circle with White Icon */}
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4 group-hover:bg-primary-dark transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
-                    <IconComponent className="text-2xl text-white transition-colors duration-300" />
+                  {/* Enhanced Icon */}
+                  <div className={`w-16 h-16 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center mb-4 group-hover:from-primary-dark group-hover:to-primary transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-lg group-hover:shadow-xl ${
+                    animateCards ? 'animate-bounceIn' : ''
+                  }`}>
+                    <IconComponent className="text-2xl text-white transition-all duration-500 group-hover:scale-110" />
                   </div>
 
-                  {/* Content */}
-                  <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors duration-300">
+                  {/* Enhanced Content */}
+                  <h3 className={`text-lg font-bold text-gray-900 mb-3 group-hover:text-primary transition-all duration-500 ${
+                    animateCards ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-5'
+                  }`} style={{ transitionDelay: `${index * 150 + 200}ms` }}>
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
+                  <p className={`text-gray-600 text-sm leading-relaxed group-hover:text-gray-800 transition-all duration-500 ${
+                    animateCards ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-5'
+                  }`} style={{ transitionDelay: `${index * 150 + 300}ms` }}>
                     {feature.description}
                   </p>
                 </div>
@@ -147,14 +180,14 @@ const WhyChooseUs = () => {
             })}
           </div>
 
-          {/* Bottom Stats */}
-          <div className="text-left mt-12">
-            <p className="text-xl font-bold text-gray-900">
-              <span className="text-primary">25,000+</span> Verified
-              Construction Suppliers &
-              <span className="text-primary"> 1 Million+</span> Construction
-              Professionals Trust Us
-            </p>
+          {/* Enhanced Bottom Stats */}
+          <div className={`text-left mt-12 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <div className="bg-gradient-to-r from-primary to-primary-dark rounded-xl p-6 text-white shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105">
+              <p className="text-xl font-bold text-center">
+                <span className="text-white animate-pulse">25,000+</span> Verified Construction Suppliers & 
+                <span className="text-white animate-pulse"> 1 Million+</span> Construction Professionals Trust Us
+              </p>
+            </div>
           </div>
         </div>
       </div>

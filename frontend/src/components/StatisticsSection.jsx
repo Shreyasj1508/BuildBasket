@@ -98,28 +98,28 @@ const StatisticsSection = () => {
   const displayCategories = categorys?.slice(0, 7) || [];
 
   return (
-    <div className="w-full py-8 bg-gray-50">
-      <div className=" w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] mx-auto">
+    <div className="w-full py-8 bg-gradient-to-br from-gray-50 via-primary/10 to-gray-100">
+      <div className="w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] mx-auto">
         {/* Statistics Banner */}
-        <div className="bg-gray-200 rounded-2xl p-8 mb-0">
+        <div className="bg-gradient-to-r from-white to-primary/10 rounded-2xl p-8 mb-0 shadow-2xl border border-primary/20 backdrop-blur-sm">
           <div className="grid grid-cols-3 gap-8">
             {/* Raw Material Prices */}
-            <div className="text-center">
+            <div className="text-center group hover:scale-105 transition-all duration-300">
               <div className="flex justify-center mb-4">
-                <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
                   <span className="text-white text-2xl font-bold">₹</span>
                 </div>
               </div>
-              <div className="text-2xl font-bold text-orange-500 mb-2">
+              <div className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent mb-2">
                 500K+
               </div>
-              <div className="text-gray-600 text-base">Raw Material Prices</div>
+              <div className="text-gray-600 text-base font-semibold">Raw Material Prices</div>
             </div>
 
             {/* Orders Delivered */}
-            <div className="text-center">
+            <div className="text-center group hover:scale-105 transition-all duration-300">
               <div className="flex justify-center mb-4">
-                <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
                   <svg
                     className="w-8 h-8 text-white"
                     fill="currentColor"
@@ -129,16 +129,16 @@ const StatisticsSection = () => {
                   </svg>
                 </div>
               </div>
-              <div className="text-2xl font-bold text-orange-500 mb-2">
+              <div className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent mb-2">
                 400K+
               </div>
-              <div className="text-gray-600 text-base">Orders Delivered</div>
+              <div className="text-gray-600 text-base font-semibold">Orders Delivered</div>
             </div>
 
             {/* Locations Served */}
-            <div className="text-center">
+            <div className="text-center group hover:scale-105 transition-all duration-300">
               <div className="flex justify-center mb-4">
-                <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
                   <svg
                     className="w-8 h-8 text-white"
                     fill="currentColor"
@@ -148,59 +148,66 @@ const StatisticsSection = () => {
                   </svg>
                 </div>
               </div>
-              <div className="text-2xl font-bold text-orange-500 mb-2">
+              <div className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent mb-2">
                 100+
               </div>
-              <div className="text-gray-600 text-base">Locations Served</div>
+              <div className="text-gray-600 text-base font-semibold">Locations Served</div>
             </div>
           </div>
         </div>
 
         {/* Explore Raw Material Categories */}
-        <div className="bg-white border-x-2 border-b-2 border-dashed border-orange-500 rounded-b-2xl p-8">
+        <div className="bg-gradient-to-br from-white to-primary/10 border-x-2 border-b-2 border-dashed border-primary rounded-b-2xl p-8 shadow-lg">
 
 
-          <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              Explore Raw Material Categories
-            </h2>
-            <p className="text-gray-500 text-lg">
-              Click the card to get all details of the product.
+          <div className="text-center mb-8">
+            <div className="inline-block">
+              <h2 className="text-4xl font-bold text-gray-800 mb-3 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+                Explore Raw Material Categories
+              </h2>
+              <div className="w-24 h-1 bg-gradient-to-r from-primary to-primary-dark mx-auto rounded-full"></div>
+            </div>
+            <p className="text-gray-600 text-lg mt-4 font-medium">
+              Discover premium quality materials for your construction needs
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-3 gap-8 mb-8">
             {loading
               ? // Loading skeleton
                 Array.from({ length: 7 }).map((_, index) => (
                   <div
                     key={index}
-                    className="bg-white shadow-md p-2 text-center border border-gray-100 animate-pulse"
+                    className="bg-white shadow-lg p-6 text-center border border-gray-100 rounded-2xl animate-pulse"
                   >
-                    <div className="flex justify-center mb-4">
-                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-                        <div className="w-8 h-8 bg-gray-300 rounded"></div>
+                    <div className="flex justify-center mb-6">
+                      <div className="w-20 h-20 bg-gray-200 rounded-2xl flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gray-300 rounded"></div>
                       </div>
                     </div>
-                    <div className="h-6 bg-gray-200 mb-3"></div>
-                    <div className="h-8 bg-gray-200 rounded"></div>
+                    <div className="h-6 bg-gray-200 mb-4 rounded"></div>
+                    <div className="h-10 bg-gray-200 rounded-lg"></div>
                   </div>
                 ))
-              : displayCategories.map((category) => (
+              : displayCategories.map((category, index) => (
                   <div
                     key={category._id}
                     data-category-id={category._id}
-                    className="bg-white  shadow-md hover:shadow-lg transition-shadow duration-300 p-6 text-center cursor-pointer border border-gray-100"
+                    className="group bg-white shadow-lg hover:shadow-2xl transition-all duration-500 p-6 text-center cursor-pointer border border-gray-100 rounded-2xl hover:border-orange-300 hover:-translate-y-2 hover:scale-105"
                     onClick={() => handleCategoryClick(category.name)}
+                    style={{
+                      animationDelay: `${index * 0.1}s`,
+                      animation: 'fadeInUp 0.6s ease-out forwards'
+                    }}
                   >
-                    <div className="flex justify-center mb-4">
-                      <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="flex justify-center mb-6">
+                      <div className="w-32 h-32 bg-gradient-to-br from-primary/20 to-primary/30 rounded-2xl flex items-center justify-center overflow-hidden group-hover:from-primary/30 group-hover:to-primary/40 transition-all duration-300 shadow-lg group-hover:shadow-xl">
                         <img
                           src={
                             category.image || "/images/placeholder-category.png"
                           }
                           alt={category.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                           onError={(e) => {
                             // Hide image and show icon fallback
                             e.target.style.display = "none";
@@ -224,18 +231,18 @@ const StatisticsSection = () => {
                           }}
                         />
                         <div
-                          className="icon-fallback w-full h-full flex items-center justify-center text-gray-600"
+                          className="icon-fallback w-full h-full flex items-center justify-center text-primary group-hover:text-primary-dark transition-colors duration-300"
                           style={{ display: "flex" }}
                         >
                           {getCategoryIcon(category.name)}
                         </div>
                       </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                    <h3 className="text-xl font-bold text-gray-800 mb-4 group-hover:text-primary transition-colors duration-300">
                       {category.name}
                     </h3>
                     <button
-                      className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors duration-300 text-sm font-medium"
+                      className="bg-gradient-to-r from-primary to-primary-dark text-white px-6 py-3 rounded-xl hover:from-primary-dark hover:to-primary transition-all duration-300 text-sm font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleCategoryClick(category.name);
@@ -247,12 +254,15 @@ const StatisticsSection = () => {
                 ))}
           </div>
 
-          <div className="text-right">
+          <div className="text-center">
             <button
-              className="text-orange-500 hover:text-orange-600 font-medium text-sm underline"
+              className="bg-gradient-to-r from-primary to-primary-dark text-white px-8 py-3 rounded-xl hover:from-primary-dark hover:to-primary transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2 mx-auto"
               onClick={handleViewAllClick}
             >
-              View All
+              <span>View All Categories</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
         </div>

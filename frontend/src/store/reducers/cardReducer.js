@@ -152,7 +152,7 @@ export const cardReducer = createSlice({
         })
         .addCase(add_to_card.fulfilled, (state, { payload }) => { 
             state.successMessage = payload?.message || 'Product added to cart'; 
-            state.card_product_count = state.card_product_count + 1
+            // Don't increment count here, let get_card_products handle it
         })
 
         .addCase(get_card_products.fulfilled, (state, { payload }) => { 

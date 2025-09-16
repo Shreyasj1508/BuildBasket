@@ -16,10 +16,10 @@ import {Pagination } from 'swiper/modules';
 import 'swiper/css'; 
 import 'swiper/css/pagination';
 import {Swiper, SwiperSlide } from 'swiper/react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { product_details } from '../store/reducers/homeReducer';
 import toast from 'react-hot-toast';
-import { add_to_card,messageClear,add_to_wishlist } from '../store/reducers/cardReducer';
+import { add_to_card,messageClear,add_to_wishlist, get_card_products, quantity_inc, quantity_dec } from '../store/reducers/cardReducer';
 import { useHomeState, useAuthState, useCardState } from '../hooks/useSafeSelector';
  
 
@@ -31,10 +31,17 @@ const Details = () => {
     const {product,relatedProducts,moreProducts} = useHomeState()
     const {userInfo } = useAuthState()
     const {errorMessage,successMessage } = useCardState()
+    const {card_products = [], outofstock_products = []} = useSelector(state => state.card)
 
     useEffect(() => {
         dispatch(product_details(slug))
     },[slug])
+
+    useEffect(() => {
+        if (userInfo && userInfo.id) {
+            dispatch(get_card_products(userInfo.id))
+        }
+    }, [userInfo, dispatch])
 
     useEffect(() => { 
         if (successMessage) {
@@ -88,29 +95,89 @@ const Details = () => {
     const [quantity, setQuantity] = useState(1)
 
     const inc = () => {
-        if (quantity >= product.stock) {
-            toast.error('Out of Stock')
+        if (userInfo) {
+            const { quantity: cartQuantity, cartItemId } = getProductQuantity(product._id)
+            
+            if (cartQuantity >= product.stock) {
+                toast.error('Out of Stock')
+            } else if (cartItemId) {
+                // If product is already in cart, increment quantity
+                dispatch(quantity_inc(cartItemId)).then(() => {
+                    dispatch(get_card_products(userInfo.id))
+                })
+            } else {
+                // If product is not in cart, add it
+                dispatch(add_to_card({
+                    userId: userInfo.id,
+                    quantity: 1,
+                    productId: product._id
+                })).then(() => {
+                    dispatch(get_card_products(userInfo.id))
+                })
+            }
         } else {
-            setQuantity(quantity + 1)
+            navigate('/login')
         }
     }
 
     const dec = () => {
-        if (quantity > 1) {
-            setQuantity(quantity - 1)
+        if (userInfo) {
+            const { quantity: cartQuantity, cartItemId } = getProductQuantity(product._id)
+            
+            if (cartQuantity > 1 && cartItemId) {
+                // Decrement quantity
+                dispatch(quantity_dec(cartItemId)).then(() => {
+                    dispatch(get_card_products(userInfo.id))
+                })
+            } else if (cartQuantity === 1 && cartItemId) {
+                // Remove from cart if quantity becomes 0
+                dispatch(quantity_dec(cartItemId)).then(() => {
+                    dispatch(get_card_products(userInfo.id))
+                })
+            }
         }
     }
 
     const add_card = () => {
         if (userInfo) {
+           dispatch(messageClear())
            dispatch(add_to_card({
             userId: userInfo.id,
             quantity,
             productId : product._id
-           }))
+           })).then(() => {
+               dispatch(get_card_products(userInfo.id))
+           })
         } else {
             navigate('/login')
         }
+    }
+
+    const getProductQuantity = (productId) => {
+        let totalQuantity = 0
+        let cartItemId = null
+        
+        // Check in regular cart products
+        card_products.forEach(sellerGroup => {
+            if (sellerGroup.products) {
+                sellerGroup.products.forEach(cartProduct => {
+                    if (cartProduct.productInfo && cartProduct.productInfo._id === productId) {
+                        totalQuantity += cartProduct.quantity
+                        cartItemId = cartProduct._id
+                    }
+                })
+            }
+        })
+        
+        // Check in out of stock products
+        outofstock_products.forEach(cartProduct => {
+            if (cartProduct.productId === productId) {
+                totalQuantity += cartProduct.quantity
+                cartItemId = cartProduct._id
+            }
+        })
+        
+        return { quantity: totalQuantity, cartItemId }
     }
 
     const add_wishlist = () => {
@@ -260,11 +327,20 @@ const Details = () => {
                     product.stock ? <>
         <div className='flex bg-slate-200 h-[50px] justify-center items-center text-xl'>
             <div onClick={dec} className='px-6 cursor-pointer'>-</div>
-            <div className='px-6'>{quantity}</div>
+            <div className='px-6'>
+                {getProductQuantity(product._id).quantity > 0 ? getProductQuantity(product._id).quantity : quantity}
+            </div>
             <div onClick={inc} className='px-6 cursor-pointer'>+</div>
         </div>
-                    <div>
-                        <button onClick={add_card} className='btn-primary h-[50px] px-8'>Add To Cart</button>
+                    <div className="relative">
+                        <button onClick={add_card} className='btn-primary h-[50px] px-8 flex items-center gap-2'>
+                            Add To Cart
+                            {getProductQuantity(product._id).quantity > 0 && (
+                                <span className="bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold border-2 border-white">
+                                    {getProductQuantity(product._id).quantity}
+                                </span>
+                            )}
+                        </button>
                     </div>
                     
                     </> : ''
