@@ -136,7 +136,13 @@ app.use('/api',require('./routes/chatRoutes'))
 app.use('/api',require('./routes/paymentRoutes'))
 app.use('/api',require('./routes/dashboard/dashboardRoutes'))
 app.use('/api',require('./routes/priceDetailRoutes'))
+
+// Excel routes
 app.use('/api/excel',require('./routes/excelRoutes'))
+
+// Admin-only routes
+app.use('/api',require('./routes/admin/adminProductRoutes'))
+app.use('/api',require('./routes/admin/adminCategoryRoutes'))
 
 app.get('/',(req,res) => res.send('Hello Server'))
 const port = process.env.PORT || 5000

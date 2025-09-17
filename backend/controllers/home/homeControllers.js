@@ -41,23 +41,40 @@ class homeControllers{
 
     get_products = async(req, res) => {
         try {
-            const products = await productModel.find({}).limit(12).sort({
+            console.log('Fetching products for homepage...');
+            
+            const products = await productModel.find({ status: 'active' }).limit(12).sort({
                 createdAt: -1
             })
-            const allProduct1 = await productModel.find({}).limit(9).sort({
+            const allProduct1 = await productModel.find({ status: 'active' }).limit(9).sort({
                 createdAt: -1
             })
             const latest_product = this.formateProduct(allProduct1);
             
-            const allProduct2 = await productModel.find({}).limit(9).sort({
+            const allProduct2 = await productModel.find({ status: 'active' }).limit(9).sort({
                 rating: -1
             })
             const topRated_product = this.formateProduct(allProduct2);
            
-            const allProduct3 = await productModel.find({}).limit(9).sort({
+            const allProduct3 = await productModel.find({ status: 'active' }).limit(9).sort({
                 discount: -1
             })
             const discount_product = this.formateProduct(allProduct3);
+
+            console.log(`Homepage API - Total products: ${products.length}`);
+            console.log(`Homepage API - Latest products: ${allProduct1.length}`);
+            console.log(`Homepage API - Top rated products: ${allProduct2.length}`);
+            console.log(`Homepage API - Discount products: ${allProduct3.length}`);
+
+            // Log sample products
+            if (products.length > 0) {
+                console.log('Sample homepage products:', products.slice(0, 2).map(p => ({
+                    id: p._id,
+                    name: p.name,
+                    status: p.status,
+                    createdAt: p.createdAt
+                })));
+            }
 
             responseReturn(res, 200,{
                 products,
@@ -67,7 +84,8 @@ class homeControllers{
             })
             
         } catch (error) {
-            console.log(error.message)
+            console.log('Error in get_products:', error.message)
+            responseReturn(res, 500, { message: 'Error fetching products', error: error.message });
         }
     }
    // end method 
@@ -78,11 +96,11 @@ class homeControllers{
             low: 0,
             high: 0,
         }
-        const products = await productModel.find({}).limit(9).sort({
+        const products = await productModel.find({ status: 'active' }).limit(9).sort({
             createdAt: -1 // 1 for asc -1 is for Desc
         })
         const latest_product = this.formateProduct(products);
-        const getForPrice = await productModel.find({}).sort({
+        const getForPrice = await productModel.find({ status: 'active' }).sort({
             'price': 1
         })
         if (getForPrice.length > 0) {
@@ -107,6 +125,8 @@ query_products = async (req, res) => {
     req.query.parPage = parPage
 
     try {
+        console.log('Shops page query_products called...');
+        
         // Decode URL parameters
         if (req.query.category) {
             req.query.category = decodeURIComponent(req.query.category);
@@ -115,13 +135,40 @@ query_products = async (req, res) => {
             req.query.searchValue = decodeURIComponent(req.query.searchValue);
         }
         
-        const products = await productModel.find({}).sort({
+        const products = await productModel.find({ status: 'active' }).sort({
             createdAt: -1
         })
+        
+        console.log(`Shops API - Total active products: ${products.length}`);
+        console.log(`Shops API - Query parameters:`, req.query);
+        
+        // Log some sample products
+        if (products.length > 0) {
+            console.log('Shops API - Sample products:', products.slice(0, 3).map(p => ({
+                id: p._id,
+                name: p.name,
+                category: p.category,
+                brand: p.brand,
+                status: p.status,
+                createdAt: p.createdAt
+            })));
+        }
         
         const totalProduct = new queryProducts(products, req.query).categoryQuery().ratingQuery().searchQuery().priceQuery().sortByPrice().countProducts();
 
         const result = new queryProducts(products, req.query).categoryQuery().ratingQuery().priceQuery().searchQuery().sortByPrice().skip().limit().getProducts();
+        
+        console.log(`Shops API - Filtered products count: ${result.length}`);
+        
+        // Log filtered results
+        if (result.length > 0) {
+            console.log('Shops API - Filtered sample products:', result.slice(0, 2).map(p => ({
+                id: p._id,
+                name: p.name,
+                category: p.category,
+                status: p.status
+            })));
+        }
         
         responseReturn(res, 200, {
             products: result,
@@ -132,6 +179,7 @@ query_products = async (req, res) => {
         
     } catch (error) {
         console.log('❌ Query Products Error:', error.message)
+        responseReturn(res, 500, { message: 'Error querying products', error: error.message });
     }
  
 }

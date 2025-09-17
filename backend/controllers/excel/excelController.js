@@ -11,20 +11,8 @@ const sellerModel = require('../../models/sellerModel');
 const customerModel = require('../../models/customerModel');
 const bannerModel = require('../../models/bannerModel');
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, '../../uploads/excel');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Configure multer for file uploads - using memory storage to avoid file locking issues
+const storage = multer.memoryStorage();
 
 const upload = multer({ 
   storage: storage,
@@ -54,8 +42,8 @@ class ExcelController {
         return responseReturn(res, 400, { message: 'No Excel file uploaded' });
       }
 
-      const filePath = req.file.path;
-      const workbook = XLSX.readFile(filePath);
+      // Read Excel file from memory buffer
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet);
@@ -109,12 +97,14 @@ class ExcelController {
         }
       }
 
-      // Clean up uploaded file
-      fs.unlinkSync(filePath);
+      // No file cleanup needed with memory storage
 
       responseReturn(res, 200, {
         message: 'Categories import completed',
-        results: results
+        success: results.success,
+        errors: results.errors,
+        details: results.details,
+        total: results.success + results.errors
       });
 
     } catch (error) {
@@ -130,13 +120,18 @@ class ExcelController {
         return responseReturn(res, 400, { message: 'No Excel file uploaded' });
       }
 
-      const filePath = req.file.path;
-      const workbook = XLSX.readFile(filePath);
+      console.log('Starting Excel import...');
+      
+      // Read Excel file from memory buffer
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet);
 
+      console.log(`Excel data rows: ${data.length}`);
+
       if (data.length === 0) {
+        console.log('❌ Excel file is empty');
         return responseReturn(res, 400, { message: 'Excel file is empty' });
       }
 
@@ -146,57 +141,109 @@ class ExcelController {
         details: []
       };
 
+      // Ensure default seller exists
+      let defaultSeller = await sellerModel.findOne({ email: 'excel-import@default.com' });
+      if (!defaultSeller) {
+        defaultSeller = await sellerModel.create({
+          name: 'Excel Import Seller',
+          email: 'excel-import@default.com',
+          password: 'default123',
+          method: 'card',
+          status: 'active',
+          shopInfo: {
+            shopName: 'Excel Import Shop',
+            address: 'Default Address'
+          }
+        });
+        console.log('Created default seller:', defaultSeller._id);
+      }
+
       for (let i = 0; i < data.length; i++) {
         const row = data[i];
         try {
           // Validate required fields
-          if (!row.name || !row.price || !row.category || !row.sellerId) {
+          if (!row.name || !row.price || !row.category) {
             results.errors++;
-            results.details.push(`Row ${i + 2}: Missing required fields (name, price, category, sellerId)`);
+            results.details.push(`Row ${i + 2}: Missing required fields (name, price, category)`);
             continue;
           }
 
-          // Check if product already exists
-          const existingProduct = await productModel.findOne({ slug: row.slug || row.name.toLowerCase().replace(/\s+/g, '-') });
+          // Ensure brand field exists
+          if (!row.brand) {
+            row.brand = 'Generic'; // Set default brand
+          }
+
+          // Generate unique slug
+          const baseSlug = row.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+          let slug = baseSlug;
+          let counter = 1;
           
+          // Ensure unique slug
+          while (await productModel.findOne({ slug })) {
+            slug = `${baseSlug}-${counter}`;
+            counter++;
+          }
+
           const productData = {
-            name: row.name,
-            slug: row.slug || row.name.toLowerCase().replace(/\s+/g, '-'),
-            price: parseFloat(row.price),
-            category: row.category,
-            sellerId: row.sellerId,
-            shopName: row.shopName || '',
-            images: row.images ? row.images.split(',').map(img => img.trim()) : [],
-            description: row.description || '',
+            name: row.name.trim(),
+            slug: slug,
+            price: parseFloat(row.price) || 0,
+            category: row.category.trim(),
+            brand: row.brand.trim(), // Now guaranteed to exist
+            sellerId: defaultSeller._id, // Always use default seller
+            shopName: (row.shopName && row.shopName.trim()) || 'Excel Import Shop',
+            images: row.images ? row.images.split(',').map(img => img.trim()).filter(img => img) : ['default-product.jpg'],
+            description: (row.description && row.description.trim()) || 'Imported from Excel',
             stock: parseInt(row.stock) || 0,
             discount: parseInt(row.discount) || 0,
             rating: parseFloat(row.rating) || 0,
-            status: row.status || 'active'
+            status: 'active'
           };
 
+          console.log(`Creating product ${i + 1}/${data.length}: ${productData.name}`);
+
+          // Check if product already exists by slug
+          const existingProduct = await productModel.findOne({ slug: productData.slug });
+          
           if (existingProduct) {
             // Update existing product
             await productModel.findByIdAndUpdate(existingProduct._id, productData);
             results.success++;
             results.details.push(`Row ${i + 2}: Updated product "${row.name}"`);
+            console.log(`Updated product: ${row.name}`);
           } else {
             // Create new product
-            await productModel.create(productData);
+            const newProduct = await productModel.create(productData);
             results.success++;
             results.details.push(`Row ${i + 2}: Created product "${row.name}"`);
+            console.log(`Created product: ${row.name}`);
           }
         } catch (error) {
           results.errors++;
           results.details.push(`Row ${i + 2}: Error - ${error.message}`);
+          console.error(`❌ Error in row ${i + 2}:`, error.message);
         }
       }
 
-      // Clean up uploaded file
-      fs.unlinkSync(filePath);
+      // Verify products were created
+      const totalProducts = await productModel.countDocuments();
+      const activeProducts = await productModel.countDocuments({ status: 'active' });
+      const inactiveProducts = await productModel.countDocuments({ status: 'inactive' });
+      const pendingProducts = await productModel.countDocuments({ status: 'pending' });
+      
+      console.log(`Import completed: ${results.success} successful, ${results.errors} errors`);
+      console.log(`Database status: ${totalProducts} total, ${activeProducts} active`);
 
       responseReturn(res, 200, {
         message: 'Products import completed',
-        results: results
+        success: results.success,
+        errors: results.errors,
+        details: results.details,
+        total: results.success + results.errors,
+        totalProducts: totalProducts,
+        activeProducts: activeProducts,
+        inactiveProducts: inactiveProducts,
+        pendingProducts: pendingProducts
       });
 
     } catch (error) {
@@ -212,8 +259,8 @@ class ExcelController {
         return responseReturn(res, 400, { message: 'No Excel file uploaded' });
       }
 
-      const filePath = req.file.path;
-      const workbook = XLSX.readFile(filePath);
+      // Read Excel file from memory buffer
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet);
@@ -272,12 +319,14 @@ class ExcelController {
         }
       }
 
-      // Clean up uploaded file
-      fs.unlinkSync(filePath);
+      // No file cleanup needed with memory storage
 
       responseReturn(res, 200, {
         message: 'Sellers import completed',
-        results: results
+        success: results.success,
+        errors: results.errors,
+        details: results.details,
+        total: results.success + results.errors
       });
 
     } catch (error) {
@@ -293,8 +342,8 @@ class ExcelController {
         return responseReturn(res, 400, { message: 'No Excel file uploaded' });
       }
 
-      const filePath = req.file.path;
-      const workbook = XLSX.readFile(filePath);
+      // Read Excel file from memory buffer
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet);
@@ -352,12 +401,14 @@ class ExcelController {
         }
       }
 
-      // Clean up uploaded file
-      fs.unlinkSync(filePath);
+      // No file cleanup needed with memory storage
 
       responseReturn(res, 200, {
         message: 'Customers import completed',
-        results: results
+        success: results.success,
+        errors: results.errors,
+        details: results.details,
+        total: results.success + results.errors
       });
 
     } catch (error) {
@@ -373,8 +424,8 @@ class ExcelController {
         return responseReturn(res, 400, { message: 'No Excel file uploaded' });
       }
 
-      const filePath = req.file.path;
-      const workbook = XLSX.readFile(filePath);
+      // Read Excel file from memory buffer
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet);
@@ -428,12 +479,14 @@ class ExcelController {
         }
       }
 
-      // Clean up uploaded file
-      fs.unlinkSync(filePath);
+      // No file cleanup needed with memory storage
 
       responseReturn(res, 200, {
         message: 'Banners import completed',
-        results: results
+        success: results.success,
+        errors: results.errors,
+        details: results.details,
+        total: results.success + results.errors
       });
 
     } catch (error) {
@@ -489,6 +542,9 @@ class ExcelController {
       responseReturn(res, 500, { message: 'Error retrieving templates', error: error.message });
     }
   };
+
+
+
 }
 
 module.exports = new ExcelController();

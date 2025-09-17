@@ -8,7 +8,10 @@ const DeactiveSellers = lazy(()=> import('../../views/admin/DeactiveSellers'))
 const SellerRequest = lazy(()=> import('../../views/admin/SellerRequest'))   
 const SellerDetails = lazy(()=> import('../../views/admin/SellerDetails'))   
 const ChatSeller = lazy(()=> import('../../views/admin/ChatSeller'))   
-const OrderDetails = lazy(()=> import('../../views/admin/OrderDetails'))  
+const OrderDetails = lazy(()=> import('../../views/admin/OrderDetails'))
+const ExcelUpload = lazy(()=> import('../../views/admin/ExcelUpload'))
+const AdminProducts = lazy(()=> import('../../views/admin/AdminProducts'))
+const AdminCategories = lazy(()=> import('../../views/admin/AdminCategories'))  
 
 export const adminRoutes = [
     {
@@ -64,6 +67,21 @@ export const adminRoutes = [
     {
         path: 'admin/dashboard/order/details/:orderId',
         element : <OrderDetails/> ,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/excel-upload',
+        element : <ExcelUpload/> ,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/admin-products',
+        element : <AdminProducts/> ,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/admin-categories',
+        element : <AdminCategories/> ,
         role : 'admin'
     },
  
