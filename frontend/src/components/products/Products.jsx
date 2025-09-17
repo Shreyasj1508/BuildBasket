@@ -4,9 +4,11 @@ import { Link } from "react-router-dom";
 import "react-multi-carousel/lib/styles.css";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { FaChartLine, FaStar, FaFire, FaTag } from "react-icons/fa";
+import { useCommission } from "../../context/CommissionContext";
 
 const Products = ({ title, products = [] }) => {
   const carouselRef = useRef(null);
+  const { calculateCommission } = useCommission();
 
   const responsive = {
     superLargeDesktop: {
@@ -230,17 +232,28 @@ const Products = ({ title, products = [] }) => {
                           {pl.name}
                         </h2>
                         <div className="flex items-center gap-2">
-                          <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
-                            ${pl.price}
-                          </span>
-                          {pl.discount && pl.discount > 0 && (
-                            <span className="text-sm text-gray-500 line-through">
-                              $
-                              {Math.round(
-                                pl.price + (pl.price * pl.discount) / 100
-                              )}
-                            </span>
-                          )}
+                          {(() => {
+                            const commissionInfo = calculateCommission(pl.price);
+                            return (
+                              <>
+                                <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+                                  ₹{commissionInfo.finalPrice}
+                                </span>
+                                {pl.discount && pl.discount > 0 && (
+                                  <span className="text-sm text-gray-500 line-through">
+                                    ₹{Math.round(
+                                      pl.price + (pl.price * pl.discount) / 100
+                                    )}
+                                  </span>
+                                )}
+                                {commissionInfo.commissionAmount > 0 && (
+                                  <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                                    +₹{commissionInfo.commissionAmount} commission
+                                  </span>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                         {/* Enhanced Rating Display */}
                         {pl.rating && (

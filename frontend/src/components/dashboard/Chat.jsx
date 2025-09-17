@@ -6,10 +6,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom'
 import { add_friend, messageClear, send_message,updateMessage } from '../../store/reducers/chatReducer';
 import toast from 'react-hot-toast';
-import io from 'socket.io-client'
+// Socket.IO removed - chat functionality disabled
 import {FaList} from 'react-icons/fa'
 
-const socket = io('http://localhost:5000')
+// Mock socket object for compatibility
+const socket = {
+    on: () => {},
+    emit: () => {},
+    connect: () => {},
+    disconnect: () => {},
+    connected: false
+}
 
 const Chat = () => {
 

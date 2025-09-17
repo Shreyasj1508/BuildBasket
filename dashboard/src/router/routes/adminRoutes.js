@@ -11,7 +11,8 @@ const ChatSeller = lazy(()=> import('../../views/admin/ChatSeller'))
 const OrderDetails = lazy(()=> import('../../views/admin/OrderDetails'))
 const ExcelUpload = lazy(()=> import('../../views/admin/ExcelUpload'))
 const AdminProducts = lazy(()=> import('../../views/admin/AdminProducts'))
-const AdminCategories = lazy(()=> import('../../views/admin/AdminCategories'))  
+const AdminCategories = lazy(()=> import('../../views/admin/AdminCategories'))
+const CommissionSettings = lazy(()=> import('../../views/admin/CommissionSettings'))  
 
 export const adminRoutes = [
     {
@@ -82,6 +83,11 @@ export const adminRoutes = [
     {
         path: 'admin/dashboard/admin-categories',
         element : <AdminCategories/> ,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/commission-settings',
+        element : <CommissionSettings/> ,
         role : 'admin'
     },
  

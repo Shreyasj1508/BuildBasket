@@ -1,6 +1,7 @@
 const cardModel = require('../../models/cardModel')
 const { responseReturn } = require('../../utiles/response')
 const { mongo: {ObjectId}} = require('mongoose')
+const { calculateCommissionSync } = require('../../utiles/commissionUtils')
 const wishlistModel = require('../../models/wishlistModel')
 
 class cardController{
@@ -45,7 +46,6 @@ class cardController{
     // End Method 
 
     get_card_products = async(req, res) => {
-       const co = 5;
        const {userId } = req.params
        try {
         const card_products = await cardModel.aggregate([{
@@ -97,7 +97,19 @@ class cardController{
                 } else {
                     pri = tempProduct.price
                 }
-        pri = pri - Math.floor((pri * co) / 100)
+                // Apply commission to the discounted price
+                // Use stored commission data if available, otherwise calculate
+                if (tempProduct.finalPrice && tempProduct.commissionAmount !== undefined) {
+                    // Use stored commission data - adjust for discount
+                    const baseCommissionAmount = tempProduct.commissionAmount;
+                    const discountRatio = pri / tempProduct.price; // Calculate discount ratio
+                    const adjustedCommissionAmount = baseCommissionAmount * discountRatio;
+                    pri = pri + adjustedCommissionAmount;
+                } else {
+                    // Calculate commission (fallback for products without stored data)
+                    const commissionInfo = calculateCommissionSync(pri);
+                    pri = commissionInfo.finalPrice;
+                }
         price = price + pri * stockProduct[j].quantity
         p[i] = {
             sellerId: unique[i], 

@@ -3,6 +3,7 @@ const { responseReturn } = require("../../utiles/response")
 const cloudinary = require('cloudinary').v2
 const productModel = require('../../models/productModel')
 const sellerModel = require('../../models/sellerModel')
+const { updateSingleProductCommission } = require('../../utiles/updateAllProductsCommission')
  
 class adminProductController {
 
@@ -124,6 +125,18 @@ class adminProductController {
                 })
 
                 console.log('Product created successfully:', product._id);
+
+                // Update commission for the new product
+                try {
+                    const commissionResult = await updateSingleProductCommission(product._id, product.price);
+                    if (commissionResult.success) {
+                        console.log('Commission updated for new product:', product._id);
+                    } else {
+                        console.warn('Failed to update commission for new product:', commissionResult.message);
+                    }
+                } catch (error) {
+                    console.error('Error updating commission for new product:', error);
+                }
 
                 responseReturn(res, 201, { 
                     message: 'Product Added Successfully by Admin',

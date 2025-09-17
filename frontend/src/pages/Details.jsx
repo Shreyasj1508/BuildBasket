@@ -21,6 +21,7 @@ import { product_details } from '../store/reducers/homeReducer';
 import toast from 'react-hot-toast';
 import { add_to_card,messageClear,add_to_wishlist, get_card_products, quantity_inc, quantity_dec } from '../store/reducers/cardReducer';
 import { useHomeState, useAuthState, useCardState } from '../hooks/useSafeSelector';
+import CommissionInfo from '../components/CommissionInfo';
  
 
 const Details = () => {
@@ -310,17 +311,30 @@ const Details = () => {
          <div className='text-2xl text-red-500 font-bold flex gap-3'>
             {
                 product.discount !== 0 ? <>
-                Price : <h2 className='line-through'>${product.price}</h2>
-                <h2>${product.price - Math.floor((product.price * product.discount) / 100)} (-{product.discount}%) </h2>
+                Price : <h2 className='line-through'>₹{product.price}</h2>
+                <h2>₹{product.price - Math.floor((product.price * product.discount) / 100)} (-{product.discount}%) </h2>
                 
-                </> : <h2> Price : ${product.price} </h2>
+                </> : <h2> Price : ₹{product.price} </h2>
             }
+            {product.finalPrice && (
+              <div className='text-lg text-green-600'>
+                Final Price (with commission): ₹{product.finalPrice}
+                {product.commissionAmount && (
+                  <span className='text-sm text-gray-600 ml-2'>
+                    (+₹{product.commissionAmount} commission)
+                  </span>
+                )}
+              </div>
+            )}
           </div> 
 
           <div className='text-slate-600'>
             <p>{product.description}  </p>
             <p className='text-slate-600 py-1 font-bold'>Shop Name : {product.shopName}</p>
-           </div> 
+           </div>
+
+           {/* Commission Information */}
+           <CommissionInfo product={product} /> 
 
             <div className='flex gap-3 pb-10 border-b'>
                 {

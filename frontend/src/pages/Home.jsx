@@ -8,6 +8,7 @@ import WhyChooseUs from "../components/WhyChooseUs";
 import CustomerTestimonials from "../components/CustomerTestimonials";
 import StatisticsSection from "../components/StatisticsSection";
 import Footer from "../components/Footer";
+// import CommissionTest from "../components/CommissionTest";
 import { useDispatch } from "react-redux";
 import { get_products, get_category } from "../store/reducers/homeReducer";
 import { useNavigate } from "react-router-dom";
@@ -210,6 +211,8 @@ const Home = () => {
 
       {/* Statistics Section */}
       <StatisticsSection />
+
+      {/* Commission Test Component removed */}
 
       <Banner />
       <Categorys />

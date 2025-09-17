@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useCommission } from '../../context/CommissionContext';
 import { FaEye, FaRegHeart, FaChartLine } from "react-icons/fa";
 import { RiShoppingCartLine } from "react-icons/ri";
 import Rating from '../Rating';
@@ -9,6 +10,7 @@ import toast from 'react-hot-toast';
 import { useAuthState, useCardState } from '../../hooks/useSafeSelector';
 
 const FeatureProducts = ({products = []}) => {
+    const { calculateCommission } = useCommission();
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const {userInfo} = useAuthState()
@@ -141,13 +143,12 @@ const FeatureProducts = ({products = []}) => {
 
         <div className='py-3 text-slate-600 px-2'>
             <h2 className='font-bold'>{p.name} </h2>
-            <div className='flex justify-start items-center gap-3'>
-                <span className='text-md font-semibold'>${p.price}</span>
-                <div className='flex'>
-                    <Rating ratings={p.rating} />
-                </div>
-
-            </div>
+                                    <div className='flex justify-start items-center gap-3'>
+                                            <span className='text-md font-semibold'>₹{calculateCommission(p.price).finalPrice}</span>
+                                            <div className='flex'>
+                                                    <Rating ratings={p.rating} />
+                                            </div>
+                                    </div>
         </div>    
 
 

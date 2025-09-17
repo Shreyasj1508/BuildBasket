@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCommission } from '../context/CommissionContext';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -25,12 +26,13 @@ ChartJS.register(
   Filler
 );
 
+
 const PriceGraph = ({ productId, productName, onClose }) => {
   const [priceData, setPriceData] = useState(null);
-  
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('7D');
   const [error, setError] = useState(null);
+  const { calculateCommission } = useCommission();
 
   const periods = [
     { key: '7D', label: '7 Days', days: 7 },
@@ -91,13 +93,13 @@ const PriceGraph = ({ productId, productName, onClose }) => {
       }
     }
     const trend = priceData.marketTrend || 'stable';
-    
     // Determine colors based on trend
     const borderColor = trend === 'up' ? '#10b981' : trend === 'down' ? '#ef4444' : '#6b7280';
     const backgroundColor = trend === 'up' ? 'rgba(16, 185, 129, 0.1)' : 
                           trend === 'down' ? 'rgba(239, 68, 68, 0.1)' : 
                           'rgba(107, 114, 128, 0.1)';
 
+    // Use commission-adjusted price for chart
     return {
       labels: data.map(item => 
         new Date(item.date).toLocaleDateString('en-IN', { 
@@ -107,8 +109,8 @@ const PriceGraph = ({ productId, productName, onClose }) => {
       ),
       datasets: [
         {
-          label: 'Price',
-          data: data.map(item => item.price),
+          label: 'Price (with commission)',
+          data: data.map(item => calculateCommission(item.price).finalPrice),
           borderColor: borderColor,
           backgroundColor: backgroundColor,
           fill: true,
@@ -245,7 +247,7 @@ const PriceGraph = ({ productId, productName, onClose }) => {
               <div className="flex items-center space-x-4">
                 <span className="text-2xl font-bold text-gray-900">
                   {Array.isArray(priceData) && priceData.length > 0
-                    ? formatPrice(priceData[priceData.length - 1].price)
+                    ? formatPrice(calculateCommission(priceData[priceData.length - 1].price).finalPrice)
                     : formatPrice(0)}
                 </span>
                 <span className="text-xs text-gray-500">
@@ -292,15 +294,15 @@ const PriceGraph = ({ productId, productName, onClose }) => {
                 <>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Highest:</span>
-                    <span className="font-semibold">{formatPrice(Math.max(...priceData.map(item => item.price)))}</span>
+                    <span className="font-semibold">{formatPrice(Math.max(...priceData.map(item => calculateCommission(item.price).finalPrice)))}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Lowest:</span>
-                    <span className="font-semibold">{formatPrice(Math.min(...priceData.map(item => item.price)))}</span>
+                    <span className="font-semibold">{formatPrice(Math.min(...priceData.map(item => calculateCommission(item.price).finalPrice)))}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Average:</span>
-                    <span className="font-semibold">{formatPrice(priceData.reduce((sum, item) => sum + item.price, 0) / priceData.length)}</span>
+                    <span className="font-semibold">{formatPrice(priceData.reduce((sum, item) => sum + calculateCommission(item.price).finalPrice, 0) / priceData.length)}</span>
                   </div>
                 </>
               ) : (

@@ -117,6 +117,11 @@ io.on('connection', (soc) => {
         io.emit('activeSeller', allSeller) 
     })
 
+    // Commission update broadcasting
+    soc.on('commission_updated', (commissionData) => {
+        console.log('Commission updated, broadcasting to all clients:', commissionData);
+        io.emit('commission_changed', commissionData);
+    })
 
 })
 
@@ -125,6 +130,7 @@ app.use(bodyParser.json())
 app.use(cookieParser())
  
 app.use('/api/home',require('./routes/home/homeRoutes'))
+app.use('/api/home/commission',require('./routes/home/commissionRoutes'))
 app.use('/api',require('./routes/authRoutes'))
 app.use('/api',require('./routes/order/orderRoutes'))
 app.use('/api',require('./routes/home/cardRoutes'))
@@ -143,10 +149,14 @@ app.use('/api/excel',require('./routes/excelRoutes'))
 // Admin-only routes
 app.use('/api',require('./routes/admin/adminProductRoutes'))
 app.use('/api',require('./routes/admin/adminCategoryRoutes'))
+app.use('/api/admin/commission',require('./routes/admin/commissionRoutes'))
 
 app.get('/',(req,res) => res.send('Hello Server'))
 const port = process.env.PORT || 5000
 console.log('Environment PORT:', process.env.PORT)
 console.log('Using port:', port)
+// Make io available globally for commission updates
+global.io = io;
+
 dbConnect()
 server.listen(port, () => console.log(`Server is running on port ${port}`))

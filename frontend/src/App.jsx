@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import "./App.css";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { CommissionProvider } from "./context/CommissionContext";
 import Home from "./pages/Home";
 import Shops from "./pages/Shops";
 import Card from "./pages/Card";
@@ -60,8 +61,9 @@ function App() {
 
   return (
     <ReduxErrorBoundary>
-      <BrowserRouter>
-        <Routes>
+      <CommissionProvider>
+        <BrowserRouter>
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -96,8 +98,9 @@ function App() {
 
           {/* Catch-all route for undefined paths - redirect to login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </BrowserRouter>
+          </Routes>
+        </BrowserRouter>
+      </CommissionProvider>
     </ReduxErrorBoundary>
   );
 }

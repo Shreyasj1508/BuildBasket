@@ -5,6 +5,7 @@ const { responseReturn } = require("../../utiles/response")
 const queryProducts = require('../../utiles/queryProducts')
 const moment = require('moment')
 const { mongo: {ObjectId}} = require('mongoose')
+const { calculateCommissionSync } = require('../../utiles/commissionUtils')
 
 class homeControllers{
 
@@ -17,6 +18,44 @@ class homeControllers{
             while (j < i + 3) {
                 if (products[j]) {
                     temp.push(products[j])
+                }
+                j++
+            }
+            productArray.push([...temp])
+            i = j
+        }
+        return productArray
+    }
+
+    // Format products with commission information
+    formateProductWithCommission = (products) => {
+        const productArray = [];
+        let i = 0;
+        while (i < products.length ) {
+            let temp = []
+            let j = i
+            while (j < i + 3) {
+                if (products[j]) {
+                    const product = products[j].toObject();
+                    
+                    // Use stored commission data if available, otherwise calculate
+                    if (product.finalPrice && product.commissionAmount !== undefined) {
+                        // Use stored commission data
+                        product.commissionInfo = {
+                            basePrice: product.price,
+                            commissionAmount: product.commissionAmount,
+                            finalPrice: product.finalPrice,
+                            commissionType: product.commissionType || 'fixed'
+                        };
+                    } else {
+                        // Calculate commission (fallback for products without stored data)
+                        const commissionInfo = calculateCommissionSync(product.price);
+                        product.commissionInfo = commissionInfo;
+                        product.finalPrice = commissionInfo.finalPrice;
+                        product.commissionAmount = commissionInfo.commissionAmount;
+                    }
+
+                    temp.push(product)
                 }
                 j++
             }
@@ -49,17 +88,17 @@ class homeControllers{
             const allProduct1 = await productModel.find({ status: 'active' }).limit(9).sort({
                 createdAt: -1
             })
-            const latest_product = this.formateProduct(allProduct1);
+            const latest_product = this.formateProductWithCommission(allProduct1);
             
             const allProduct2 = await productModel.find({ status: 'active' }).limit(9).sort({
                 rating: -1
             })
-            const topRated_product = this.formateProduct(allProduct2);
+            const topRated_product = this.formateProductWithCommission(allProduct2);
            
             const allProduct3 = await productModel.find({ status: 'active' }).limit(9).sort({
                 discount: -1
             })
-            const discount_product = this.formateProduct(allProduct3);
+            const discount_product = this.formateProductWithCommission(allProduct3);
 
             console.log(`Homepage API - Total products: ${products.length}`);
             console.log(`Homepage API - Latest products: ${allProduct1.length}`);
@@ -170,8 +209,20 @@ query_products = async (req, res) => {
             })));
         }
         
+        // Add commission information to each product
+        const productsWithCommission = result.map(product => {
+            const productObj = product.toObject();
+            const commissionInfo = calculateCommissionSync(productObj.price);
+            
+            productObj.commissionInfo = commissionInfo;
+            productObj.finalPrice = commissionInfo.finalPrice;
+            productObj.commissionAmount = commissionInfo.commissionAmount;
+            
+            return productObj;
+        });
+
         responseReturn(res, 200, {
-            products: result,
+            products: productsWithCommission,
             totalProduct,
             parPage
         })

@@ -53,7 +53,25 @@ const productSchema = new Schema({
     rating: {
         type: Number,
         default : 0
-    } 
+    },
+    // Commission-related fields
+    finalPrice: {
+        type: Number,
+        default: 0
+    },
+    commissionAmount: {
+        type: Number,
+        default: 0
+    },
+    commissionType: {
+        type: String,
+        enum: ['fixed', 'percentage'],
+        default: 'fixed'
+    },
+    lastCommissionUpdate: {
+        type: Date,
+        default: Date.now
+    }
      
 }, {timestamps: true})
 
