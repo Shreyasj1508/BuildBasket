@@ -16,6 +16,7 @@ import {
   Filler
 } from 'chart.js';
 import api from '../api/api';
+import { useCommission } from '../context/CommissionContext';
 
 ChartJS.register(
   CategoryScale,
@@ -31,6 +32,7 @@ ChartJS.register(
 const PriceDetail = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
+  const { calculateCommission } = useCommission();
   const [priceDetail, setPriceDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('30d');
@@ -248,7 +250,7 @@ const PriceDetail = () => {
                 <div className="flex items-center space-x-2">
                   <FaRupeeSign className="text-2xl text-primary" />
                   <span className="text-3xl font-bold text-gray-900">
-                    {formatPrice(priceDetail.currentPrice)}
+                    {formatPrice(Math.round(calculateCommission(priceDetail.currentPrice).finalPrice))}
                   </span>
                 </div>
                 <div className={`flex items-center space-x-1 ${getTrendColor(priceDetail.marketTrend)}`}>

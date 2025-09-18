@@ -5,23 +5,55 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import PriceGraph from '../components/PriceGraph';
 import PriceRangeDetails from '../components/PriceRangeDetails';
-import { FaArrowLeft, FaChartLine, FaRupeeSign, FaCalendarAlt } from 'react-icons/fa';
+import { FaArrowLeft, FaChartLine, FaRupeeSign, FaCalendarAlt, FaFilter, FaTimes } from 'react-icons/fa';
 import { get_products } from '../store/reducers/homeReducer';
 import api from '../api/api';
+import { useCommission } from '../context/CommissionContext';
 
 const PriceHistory = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { products } = useSelector(state => state.home);
+    const { calculateCommission } = useCommission();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
+    
+    // Filter states
+    const [filters, setFilters] = useState({
+        state: '',
+        city: '',
+        region: '',
+        category: ''
+    });
+    const [filterOptions, setFilterOptions] = useState({
+        states: [],
+        cities: [],
+        regions: [],
+        categories: []
+    });
+    const [showFilters, setShowFilters] = useState(false);
+
+    // Fetch filter options
+    const fetchFilterOptions = async () => {
+        try {
+            const { data } = await api.get('/home/price-history-filter-options');
+            if (data.success) {
+                setFilterOptions(data.filterOptions);
+            }
+        } catch (error) {
+            console.error('Error fetching filter options:', error);
+        }
+    };
 
     useEffect(() => {
         // Set a timeout to prevent infinite loading
         const timeout = setTimeout(() => {
             setLoading(false);
         }, 10000); // 10 seconds timeout
+
+        // Fetch filter options
+        fetchFilterOptions();
 
         // First try to find product in existing products list
         if (products && products.length > 0) {
@@ -72,6 +104,30 @@ const PriceHistory = () => {
             }
         }
     }, [products, productId, product, fetchProductFromAPI]);
+
+    // Filter functions
+    const handleFilterChange = (filterType, value) => {
+        setFilters(prev => ({
+            ...prev,
+            [filterType]: value
+        }));
+    };
+
+    const clearFilters = () => {
+        setFilters({
+            state: '',
+            city: '',
+            region: '',
+            category: ''
+        });
+    };
+
+    const applyFilters = () => {
+        // This will trigger a re-fetch of price history with filters
+        setShowFilters(false);
+    };
+
+    const hasActiveFilters = Object.values(filters).some(filter => filter !== '');
 
     if (loading) {
         return (
@@ -137,7 +193,119 @@ const PriceHistory = () => {
                                 </div>
                             </div>
                         </div>
+                        
+                        {/* Filter Button */}
+                        <div className="flex items-center space-x-3">
+                            {hasActiveFilters && (
+                                <button
+                                    onClick={clearFilters}
+                                    className="flex items-center space-x-2 text-sm text-gray-600 hover:text-red-600 transition-colors"
+                                >
+                                    <FaTimes />
+                                    <span>Clear Filters</span>
+                                </button>
+                            )}
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                                    showFilters || hasActiveFilters
+                                        ? 'bg-primary text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                            >
+                                <FaFilter />
+                                <span>Filters</span>
+                                {hasActiveFilters && (
+                                    <span className="bg-white text-primary text-xs px-2 py-1 rounded-full">
+                                        {Object.values(filters).filter(f => f !== '').length}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
                     </div>
+                    
+                    {/* Filter Panel */}
+                    {showFilters && (
+                        <div className="mt-6 p-6 bg-gray-50 rounded-lg border border-gray-200">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter Price History</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {/* State Filter */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+                                    <select
+                                        value={filters.state}
+                                        onChange={(e) => handleFilterChange('state', e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    >
+                                        <option value="">All States</option>
+                                        {filterOptions.states.map(state => (
+                                            <option key={state} value={state}>{state}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                
+                                {/* City Filter */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                    <select
+                                        value={filters.city}
+                                        onChange={(e) => handleFilterChange('city', e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    >
+                                        <option value="">All Cities</option>
+                                        {filterOptions.cities.map(city => (
+                                            <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                
+                                {/* Region Filter */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Region</label>
+                                    <select
+                                        value={filters.region}
+                                        onChange={(e) => handleFilterChange('region', e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    >
+                                        <option value="">All Regions</option>
+                                        {filterOptions.regions.map(region => (
+                                            <option key={region} value={region}>{region}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                
+                                {/* Category Filter */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                                    <select
+                                        value={filters.category}
+                                        onChange={(e) => handleFilterChange('category', e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    >
+                                        <option value="">All Categories</option>
+                                        {filterOptions.categories.map(category => (
+                                            <option key={category} value={category}>{category}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div className="flex justify-end space-x-3 mt-4">
+                                <button
+                                    onClick={() => setShowFilters(false)}
+                                    className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={applyFilters}
+                                    className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                                >
+                                    Apply Filters
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -164,7 +332,7 @@ const PriceHistory = () => {
                                             currency: 'INR',
                                             minimumFractionDigits: 0,
                                             maximumFractionDigits: 0,
-                                        }).format(product.price)}
+                                        }).format(Math.round(calculateCommission(product.price).finalPrice))}
                                     </span>
                                 </div>
                                 {product.discount > 0 && (
@@ -185,11 +353,12 @@ const PriceHistory = () => {
                         productId={productId}
                         productName={product.name}
                         onClose={() => {}} // No close functionality needed on this page
+                        filters={filters} // Pass filters to PriceGraph
                     />
                     {/* Price Range Details */}
                     <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                         <h4 className="text-md font-semibold text-gray-800 mb-2">Price Range</h4>
-                        <PriceRangeDetails productId={productId} />
+                        <PriceRangeDetails productId={productId} filters={filters} />
                     </div>
                 </div>
 

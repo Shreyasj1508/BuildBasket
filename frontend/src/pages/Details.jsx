@@ -21,7 +21,7 @@ import { product_details } from '../store/reducers/homeReducer';
 import toast from 'react-hot-toast';
 import { add_to_card,messageClear,add_to_wishlist, get_card_products, quantity_inc, quantity_dec } from '../store/reducers/cardReducer';
 import { useHomeState, useAuthState, useCardState } from '../hooks/useSafeSelector';
-import CommissionInfo from '../components/CommissionInfo';
+import { useCommission } from '../context/CommissionContext';
  
 
 const Details = () => {
@@ -33,6 +33,7 @@ const Details = () => {
     const {userInfo } = useAuthState()
     const {errorMessage,successMessage } = useCardState()
     const {card_products = [], outofstock_products = []} = useSelector(state => state.card)
+    const { calculateCommission } = useCommission()
 
     useEffect(() => {
         dispatch(product_details(slug))
@@ -311,21 +312,11 @@ const Details = () => {
          <div className='text-2xl text-red-500 font-bold flex gap-3'>
             {
                 product.discount !== 0 ? <>
-                Price : <h2 className='line-through'>₹{product.price}</h2>
-                <h2>₹{product.price - Math.floor((product.price * product.discount) / 100)} (-{product.discount}%) </h2>
+                Price : <h2 className='line-through'>₹{Math.round(calculateCommission(product.price).finalPrice)}</h2>
+                <h2>₹{Math.round(calculateCommission(product.price - Math.floor((product.price * product.discount) / 100)).finalPrice)} (-{product.discount}%) </h2>
                 
-                </> : <h2> Price : ₹{product.price} </h2>
+                </> : <h2> Price : ₹{Math.round(calculateCommission(product.price).finalPrice)} </h2>
             }
-            {product.finalPrice && (
-              <div className='text-lg text-green-600'>
-                Final Price (with commission): ₹{product.finalPrice}
-                {product.commissionAmount && (
-                  <span className='text-sm text-gray-600 ml-2'>
-                    (+₹{product.commissionAmount} commission)
-                  </span>
-                )}
-              </div>
-            )}
           </div> 
 
           <div className='text-slate-600'>
@@ -333,8 +324,6 @@ const Details = () => {
             <p className='text-slate-600 py-1 font-bold'>Shop Name : {product.shopName}</p>
            </div>
 
-           {/* Commission Information */}
-           <CommissionInfo product={product} /> 
 
             <div className='flex gap-3 pb-10 border-b'>
                 {
@@ -454,7 +443,7 @@ const Details = () => {
 
             <h2 className='text-slate-600 py-1 font-bold'>{p.name} </h2>
             <div className='flex gap-2'>
-                <h2 className='text-lg font-bold text-slate-600'>${p.price}</h2>
+                <h2 className='text-lg font-bold text-slate-600'>₹{Math.round(calculateCommission(p.price).finalPrice)}</h2>
                 <div className='flex items-center gap-2'>
                     <Rating ratings={p.rating}  />
                 </div>
@@ -519,7 +508,7 @@ const Details = () => {
             <div className='p-4 flex flex-col gap-1'>
             <h2 className='text-slate-600 text-lg font-bold'>{p.name} </h2>
             <div className='flex justify-start items-center gap-3'>
-                <h2 className='text-lg font-bold text-slate-600'>${p.price}</h2>
+                <h2 className='text-lg font-bold text-slate-600'>₹{Math.round(calculateCommission(p.price).finalPrice)}</h2>
                 <div className='flex'>
                     <Rating ratings={p.rating}  />
                 </div>

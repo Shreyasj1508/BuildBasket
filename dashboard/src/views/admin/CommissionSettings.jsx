@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaCog, FaCalculator, FaHistory, FaSave } from "react-icons/fa";
 import api from "../../api/api";
 import toast from "react-hot-toast";
 
 // Main component for managing commission settings in the admin dashboard
+import io from 'socket.io-client';
 const CommissionSettings = () => {
   const [commission, setCommission] = useState({
     commissionType: 'fixed',
@@ -12,15 +13,25 @@ const CommissionSettings = () => {
     description: 'Platform commission'
   });
   const [loading, setLoading] = useState(false);
+  const socketRef = useRef(null);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [testPrice, setTestPrice] = useState(100);
   const [testResult, setTestResult] = useState(null);
 
 
-  // Fetch commission settings on component mount
+
+  // Setup socket connection on mount
   useEffect(() => {
+    socketRef.current = io('http://localhost:5000', {
+      transports: ['websocket', 'polling']
+    });
     fetchCommissionSettings();
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
   }, []);
 
   // Fetch current commission settings from the API
@@ -54,6 +65,14 @@ const CommissionSettings = () => {
           toast.success(`Commission updated! ${productsUpdate.updatedCount} products updated successfully.`);
         } else {
           toast.success('Commission settings updated successfully!');
+        }
+        // Emit commission_updated event to backend for real-time update
+        if (socketRef.current) {
+          socketRef.current.emit('commission_updated', {
+            commission: response.data.commission,
+            message: 'Commission settings have been updated',
+            productsUpdated: productsUpdate?.updatedCount || 0
+          });
         }
         fetchCommissionSettings();
       } else {

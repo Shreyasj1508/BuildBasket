@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import api from '../api/api';
+import io from 'socket.io-client';
 
 const CommissionContext = createContext();
 
@@ -65,12 +66,62 @@ export const CommissionProvider = ({ children }) => {
         };
     };
 
-    // Setup polling for commission updates (fallback for WebSocket)
+    // Setup Socket.io for real-time commission updates
+    useEffect(() => {
+        const socketInstance = io('http://localhost:5000', {
+            transports: ['websocket', 'polling']
+        });
+
+        setSocket(socketInstance);
+
+        // Debug: Log socket instance and connection state
+        console.log('[CommissionContext] Socket instance created:', socketInstance);
+
+        // Listen for commission updates
+        socketInstance.on('commission_changed', (data) => {
+            console.log('[CommissionContext] Real-time commission update received:', data);
+            if (data.commission) {
+                setCommission(data.commission);
+                // Debug: Log commission update
+                console.log('[CommissionContext] Commission state updated:', data.commission);
+                // Show notification to user
+                if (typeof window !== 'undefined' && window.toast) {
+                    window.toast.success('Commission rates have been updated!');
+                } else {
+                    console.log('[CommissionContext] Commission rates have been updated!');
+                }
+            }
+        });
+
+        // Handle connection events
+        socketInstance.on('connect', () => {
+            console.log('[CommissionContext] Connected to server for commission updates');
+        });
+
+        socketInstance.on('disconnect', () => {
+            console.log('[CommissionContext] Disconnected from server');
+        });
+
+        socketInstance.on('connect_error', (error) => {
+            console.error('[CommissionContext] Socket connection error:', error);
+        });
+
+        return () => {
+            socketInstance.disconnect();
+        };
+    }, []);
+
+    // Fetch commission settings on mount
+    useEffect(() => {
+        fetchCommissionSettings();
+    }, []);
+
+    // Fallback polling mechanism (in case Socket.io fails)
     useEffect(() => {
         let pollingInterval;
         
-        const startPolling = () => {
-            // Poll for commission updates every 5 seconds
+        const startFallbackPolling = () => {
+            // Poll every 30 seconds as fallback
             pollingInterval = setInterval(async () => {
                 try {
                     const response = await api.get('/home/commission/settings');
@@ -79,25 +130,18 @@ export const CommissionProvider = ({ children }) => {
                         
                         // Check if commission has changed
                         if (JSON.stringify(newCommission) !== JSON.stringify(commission)) {
-                            console.log('Commission updated via polling:', newCommission);
+                            console.log('Commission updated via fallback polling:', newCommission);
                             setCommission(newCommission);
-                            
-                            // Show notification to user
-                            if (typeof window !== 'undefined' && window.toast) {
-                                window.toast.success('Commission rates have been updated!');
-                            } else {
-                                console.log('Commission rates have been updated!');
-                            }
                         }
                     }
                 } catch (error) {
-                    console.error('Error polling commission updates:', error);
+                    console.error('Error in fallback polling:', error);
                 }
-            }, 5000); // Poll every 5 seconds
+            }, 30000); // Poll every 30 seconds
         };
 
-        // Start polling after initial fetch
-        const timeoutId = setTimeout(startPolling, 2000);
+        // Start fallback polling after 10 seconds
+        const timeoutId = setTimeout(startFallbackPolling, 10000);
 
         return () => {
             clearTimeout(timeoutId);
@@ -106,11 +150,6 @@ export const CommissionProvider = ({ children }) => {
             }
         };
     }, [commission]);
-
-    // Fetch commission settings on mount
-    useEffect(() => {
-        fetchCommissionSettings();
-    }, []);
 
     const value = {
         commission,

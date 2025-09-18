@@ -3,8 +3,11 @@ import { FaEye, FaRegHeart, FaChartLine } from "react-icons/fa";
 import { RiShoppingCartLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import Rating from "../Rating";
+import { useCommission } from "../../context/CommissionContext";
 
 const ShopProducts = ({ styles, products }) => {
+  const { calculateCommission } = useCommission();
+  
   return (
     <div
       className={`w-full grid ${
@@ -55,7 +58,7 @@ const ShopProducts = ({ styles, products }) => {
           <div className="flex justify-start items-start flex-col gap-1">
             <h2 className="font-bold">{p.name}</h2>
             <div className="flex justify-start items-center gap-3">
-              <span className="text-md font-semibold">${p.price}</span>
+              <span className="text-md font-semibold">₹{Math.round(calculateCommission(p.price).finalPrice)}</span>
               <div className="flex">
                 <Rating ratings={p.rating} />
               </div>

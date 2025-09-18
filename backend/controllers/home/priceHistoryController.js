@@ -7,9 +7,18 @@ class priceHistoryController {
     get_price_history = async (req, res) => {
         try {
             const { productId } = req.params;
-            const { period = '1M' } = req.query; // 7D, 1M, 3M, 6M, 1Y
+            const { period = '1M', state, city, region, category } = req.query; // 7D, 1M, 3M, 6M, 1Y
             
-            let priceHistory = await priceHistoryModel.findOne({ productId }).populate('productId');
+            // Build filter object
+            let filter = { productId };
+            
+            // Add location and category filters if provided
+            if (state) filter['location.state'] = state;
+            if (city) filter['location.city'] = city;
+            if (region) filter['location.region'] = region;
+            if (category) filter['category'] = category;
+            
+            let priceHistory = await priceHistoryModel.findOne(filter).populate('productId');
             
             if (!priceHistory) {
                 // Create default price history if not exists
@@ -290,6 +299,40 @@ class priceHistoryController {
         } catch (error) {
             console.error('Error fetching products with prices:', error);
             responseReturn(res, 500, { message: 'Error fetching products with prices', error: error.message });
+        }
+    };
+
+    // Get filter options for price history
+    get_filter_options = async (req, res) => {
+        try {
+            // Get unique states
+            const states = await priceHistoryModel.distinct('location.state');
+            
+            // Get unique cities
+            const cities = await priceHistoryModel.distinct('location.city');
+            
+            // Get unique regions
+            const regions = await priceHistoryModel.distinct('location.region');
+            
+            // Get unique categories from products
+            const categories = await productModel.distinct('category');
+            
+            responseReturn(res, 200, {
+                success: true,
+                filterOptions: {
+                    states: states.sort(),
+                    cities: cities.sort(),
+                    regions: regions.sort(),
+                    categories: categories.sort()
+                }
+            });
+        } catch (error) {
+            console.error('Error fetching filter options:', error);
+            responseReturn(res, 500, { 
+                success: false, 
+                message: 'Error fetching filter options', 
+                error: error.message 
+            });
         }
     };
 

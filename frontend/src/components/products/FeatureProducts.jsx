@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useCommission } from '../../context/CommissionContext';
 import { FaEye, FaRegHeart, FaChartLine } from "react-icons/fa";
 import { RiShoppingCartLine } from "react-icons/ri";
 import Rating from '../Rating';
@@ -8,14 +7,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { add_to_card,add_to_wishlist,messageClear, get_card_products } from '../../store/reducers/cardReducer';
 import toast from 'react-hot-toast';
 import { useAuthState, useCardState } from '../../hooks/useSafeSelector';
+import { useCommission } from '../../context/CommissionContext';
 
 const FeatureProducts = ({products = []}) => {
-    const { calculateCommission } = useCommission();
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const {userInfo} = useAuthState()
     const {errorMessage, successMessage} = useCardState()
     const {card_products = [], card_product_count = 0, outofstock_products = []} = useSelector(state => state.card)
+    const { calculateCommission } = useCommission();
 
     const add_card = (id) => {
         if (userInfo) {
@@ -144,7 +144,7 @@ const FeatureProducts = ({products = []}) => {
         <div className='py-3 text-slate-600 px-2'>
             <h2 className='font-bold'>{p.name} </h2>
                                     <div className='flex justify-start items-center gap-3'>
-                                            <span className='text-md font-semibold'>₹{calculateCommission(p.price).finalPrice}</span>
+                                            <span className='text-md font-semibold'>₹{Math.round(calculateCommission(p.price).finalPrice)}</span>
                                             <div className='flex'>
                                                     <Rating ratings={p.rating} />
                                             </div>

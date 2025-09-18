@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaChartLine, FaRupeeSign, FaArrowUp, FaArrowDown, FaMinus, FaEye, FaShoppingCart, FaRegHeart } from 'react-icons/fa';
 import PriceGraph from './PriceGraph';
+import { useCommission } from '../../context/CommissionContext';
 
 const ProductCardWithGraph = ({ product, add_card, add_wishlist }) => {
   const [showGraph, setShowGraph] = useState(false);
+  const { calculateCommission } = useCommission();
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-IN', {
@@ -96,7 +98,7 @@ const ProductCardWithGraph = ({ product, add_card, add_wishlist }) => {
               <div className="flex items-center space-x-1">
                 <FaRupeeSign className="text-primary text-sm" />
                 <span className="text-lg font-bold text-gray-900">
-                  {formatPrice(product.price)}
+                  {formatPrice(Math.round(calculateCommission(product.price).finalPrice))}
                 </span>
               </div>
               <div className="text-right">

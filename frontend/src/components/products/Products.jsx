@@ -232,28 +232,14 @@ const Products = ({ title, products = [] }) => {
                           {pl.name}
                         </h2>
                         <div className="flex items-center gap-2">
-                          {(() => {
-                            const commissionInfo = calculateCommission(pl.price);
-                            return (
-                              <>
-                                <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
-                                  ₹{commissionInfo.finalPrice}
-                                </span>
-                                {pl.discount && pl.discount > 0 && (
-                                  <span className="text-sm text-gray-500 line-through">
-                                    ₹{Math.round(
-                                      pl.price + (pl.price * pl.discount) / 100
-                                    )}
-                                  </span>
-                                )}
-                                {commissionInfo.commissionAmount > 0 && (
-                                  <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                                    +₹{commissionInfo.commissionAmount} commission
-                                  </span>
-                                )}
-                              </>
-                            );
-                          })()}
+                          <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+                            ₹{Math.round(calculateCommission(pl.price).finalPrice)}
+                          </span>
+                          {pl.discount && pl.discount > 0 && (
+                            <span className="text-sm text-gray-500 line-through">
+                              ₹{Math.round(calculateCommission(pl.price + (pl.price * pl.discount) / 100).finalPrice)}
+                            </span>
+                          )}
                         </div>
                         {/* Enhanced Rating Display */}
                         {pl.rating && (

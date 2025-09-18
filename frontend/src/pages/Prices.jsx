@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useCommission } from '../context/CommissionContext';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useDispatch } from 'react-redux';
@@ -9,6 +10,7 @@ import api from '../api/api';
 const Prices = () => {
     const dispatch = useDispatch();
     const { products } = useHomeState();
+    const { calculateCommission, commission } = useCommission();
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
@@ -67,7 +69,7 @@ const Prices = () => {
         });
 
         setFilteredProducts(filtered);
-    }, [products, selectedCategory, priceRange, sortBy]);
+    }, [products, selectedCategory, priceRange, sortBy, calculateCommission]);
 
     const categories = [...new Set(products.map(product => product.category))];
 
@@ -198,11 +200,11 @@ const Prices = () => {
                                 <div className='flex items-center justify-between mb-3'>
                                     <div className='flex items-center gap-2'>
                                         <span className='text-2xl font-bold text-[#eba834]'>
-                                            ${product.price - Math.floor((product.price * product.discount) / 100)}
+                                            ₹{Math.round(calculateCommission(product.price - Math.floor((product.price * product.discount) / 100)).finalPrice)}
                                         </span>
                                         {product.discount > 0 && (
                                             <span className='text-sm text-gray-500 line-through'>
-                                                ${product.price}
+                                                ₹{Math.round(calculateCommission(product.price).finalPrice)}
                                             </span>
                                         )}
                                     </div>

@@ -71,7 +71,26 @@ const productSchema = new Schema({
     lastCommissionUpdate: {
         type: Date,
         default: Date.now
-    }
+    },
+    // Location and Commodity fields for filtering
+    location: {
+        state: {
+            type: String,
+            required: true,
+            default: 'Maharashtra'
+        },
+        city: {
+            type: String,
+            required: true,
+            default: 'Mumbai'
+        },
+        region: {
+            type: String,
+            required: true,
+            default: 'Western'
+        }
+    },
+    // Using existing category field instead of commodityType
      
 }, {timestamps: true})
 

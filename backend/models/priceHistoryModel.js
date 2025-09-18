@@ -7,6 +7,25 @@ const priceHistorySchema = new Schema({
         required: true,
         index: true
     },
+    // Location and Commodity data for filtering
+    location: {
+        state: {
+            type: String,
+            required: true,
+            default: 'Maharashtra'
+        },
+        city: {
+            type: String,
+            required: true,
+            default: 'Mumbai'
+        },
+        region: {
+            type: String,
+            required: true,
+            default: 'Western'
+        }
+    },
+    // Using category from product instead of commodityType
     currentPrice: {
         type: Number,
         required: true

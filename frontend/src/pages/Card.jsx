@@ -6,12 +6,14 @@ import { IoIosArrowForward } from "react-icons/io";
 import { useDispatch,useSelector } from 'react-redux';
 import { get_card_products,delete_card_product,messageClear,quantity_inc,quantity_dec } from '../store/reducers/cardReducer';
 import toast from 'react-hot-toast';
+import { useCommission } from '../context/CommissionContext';
 
 const Card = () => {
 
     const dispatch = useDispatch()
     const {userInfo} = useSelector(state => state.auth) 
     const {card_products = [], successMessage, price = 0, buy_product_item = 0, shipping_fee = 0, outofstock_products = []} = useSelector(state => state.card) 
+    const { calculateCommission } = useCommission();
     const [loading, setLoading] = useState(true)
 
     const navigate = useNavigate()  
@@ -125,8 +127,8 @@ const Card = () => {
 
    <div className='flex justify-between w-5/12 sm:w-full sm:mt-3'>
        <div className='pl-4 sm:pl-0'>
-           <h2 className='text-lg text-primary font-bold'>${pt.productInfo.price - Math.floor((pt.productInfo.price * pt.productInfo.discount) / 100)}</h2>
-           <p className='line-through'>${pt.productInfo.price}</p>
+           <h2 className='text-lg text-primary font-bold'>₹{Math.round(calculateCommission(pt.productInfo.price - Math.floor((pt.productInfo.price * pt.productInfo.discount) / 100)).finalPrice)}</h2>
+           <p className='line-through'>₹{Math.round(calculateCommission(pt.productInfo.price).finalPrice)}</p>
            <p>-{pt.productInfo.discount}%</p>
        </div>
        <div className='flex gap-2 flex-col'>
@@ -167,8 +169,8 @@ const Card = () => {
 
    <div className='flex justify-between w-5/12 sm:w-full sm:mt-3'>
        <div className='pl-4 sm:pl-0'>
-           <h2 className='text-lg text-primary font-bold'>${p.products[0].price - Math.floor((p.products[0].price * p.products[0].discount) / 100 )}</h2>
-           <p className='line-through'>${p.products[0].price}</p>
+           <h2 className='text-lg text-primary font-bold'>₹{Math.round(calculateCommission(p.products[0].price - Math.floor((p.products[0].price * p.products[0].discount) / 100)).finalPrice)}</h2>
+           <p className='line-through'>₹{Math.round(calculateCommission(p.products[0].price).finalPrice)}</p>
            <p>-{p.products[0].discount}%</p>
        </div>
        <div className='flex gap-2 flex-col'>

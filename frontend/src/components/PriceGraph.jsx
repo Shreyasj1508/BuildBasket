@@ -27,7 +27,7 @@ ChartJS.register(
 );
 
 
-const PriceGraph = ({ productId, productName, onClose }) => {
+const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
   const [priceData, setPriceData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('7D');
@@ -48,7 +48,19 @@ const PriceGraph = ({ productId, productName, onClose }) => {
     try {
       setLoading(true);
       setError(null);
-      const { data } = await api.get(`/home/price-history/${productId}?period=${selectedPeriod}`);
+      
+      // Build query parameters including filters
+      const queryParams = new URLSearchParams({
+        period: selectedPeriod
+      });
+      
+      // Add filters to query params if they exist
+      if (filters.state) queryParams.append('state', filters.state);
+      if (filters.city) queryParams.append('city', filters.city);
+      if (filters.region) queryParams.append('region', filters.region);
+      if (filters.category) queryParams.append('category', filters.category);
+      
+      const { data } = await api.get(`/home/price-history/${productId}?${queryParams.toString()}`);
       if (data.success) {
         setPriceData(data.priceHistory.priceHistory);
       } else {
@@ -59,7 +71,7 @@ const PriceGraph = ({ productId, productName, onClose }) => {
     } finally {
       setLoading(false);
     }
-  }, [productId, selectedPeriod]);
+  }, [productId, selectedPeriod, filters]);
 
   // Refetch data when product or period changes
   useEffect(() => {

@@ -21,6 +21,7 @@ router.get('/faq-data', pageController.get_faq_data)
 // Price history routes
 router.get('/price-history/:productId', priceHistoryController.get_price_history)
 router.get('/products-with-prices', priceHistoryController.get_all_products_with_prices)
+router.get('/price-history-filter-options', priceHistoryController.get_filter_options)
 router.put('/update-price/:productId', priceHistoryController.update_price)
   
 

@@ -113,7 +113,13 @@ async function seedPriceHistory() {
                     weeklyChange: 0, // Will be calculated dynamically
                     monthlyChange: 0, // Will be calculated dynamically
                     quarterlyChange: 0, // Will be calculated dynamically
-                    yearlyChange: metrics.totalChangePercent
+                    yearlyChange: metrics.totalChangePercent,
+                    // Add location data from product
+                    location: {
+                        state: product.location?.state || 'Maharashtra',
+                        city: product.location?.city || 'Mumbai',
+                        region: product.location?.region || 'Western'
+                    }
                 });
 
                 await priceHistoryDoc.save();

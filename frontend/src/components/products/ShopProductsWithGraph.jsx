@@ -8,12 +8,14 @@ import { add_to_card, add_to_wishlist, messageClear } from '../../store/reducers
 import { useAuthState, useCardState } from '../../hooks/useSafeSelector';
 import toast from 'react-hot-toast';
 import api from '../../api/api';
+import { useCommission } from '../../context/CommissionContext';
 
 const ShopProductsWithGraph = ({ products = [], grid }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { userInfo } = useAuthState();
     const { errorMessage, successMessage } = useCardState();
+    const { calculateCommission } = useCommission();
     const [productsWithPrices, setProductsWithPrices] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -194,7 +196,7 @@ const ShopProductsWithGraph = ({ products = [], grid }) => {
                                         <div className="flex items-center space-x-2">
                                             <FaRupeeSign className="text-primary" />
                                             <span className="text-2xl font-bold text-gray-900">
-                                                {formatPrice(product.price)}
+                                                {formatPrice(Math.round(calculateCommission(product.price).finalPrice))}
                                             </span>
                                         </div>
                                         <div className="text-right">
@@ -320,7 +322,7 @@ const ShopProductsWithGraph = ({ products = [], grid }) => {
                                         <div className="flex items-center space-x-2">
                                             <FaRupeeSign className="text-primary" />
                                             <span className="text-xl font-bold text-gray-900">
-                                                {formatPrice(product.price)}
+                                                {formatPrice(Math.round(calculateCommission(product.price).finalPrice))}
                                             </span>
                                         </div>
                                         <div className="text-right">
