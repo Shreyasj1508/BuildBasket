@@ -233,11 +233,19 @@ const Products = ({ title, products = [] }) => {
                         </h2>
                         <div className="flex items-center gap-2">
                           <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
-                            ₹{Math.round(calculateCommission(pl.price).finalPrice)}
+                            ₹
+                            {Math.round(
+                              calculateCommission(pl.price).finalPrice
+                            )}
                           </span>
                           {pl.discount && pl.discount > 0 && (
                             <span className="text-sm text-gray-500 line-through">
-                              ₹{Math.round(calculateCommission(pl.price + (pl.price * pl.discount) / 100).finalPrice)}
+                              ₹
+                              {Math.round(
+                                calculateCommission(
+                                  pl.price + (pl.price * pl.discount) / 100
+                                ).finalPrice
+                              )}
                             </span>
                           )}
                         </div>

@@ -25,7 +25,6 @@ const priceHistorySchema = new Schema({
             default: 'Western'
         }
     },
-    // Using category from product instead of commodityType
     currentPrice: {
         type: Number,
         required: true
@@ -54,7 +53,7 @@ const priceHistorySchema = new Schema({
         },
         marketCondition: {
             type: String,
-            enum: ['bullish', 'bearish', 'stable', 'volatile'],
+            enum: ['bullish', 'bearish', 'stable', 'volatile', 'moderate'],
             default: 'stable'
         }
     }],

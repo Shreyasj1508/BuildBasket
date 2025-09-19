@@ -86,6 +86,10 @@ const Prices = () => {
 
     return (
         <div className='min-h-screen bg-gray-50'>
+            {/* DEBUG: Show current commission value */}
+            <div style={{ background: '#ffe066', color: '#333', padding: '8px 0', textAlign: 'center', fontWeight: 'bold', fontSize: '15px' }}>
+                Commission Debug: Type: {commission.commissionType}, Fixed: {commission.fixedAmount}, %: {commission.percentageAmount}, Active: {commission.isActive ? 'Yes' : 'No'}
+            </div>
             <Header />
             
             {/* Hero Section */}
@@ -201,6 +205,10 @@ const Prices = () => {
                                     <div className='flex items-center gap-2'>
                                         <span className='text-2xl font-bold text-[#eba834]'>
                                             ₹{Math.round(calculateCommission(product.price - Math.floor((product.price * product.discount) / 100)).finalPrice)}
+                                            {/* DEBUG: Show raw commission-adjusted price */}
+                                            <span style={{fontSize: '12px', color: '#888', marginLeft: 4}}>
+                                                [debug: {calculateCommission(product.price - Math.floor((product.price * product.discount) / 100)).finalPrice}]
+                                            </span>
                                         </span>
                                         {product.discount > 0 && (
                                             <span className='text-sm text-gray-500 line-through'>

@@ -58,7 +58,6 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
       if (filters.state) queryParams.append('state', filters.state);
       if (filters.city) queryParams.append('city', filters.city);
       if (filters.region) queryParams.append('region', filters.region);
-      if (filters.category) queryParams.append('category', filters.category);
       
       const { data } = await api.get(`/home/price-history/${productId}?${queryParams.toString()}`);
       if (data.success) {

@@ -21,7 +21,6 @@ const PriceRangeDetails = ({ productId, filters = {} }) => {
         if (filters.state) queryParams.append('state', filters.state);
         if (filters.city) queryParams.append('city', filters.city);
         if (filters.region) queryParams.append('region', filters.region);
-        if (filters.category) queryParams.append('category', filters.category);
         
         const queryString = queryParams.toString();
         const url = queryString ? `/home/price-history/${productId}?${queryString}` : `/home/price-history/${productId}`;
