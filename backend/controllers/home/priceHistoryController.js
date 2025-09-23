@@ -67,17 +67,43 @@ class priceHistoryController {
         const currentDate = new Date();
         const basePrice = product.price;
         
-        // Generate 1 year of data
-        for (let i = 365; i >= 0; i--) {
+        // Generate price data at specific intervals for different time periods
+        // 7 days: 7 data points (daily)
+        // 1 month: Every 5 days (6 data points)
+        // 3 months: Every 7 days (13 data points)
+        // 6 months: Every 9 days (20 data points)
+        // 1 year: Every 11 days (33 data points)
+        
+        const intervals = [
+            // 7 days - daily data (7 points)
+            ...Array.from({ length: 7 }, (_, i) => i),
+            
+            // 1 month - every 5 days (6 points: 5, 10, 15, 20, 25, 30)
+            ...Array.from({ length: 6 }, (_, i) => (i + 1) * 5),
+            
+            // 3 months - every 7 days (13 points: 37, 44, 51, 58, 65, 72, 79, 86, 93, 100, 107, 114, 121)
+            ...Array.from({ length: 13 }, (_, i) => 37 + (i * 7)),
+            
+            // 6 months - every 9 days (20 points: 128, 137, 146, 155, 164, 173, 182, 191, 200, 209, 218, 227, 236, 245, 254, 263, 272, 281, 290, 299)
+            ...Array.from({ length: 20 }, (_, i) => 128 + (i * 9)),
+            
+            // 1 year - every 11 days (33 points: 308, 319, 330, 341, 352, 363, 374, 385, 396, 407, 418, 429, 440, 451, 462, 473, 484, 495, 506, 517, 528, 539, 550, 561, 572, 583, 594, 605, 616, 627, 638, 649, 660)
+            ...Array.from({ length: 33 }, (_, i) => 308 + (i * 11))
+        ];
+
+        // Sort intervals and remove duplicates
+        const uniqueIntervals = [...new Set(intervals)].sort((a, b) => b - a);
+
+        for (const daysAgo of uniqueIntervals) {
             const date = new Date(currentDate);
-            date.setDate(date.getDate() - i);
+            date.setDate(date.getDate() - daysAgo);
             
             // Generate realistic price variations
-            const variation = this.generatePriceVariation(basePrice, i, product.category);
+            const variation = this.generatePriceVariation(basePrice, daysAgo, product.category);
             const price = Math.round(basePrice * variation);
             
-            const change = i === 365 ? 0 : price - (priceHistory[priceHistory.length - 1]?.price || basePrice);
-            const changePercent = i === 365 ? 0 : ((change / (priceHistory[priceHistory.length - 1]?.price || basePrice)) * 100);
+            const change = daysAgo === 0 ? 0 : price - (priceHistory[priceHistory.length - 1]?.price || basePrice);
+            const changePercent = daysAgo === 0 ? 0 : ((change / (priceHistory[priceHistory.length - 1]?.price || basePrice)) * 100);
             
             priceHistory.push({
                 price,
@@ -94,6 +120,11 @@ class priceHistoryController {
 
         return await priceHistoryModel.create({
             productId: product._id,
+            location: {
+                state: 'Maharashtra',
+                city: 'Mumbai',
+                region: 'Western'
+            },
             currentPrice,
             priceHistory,
             marketTrend: changes.weekly.value > 0 ? 'up' : changes.weekly.value < 0 ? 'down' : 'stable',
@@ -118,10 +149,41 @@ class priceHistoryController {
         const categoryVolatility = this.getCategoryVolatility(category);
         const trendFactor = 1 + (daysAgo * 0.0001); // Slight upward trend over time
         
-        // Add random variation
-        const randomVariation = (Math.random() - 0.5) * categoryVolatility;
+        // Add more realistic price variations with occasional significant changes
+        let randomVariation;
         
-        return seasonalFactor * trendFactor * (1 + randomVariation);
+        // 5% chance of significant price change (>10%)
+        if (Math.random() < 0.05) {
+            const significantChange = (Math.random() - 0.5) * 0.3; // ±15% change
+            randomVariation = significantChange;
+        } else {
+            // Normal variation
+            randomVariation = (Math.random() - 0.5) * categoryVolatility;
+        }
+        
+        // Add market events (10% chance of market-driven changes)
+        let marketEventFactor = 1;
+        if (Math.random() < 0.1) {
+            const eventTypes = ['supply_shortage', 'demand_surge', 'raw_material_cost', 'seasonal_demand'];
+            const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+            
+            switch (eventType) {
+                case 'supply_shortage':
+                    marketEventFactor = 1.15; // 15% increase
+                    break;
+                case 'demand_surge':
+                    marketEventFactor = 1.12; // 12% increase
+                    break;
+                case 'raw_material_cost':
+                    marketEventFactor = 1.08; // 8% increase
+                    break;
+                case 'seasonal_demand':
+                    marketEventFactor = 1.05; // 5% increase
+                    break;
+            }
+        }
+        
+        return seasonalFactor * trendFactor * marketEventFactor * (1 + randomVariation);
     };
 
     // Get seasonal factor based on date
@@ -139,47 +201,54 @@ class priceHistoryController {
     // Get volatility based on product category
     getCategoryVolatility = (category) => {
         const volatilityMap = {
-            'Cement & Concrete': 0.08,
-            'Steel & Iron': 0.12,
-            'Bricks & Blocks': 0.06,
-            'Tiles & Flooring': 0.10,
-            'Electrical': 0.15,
-            'Plumbing': 0.09,
-            'Tools & Equipment': 0.07,
-            'Paint & Chemicals': 0.11,
-            'Hardware & Fasteners': 0.05,
-            'Safety & Security': 0.08,
-            'Doors & Windows': 0.09
+            'Cement & Concrete': 0.12, // Increased for more realistic variations
+            'Steel & Iron': 0.18,      // Higher volatility for steel
+            'Bricks & Blocks': 0.08,   // Slightly increased
+            'Tiles & Flooring': 0.14,  // Increased for seasonal variations
+            'Electrical': 0.20,        // High volatility for electrical components
+            'Plumbing': 0.12,          // Increased
+            'Tools & Equipment': 0.10, // Increased
+            'Paint & Chemicals': 0.15, // Increased for chemical price fluctuations
+            'Hardware & Fasteners': 0.08, // Increased
+            'Safety & Security': 0.10, // Increased
+            'Doors & Windows': 0.12    // Increased for seasonal demand
         };
-        return volatilityMap[category] || 0.08;
+        return volatilityMap[category] || 0.12; // Default increased from 0.08
     };
 
     // Get market condition based on price change
     getMarketCondition = (changePercent) => {
-        if (changePercent > 5) return 'bullish';
-        if (changePercent < -5) return 'bearish';
-        if (Math.abs(changePercent) > 2) return 'volatile';
+        if (changePercent > 8) return 'bullish';
+        if (changePercent < -8) return 'bearish';
+        if (Math.abs(changePercent) > 5) return 'volatile';
+        if (Math.abs(changePercent) > 2) return 'moderate';
         return 'stable';
     };
 
-    // Filter data by time period
+    // Filter data by time period - return specific number of data points
     filterDataByPeriod = (priceHistory, period) => {
-        const now = new Date();
-        let days;
+        // Sort price history by date (newest first)
+        const sortedHistory = priceHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
         
         switch (period) {
-            case '7D': days = 7; break;
-            case '1M': days = 30; break;
-            case '3M': days = 90; break;
-            case '6M': days = 180; break;
-            case '1Y': days = 365; break;
-            default: days = 30;
+            case '7D': 
+                // Return 7 data points (daily for past 7 days)
+                return sortedHistory.slice(0, 7);
+            case '1M': 
+                // Return 6 data points (every 5 days for past month)
+                return sortedHistory.slice(0, 6);
+            case '3M': 
+                // Return 13 data points (every 7 days for past 3 months)
+                return sortedHistory.slice(0, 13);
+            case '6M': 
+                // Return 20 data points (every 9 days for past 6 months)
+                return sortedHistory.slice(0, 20);
+            case '1Y': 
+                // Return 33 data points (every 11 days for past year)
+                return sortedHistory.slice(0, 33);
+            default: 
+                return sortedHistory.slice(0, 6); // Default to 1 month
         }
-        
-        const cutoffDate = new Date(now);
-        cutoffDate.setDate(cutoffDate.getDate() - days);
-        
-        return priceHistory.filter(item => new Date(item.date) >= cutoffDate);
     };
 
     // Calculate all time period changes

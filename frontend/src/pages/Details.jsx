@@ -35,6 +35,14 @@ const Details = () => {
     const {card_products = [], outofstock_products = []} = useSelector(state => state.card)
     const { calculateCommission } = useCommission()
 
+  // Get current price from price history or fallback to product price
+  const getCurrentPrice = () => {
+    if (product?.priceHistory?.currentPrice) {
+      return product.priceHistory.currentPrice;
+    }
+    return product?.price || 0;
+  };
+
     useEffect(() => {
         dispatch(product_details(slug))
     },[slug])
@@ -312,11 +320,16 @@ const Details = () => {
          <div className='text-2xl text-red-500 font-bold flex gap-3'>
             {
                 product.discount !== 0 ? <>
-                Price : <h2 className='line-through'>₹{Math.round(calculateCommission(product.price).finalPrice)}</h2>
-                <h2>₹{Math.round(calculateCommission(product.price - Math.floor((product.price * product.discount) / 100)).finalPrice)} (-{product.discount}%) </h2>
+                Price : <h2 className='line-through'>₹{Math.round(calculateCommission(getCurrentPrice()).finalPrice)}</h2>
+                <h2>₹{Math.round(calculateCommission(getCurrentPrice() - Math.floor((getCurrentPrice() * product.discount) / 100)).finalPrice)} (-{product.discount}%) </h2>
                 
-                </> : <h2> Price : ₹{Math.round(calculateCommission(product.price).finalPrice)} </h2>
+                </> : <h2> Price : ₹{Math.round(calculateCommission(getCurrentPrice()).finalPrice)} </h2>
             }
+            {product?.priceHistory?.currentPrice && product.priceHistory.currentPrice !== product.price && (
+                <span className="text-sm text-gray-500 ml-2">
+                    (Updated from ₹{Math.round(calculateCommission(product.price).finalPrice)})
+                </span>
+            )}
           </div> 
 
           <div className='text-slate-600'>

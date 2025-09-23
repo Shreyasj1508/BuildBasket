@@ -90,25 +90,22 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
 
   // Prepare chart data for Chart.js
   const getChartData = () => {
-    if (!priceData) return null;
+    if (!priceData || !Array.isArray(priceData)) return null;
 
-    let data = priceData;
-    // Sample data for longer periods to reduce points
-    if (Array.isArray(data)) {
-      let step = 1;
-      if (selectedPeriod === '3M') step = 3; // every 3rd day
-      if (selectedPeriod === '6M') step = 7; // every 7th day
-      if (selectedPeriod === '1Y') step = 15; // every 15th day
-      if (step > 1) {
-        data = data.filter((_, idx) => idx % step === 0 || idx === data.length - 1);
-      }
-    }
-    const trend = priceData.marketTrend || 'stable';
-    // Determine colors based on trend
-    const borderColor = trend === 'up' ? '#10b981' : trend === 'down' ? '#ef4444' : '#6b7280';
-    const backgroundColor = trend === 'up' ? 'rgba(16, 185, 129, 0.1)' : 
-                          trend === 'down' ? 'rgba(239, 68, 68, 0.1)' : 
-                          'rgba(107, 114, 128, 0.1)';
+    let data = [...priceData]; // Create a copy to avoid mutating original data
+    
+    // No need to sample data since we now have exact intervals for each period
+    // The database already provides the correct number of data points for each time period
+
+    // Calculate price range for better scaling
+    const prices = data.map(item => calculateCommission(item.price).finalPrice);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    const priceRange = maxPrice - minPrice;
+    
+    // Use slight green color for all graphs, especially for 1-year period
+    const borderColor = '#22c55e'; // Slight green color
+    const backgroundColor = 'rgba(34, 197, 94, 0.1)'; // Light green background
 
     // Use commission-adjusted price for chart
     return {
@@ -121,7 +118,7 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
       datasets: [
         {
           label: 'Price (with commission)',
-          data: data.map(item => calculateCommission(item.price).finalPrice),
+          data: prices,
           borderColor: borderColor,
           backgroundColor: backgroundColor,
           fill: true,
@@ -129,8 +126,8 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
           pointBackgroundColor: borderColor,
           pointBorderColor: '#ffffff',
           pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
+          pointRadius: priceRange > 10000 ? 3 : 4, // Smaller points for large price ranges
+          pointHoverRadius: priceRange > 10000 ? 5 : 6,
         }
       ]
     };
@@ -160,14 +157,15 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
         borderWidth: 1,
         callbacks: {
           label: function(context) {
-            const item = priceData?.priceHistory?.[context.dataIndex];
+            const item = priceData?.[context.dataIndex];
             if (!item) {
               return [`Price: ${formatPrice(context.parsed.y)}`];
             }
             return [
               `Price: ${formatPrice(context.parsed.y)}`,
-              `Change: ${item.change >= 0 ? '+' : ''}${formatPrice(item.change)}`,
-              `Change %: ${item.changePercent >= 0 ? '+' : ''}${item.changePercent?.toFixed(2) ?? '0.00'}%`
+              `Change: ${item.change >= 0 ? '+' : ''}${formatPrice(item.change || 0)}`,
+              `Change %: ${item.changePercent >= 0 ? '+' : ''}${item.changePercent?.toFixed(2) ?? '0.00'}%`,
+              `Date: ${new Date(item.date).toLocaleDateString('en-IN')}`
             ];
           }
         }
@@ -182,7 +180,8 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
           color: '#6b7280',
           font: {
             size: 12
-          }
+          },
+          maxTicksLimit: 8 // Limit number of x-axis labels for better readability
         }
       },
       y: {
@@ -197,6 +196,17 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
           },
           callback: function(value) {
             return formatPrice(value);
+          },
+          // Better scaling for significant price changes
+          min: function(context) {
+            const prices = context.chart.data.datasets[0].data;
+            const minPrice = Math.min(...prices);
+            return Math.max(0, minPrice * 0.95); // Add 5% padding below minimum
+          },
+          max: function(context) {
+            const prices = context.chart.data.datasets[0].data;
+            const maxPrice = Math.max(...prices);
+            return maxPrice * 1.05; // Add 5% padding above maximum
           }
         }
       }
@@ -205,6 +215,11 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
       point: {
         hoverBackgroundColor: '#ffffff'
       }
+    },
+    // Better interaction for significant price changes
+    interaction: {
+      intersect: false,
+      mode: 'index'
     }
   };
 
@@ -297,23 +312,29 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
         </div>
 
         {/* Price Range for selected period */}
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="font-semibold text-gray-900 mb-2">Price Range</h3>
+            <h3 className="font-semibold text-gray-900 mb-2">Price Range ({selectedPeriod})</h3>
             <div className="space-y-1">
               {Array.isArray(priceData) && priceData.length > 0 ? (
                 <>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Highest:</span>
-                    <span className="font-semibold">{formatPrice(Math.max(...priceData.map(item => calculateCommission(item.price).finalPrice)))}</span>
+                    <span className="font-semibold text-green-600">{formatPrice(Math.max(...priceData.map(item => calculateCommission(item.price).finalPrice)))}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Lowest:</span>
-                    <span className="font-semibold">{formatPrice(Math.min(...priceData.map(item => calculateCommission(item.price).finalPrice)))}</span>
+                    <span className="font-semibold text-red-600">{formatPrice(Math.min(...priceData.map(item => calculateCommission(item.price).finalPrice)))}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Average:</span>
-                    <span className="font-semibold">{formatPrice(priceData.reduce((sum, item) => sum + calculateCommission(item.price).finalPrice, 0) / priceData.length)}</span>
+                    <span className="font-semibold text-blue-600">{formatPrice(Math.round(priceData.reduce((sum, item) => sum + calculateCommission(item.price).finalPrice, 0) / priceData.length))}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Range:</span>
+                    <span className="font-semibold text-purple-600">
+                      {formatPrice(Math.max(...priceData.map(item => calculateCommission(item.price).finalPrice)) - Math.min(...priceData.map(item => calculateCommission(item.price).finalPrice)))}
+                    </span>
                   </div>
                 </>
               ) : (
@@ -329,6 +350,78 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Average:</span>
                     <span className="font-semibold">{formatPrice(0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Range:</span>
+                    <span className="font-semibold">{formatPrice(0)}</span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+          
+          {/* Additional Statistics */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h3 className="font-semibold text-gray-900 mb-2">Statistics</h3>
+            <div className="space-y-1">
+              {Array.isArray(priceData) && priceData.length > 0 ? (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Data Points:</span>
+                    <span className="font-semibold">{priceData.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Period:</span>
+                    <span className="font-semibold">{selectedPeriod}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Volatility:</span>
+                    <span className="font-semibold">
+                      {(() => {
+                        const prices = priceData.map(item => calculateCommission(item.price).finalPrice);
+                        const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+                        const variance = prices.reduce((acc, price) => acc + Math.pow(price - avg, 2), 0) / prices.length;
+                        const volatility = Math.sqrt(variance);
+                        return `${((volatility / avg) * 100).toFixed(1)}%`;
+                      })()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Trend:</span>
+                    <span className={`font-semibold ${
+                      (() => {
+                        const prices = priceData.map(item => calculateCommission(item.price).finalPrice);
+                        const firstPrice = prices[0];
+                        const lastPrice = prices[prices.length - 1];
+                        return lastPrice > firstPrice ? 'text-green-600' : lastPrice < firstPrice ? 'text-red-600' : 'text-gray-600';
+                      })()
+                    }`}>
+                      {(() => {
+                        const prices = priceData.map(item => calculateCommission(item.price).finalPrice);
+                        const firstPrice = prices[0];
+                        const lastPrice = prices[prices.length - 1];
+                        return lastPrice > firstPrice ? '↗ Upward' : lastPrice < firstPrice ? '↘ Downward' : '→ Stable';
+                      })()}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Data Points:</span>
+                    <span className="font-semibold">0</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Period:</span>
+                    <span className="font-semibold">{selectedPeriod}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Volatility:</span>
+                    <span className="font-semibold">0%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Trend:</span>
+                    <span className="font-semibold text-gray-600">→ Stable</span>
                   </div>
                 </>
               )}

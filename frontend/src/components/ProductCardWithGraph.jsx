@@ -43,6 +43,14 @@ const ProductCardWithGraph = ({ product, add_card, add_wishlist }) => {
     return value >= 0 ? 'text-green-500' : 'text-red-500';
   };
 
+  // Get current price from price history or fallback to product price
+  const getCurrentPrice = () => {
+    if (product.priceHistory && product.priceHistory.currentPrice) {
+      return product.priceHistory.currentPrice;
+    }
+    return product.price;
+  };
+
   return (
     <>
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:scale-105">
@@ -98,8 +106,13 @@ const ProductCardWithGraph = ({ product, add_card, add_wishlist }) => {
               <div className="flex items-center space-x-1">
                 <FaRupeeSign className="text-primary text-sm" />
                 <span className="text-lg font-bold text-gray-900">
-                  {formatPrice(Math.round(calculateCommission(product.price).finalPrice))}
+                  {formatPrice(Math.round(calculateCommission(getCurrentPrice()).finalPrice))}
                 </span>
+                {product.priceHistory && product.priceHistory.currentPrice && product.priceHistory.currentPrice !== product.price && (
+                  <span className="text-xs text-gray-500 ml-1">
+                    (Updated)
+                  </span>
+                )}
               </div>
               <div className="text-right">
                 <p className="text-xs text-gray-500">Stock</p>
@@ -111,7 +124,7 @@ const ProductCardWithGraph = ({ product, add_card, add_wishlist }) => {
             {product.priceHistory && (
               <div className="bg-gray-50 rounded p-2 mb-2">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-semibold text-gray-700">Market Price</span>
+                  <span className="text-xs font-semibold text-gray-700">Current Market Price</span>
                   <div className="flex items-center space-x-1">
                     {getTrendIcon(product.priceHistory.marketTrend)}
                     <span className={`text-xs font-semibold capitalize ${getTrendColor(product.priceHistory.marketTrend)}`}>
@@ -122,18 +135,30 @@ const ProductCardWithGraph = ({ product, add_card, add_wishlist }) => {
                 
                 <div className="grid grid-cols-2 gap-1 text-xs">
                   <div>
-                    <p className="text-gray-500">Weekly</p>
+                    <p className="text-gray-500">Weekly Change</p>
                     <p className={`font-semibold ${getPriceChangeColor(product.priceHistory.changes?.weekly?.value || 0)}`}>
                       {product.priceHistory.changes?.weekly?.value >= 0 ? '+' : ''}{formatPrice(product.priceHistory.changes?.weekly?.value || 0)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-gray-500">Monthly</p>
+                    <p className="text-gray-500">Monthly Change</p>
                     <p className={`font-semibold ${getPriceChangeColor(product.priceHistory.changes?.monthly?.value || 0)}`}>
                       {product.priceHistory.changes?.monthly?.value >= 0 ? '+' : ''}{formatPrice(product.priceHistory.changes?.monthly?.value || 0)}
                     </p>
                   </div>
                 </div>
+                
+                {/* Show original price if different from current */}
+                {product.priceHistory.currentPrice && product.priceHistory.currentPrice !== product.price && (
+                  <div className="mt-1 pt-1 border-t border-gray-200">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-500">Original Price:</span>
+                      <span className="text-gray-600 line-through">
+                        {formatPrice(Math.round(calculateCommission(product.price).finalPrice))}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

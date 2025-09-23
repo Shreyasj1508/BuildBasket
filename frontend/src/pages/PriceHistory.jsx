@@ -38,40 +38,49 @@ const PriceHistory = () => {
     const fetchFilterOptions = async () => {
         try {
             console.log('Fetching filter options from database...');
+            setFiltersLoading(true);
+            
             const { data } = await api.get('/home/price-history-filter-options');
             console.log('Filter options API response:', data);
             
             if (data.success && data.filterOptions) {
                 // Update filter options with database data
-                setFilterOptions({
+                const newFilterOptions = {
                     states: data.filterOptions.states || [],
                     cities: data.filterOptions.cities || [],
                     regions: data.filterOptions.regions || []
-                });
+                };
+                
+                setFilterOptions(newFilterOptions);
                 console.log('✅ Filter options loaded from database:');
-                console.log('States:', data.filterOptions.states?.length || 0);
-                console.log('Cities:', data.filterOptions.cities?.length || 0);
-                console.log('Regions:', data.filterOptions.regions?.length || 0);
+                console.log('States:', newFilterOptions.states.length);
+                console.log('Cities:', newFilterOptions.cities.length);
+                console.log('Regions:', newFilterOptions.regions.length);
             } else {
                 console.error('❌ API returned success: false or missing filterOptions', data);
                 // Set fallback options if API fails
-                setFilterOptions({
-                    states: ['Maharashtra', 'Delhi', 'Karnataka'],
-                    cities: ['Mumbai', 'Delhi', 'Bangalore'],
+                const fallbackOptions = {
+                    states: ['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Gujarat'],
+                    cities: ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Ahmedabad'],
                     regions: ['Northern', 'Southern', 'Eastern', 'Western', 'Central']
-                });
+                };
+                setFilterOptions(fallbackOptions);
                 console.log('Using fallback filter options');
             }
         } catch (error) {
             console.error('❌ Error fetching filter options:', error);
             console.error('Error details:', error.response?.data);
-            // Set fallback options on error
-            setFilterOptions({
-                states: ['Maharashtra', 'Delhi', 'Karnataka'],
-                cities: ['Mumbai', 'Delhi', 'Bangalore'], 
-                regions: ['Northern', 'Southern', 'Eastern', 'Western', 'Central']
-            });
-            console.log('Using fallback filter options due to error');
+            
+            // Set comprehensive fallback options on error
+            const fallbackOptions = {
+                states: ['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Gujarat', 'West Bengal', 'Rajasthan'],
+                cities: ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Ahmedabad', 'Kolkata', 'Jaipur'],
+                regions: ['Northern', 'Southern', 'Eastern', 'Western', 'Central', 'Northeast']
+            };
+            setFilterOptions(fallbackOptions);
+            console.log('Using comprehensive fallback filter options due to error');
+        } finally {
+            setFiltersLoading(false);
         }
     };
 
@@ -137,24 +146,25 @@ const PriceHistory = () => {
         }
     }, [products, productId, product, fetchProductFromAPI]);
 
-    // Filter functions
+    // Filter functions - Only one filter at a time
     const handleFilterChange = (filterType, value) => {
         console.log(`=== handleFilterChange called ===`);
         console.log(`Filter type: ${filterType}`);
         console.log(`Value: "${value}"`);
-        console.log(`Value type: ${typeof value}`);
-        console.log(`Value length: ${value.length}`);
         console.log(`Current filters before change:`, filters);
+        
+        // Prevent any navigation
+        console.log('Preventing navigation...');
         
         setFiltersLoading(true);
         
-        // If value is empty (like "All Regions"), clear all filters
+        // If value is empty (like "All States"), clear all filters
         if (value === '') {
             console.log('Clearing all filters because value is empty');
             setFilters({ state: '', city: '', region: '' });
         } else {
             console.log(`Setting ${filterType} filter to: "${value}"`);
-            // Only one filter can be active at a time
+            // Only one filter can be active at a time - clear others
             if (filterType === 'state') {
                 setFilters({ state: value, city: '', region: '' });
             } else if (filterType === 'city') {
@@ -167,9 +177,12 @@ const PriceHistory = () => {
         setTimeout(() => {
             setFiltersLoading(false);
             console.log('Filters loading set to false');
-        }, 500);
+        }, 300);
         
         console.log(`=== handleFilterChange completed ===`);
+        
+        // Return false to prevent any default behavior
+        return false;
     };
 
     const clearFilters = (e) => {
@@ -307,100 +320,165 @@ const PriceHistory = () => {
                     </div>
                     
 
-                    {/* Simple Filter Dropdown */}
-                    <div className="mt-6 bg-white p-4 rounded-lg shadow-md border">
-                        <div className="flex items-center space-x-4 flex-wrap">
-                            <span className="text-sm font-medium text-gray-700">Filter by:</span>
+                    {/* Enhanced Filter Dropdown */}
+                    <div 
+                        className="mt-6 bg-white p-6 rounded-lg shadow-md border"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('Filter div clicked - preventing navigation');
+                        }}
+                    >
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-800">Price History Filters</h3>
+                                <p className="text-sm text-gray-500 mt-1">Select one filter at a time</p>
+                            </div>
+                            {filtersLoading && (
+                                <div className="flex items-center space-x-2 text-blue-600">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                    <span className="text-sm">Loading filters...</span>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="flex items-center space-x-4 flex-wrap mb-4">
+                            <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Filter by:</span>
                             
                             {/* State Dropdown */}
-                            <select
-                                value={filters.state || ''}
-                                onChange={(e) => {
-                                    const selectedValue = e.target.value;
-                                    console.log('State selected:', selectedValue);
-                                    handleFilterChange('state', selectedValue);
-                                }}
-                                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                                <option value="">All States</option>
-                                {filterOptions.states && filterOptions.states.map(state => (
-                                    <option key={state} value={state}>{state}</option>
-                                ))}
-                            </select>
-
-                            {/* City Dropdown */}
-                            <select
-                                value={filters.city || ''}
-                                onChange={(e) => {
-                                    const selectedValue = e.target.value;
-                                    console.log('City selected:', selectedValue);
-                                    handleFilterChange('city', selectedValue);
-                                }}
-                                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            >
-                                <option value="">All Cities</option>
-                                {filterOptions.cities && filterOptions.cities.map(city => (
-                                    <option key={city} value={city}>{city}</option>
-                                ))}
-                            </select>
-
-                            {/* New Region Dropdown - Database Integrated */}
-                            <select
-                                value={filters.region || ''}
-                                onChange={(e) => {
-                                    const selectedValue = e.target.value;
-                                    console.log('New Region selected:', selectedValue);
-                                    handleFilterChange('region', selectedValue);
-                                }}
-                                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 min-w-[150px]"
-                                style={{ minWidth: '150px' }}
-                            >
-                                <option value="">All Regions</option>
-                                {filterOptions.regions && filterOptions.regions.map(region => (
-                                    <option key={region} value={region}>{region}</option>
-                                ))}
-                            </select>
-
-
-                            {/* New Remove All Filters Button */}
-                            {hasActiveFilters && (
-                                <button
-                                    type="button"
-                                    onClick={(e) => {
+                            <div className="flex items-center space-x-2">
+                                <label className="text-sm font-medium text-gray-600 whitespace-nowrap">
+                                    State:
+                                </label>
+                                <select
+                                    value={filters.state || ''}
+                                    onChange={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        clearFilters(e);
+                                        const selectedValue = e.target.value;
+                                        console.log('State selected:', selectedValue);
+                                        handleFilterChange('state', selectedValue);
                                     }}
-                                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium flex items-center space-x-2 shadow-md"
-                                    title="Clear all active filters"
+                                    disabled={filtersLoading}
+                                    className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed min-w-[120px]"
                                 >
-                                    <span>🗑️</span>
-                                    <span>Remove All Filters</span>
-                                    <span className="bg-red-600 text-xs px-1.5 py-0.5 rounded-full">
-                                        {Object.values(filters).filter(f => f !== '').length}
-                                    </span>
-                                </button>
-                            )}
+                                    <option value="">All States</option>
+                                    {filterOptions.states && filterOptions.states.map(state => (
+                                        <option key={state} value={state}>{state}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* City Dropdown */}
+                            <div className="flex items-center space-x-2">
+                                <label className="text-sm font-medium text-gray-600 whitespace-nowrap">
+                                    City:
+                                </label>
+                                <select
+                                    value={filters.city || ''}
+                                    onChange={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const selectedValue = e.target.value;
+                                        console.log('City selected:', selectedValue);
+                                        handleFilterChange('city', selectedValue);
+                                    }}
+                                    disabled={filtersLoading}
+                                    className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed min-w-[120px]"
+                                >
+                                    <option value="">All Cities</option>
+                                    {filterOptions.cities && filterOptions.cities.map(city => (
+                                        <option key={city} value={city}>{city}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Region Dropdown */}
+                            <div className="flex items-center space-x-2">
+                                <label className="text-sm font-medium text-gray-600 whitespace-nowrap">
+                                    Region:
+                                </label>
+                                <select
+                                    value={filters.region || ''}
+                                    onChange={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const selectedValue = e.target.value;
+                                        console.log('Region selected:', selectedValue);
+                                        handleFilterChange('region', selectedValue);
+                                    }}
+                                    disabled={filtersLoading}
+                                    className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed min-w-[120px]"
+                                >
+                                    <option value="">All Regions</option>
+                                    {filterOptions.regions && filterOptions.regions.map(region => (
+                                        <option key={region} value={region}>{region}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Filter Actions */}
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                            <div className="flex items-center space-x-2">
+                                {hasActiveFilters && (
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            clearFilters(e);
+                                        }}
+                                        disabled={filtersLoading}
+                                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium flex items-center space-x-2 shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                        title="Clear all active filters"
+                                    >
+                                        <span>🗑️</span>
+                                        <span>Clear Filter</span>
+                                        <span className="bg-red-600 text-xs px-1.5 py-0.5 rounded-full">
+                                            1
+                                        </span>
+                                    </button>
+                                )}
+                            </div>
+                            
+                            <div className="text-sm text-gray-500">
+                                {!hasActiveFilters && (
+                                    <span>No filters applied</span>
+                                )}
+                            </div>
                         </div>
                         
                         {/* Active Filters Display */}
                         {Object.values(filters).filter(f => f !== '').length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-gray-200">
+                            <div className="mt-4 pt-4 border-t border-gray-200">
                                 <div className="flex items-center justify-between">
-                                    <div>
-                                        <span className="text-sm text-gray-600">Active filters: </span>
-                                        {filters.state && <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1">{filters.state}</span>}
-                                        {filters.city && <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1">{filters.city}</span>}
-                                        {filters.region && <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded mr-1">{filters.region}</span>}
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-sm font-medium text-gray-600">Active filters:</span>
+                                        {filters.state && (
+                                            <span className="inline-flex items-center bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-medium">
+                                                📍 {filters.state}
+                                            </span>
+                                        )}
+                                        {filters.city && (
+                                            <span className="inline-flex items-center bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium">
+                                                🏙️ {filters.city}
+                                            </span>
+                                        )}
+                                        {filters.region && (
+                                            <span className="inline-flex items-center bg-purple-100 text-purple-800 text-xs px-3 py-1 rounded-full font-medium">
+                                                🌍 {filters.region}
+                                            </span>
+                                        )}
                                     </div>
-                                    <div className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                                    <div className="text-xs text-green-600 bg-green-50 px-3 py-1 rounded-full font-medium">
                                         {filtersLoading ? (
                                             <span className="flex items-center">
                                                 <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-green-600 mr-1"></div>
                                                 Applying...
                                             </span>
                                         ) : (
-                                            "✅ Filters Applied"
+                                            "Filters Applied"
                                         )}
                                     </div>
                                 </div>

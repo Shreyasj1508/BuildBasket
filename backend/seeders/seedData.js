@@ -9,7 +9,7 @@ const productModel = require("../models/productModel");
 const sellerModel = require("../models/sellerModel");
 const sellerCustomerModel = require("../models/chat/sellerCustomerModel");
 const customerModel = require("../models/customerModel");
-const priceDetailModel = require("../models/priceDetailModel");
+const priceHistoryModel = require("../models/priceHistoryModel");
 
 const seedData = async () => {
   console.log("🌱 Starting database seeding...");
@@ -2457,25 +2457,119 @@ const seedData = async () => {
     console.log("📊 Creating price details for products...");
     const allProducts = await productModel.find({});
 
+    // Define different locations for variety
+    const locations = [
+      { state: 'Maharashtra', city: 'Mumbai', region: 'Western' },
+      { state: 'Maharashtra', city: 'Pune', region: 'Western' },
+      { state: 'Maharashtra', city: 'Nagpur', region: 'Central' },
+      { state: 'Delhi', city: 'New Delhi', region: 'Northern' },
+      { state: 'Delhi', city: 'Gurgaon', region: 'Northern' },
+      { state: 'Karnataka', city: 'Bangalore', region: 'Southern' },
+      { state: 'Karnataka', city: 'Mysore', region: 'Southern' },
+      { state: 'Tamil Nadu', city: 'Chennai', region: 'Southern' },
+      { state: 'Tamil Nadu', city: 'Coimbatore', region: 'Southern' },
+      { state: 'Gujarat', city: 'Ahmedabad', region: 'Western' },
+      { state: 'Gujarat', city: 'Surat', region: 'Western' },
+      { state: 'West Bengal', city: 'Kolkata', region: 'Eastern' },
+      { state: 'West Bengal', city: 'Howrah', region: 'Eastern' },
+      { state: 'Rajasthan', city: 'Jaipur', region: 'Northern' },
+      { state: 'Rajasthan', city: 'Jodhpur', region: 'Northern' },
+      { state: 'Uttar Pradesh', city: 'Lucknow', region: 'Northern' },
+      { state: 'Uttar Pradesh', city: 'Kanpur', region: 'Northern' },
+      { state: 'Andhra Pradesh', city: 'Hyderabad', region: 'Southern' },
+      { state: 'Andhra Pradesh', city: 'Vijayawada', region: 'Southern' },
+      { state: 'Kerala', city: 'Kochi', region: 'Southern' }
+    ];
+
     for (const product of allProducts) {
-      // Generate sample price history
+      // Generate comprehensive price history for all time periods (1 year = 365 days)
       const priceHistory = [];
       const basePrice = product.price;
       const currentDate = new Date();
+      
+      // Select a random location for this product
+      const location = locations[Math.floor(Math.random() * locations.length)];
 
-      for (let i = 30; i >= 0; i--) {
+      // Generate price data at specific intervals for different time periods
+      // 7 days: 7 data points (daily)
+      // 1 month: Every 5 days (6 data points)
+      // 3 months: Every 7 days (13 data points)
+      // 6 months: Every 9 days (20 data points)
+      // 1 year: Every 11 days (33 data points)
+      
+      const intervals = [
+        // 7 days - daily data (7 points)
+        ...Array.from({ length: 7 }, (_, i) => i),
+        
+        // 1 month - every 5 days (6 points: 5, 10, 15, 20, 25, 30)
+        ...Array.from({ length: 6 }, (_, i) => (i + 1) * 5),
+        
+        // 3 months - every 7 days (13 points: 37, 44, 51, 58, 65, 72, 79, 86, 93, 100, 107, 114, 121)
+        ...Array.from({ length: 13 }, (_, i) => 37 + (i * 7)),
+        
+        // 6 months - every 9 days (20 points: 128, 137, 146, 155, 164, 173, 182, 191, 200, 209, 218, 227, 236, 245, 254, 263, 272, 281, 290, 299)
+        ...Array.from({ length: 20 }, (_, i) => 128 + (i * 9)),
+        
+        // 1 year - every 11 days (33 points: 308, 319, 330, 341, 352, 363, 374, 385, 396, 407, 418, 429, 440, 451, 462, 473, 484, 495, 506, 517, 528, 539, 550, 561, 572, 583, 594, 605, 616, 627, 638, 649, 660)
+        ...Array.from({ length: 33 }, (_, i) => 308 + (i * 11))
+      ];
+
+      // Sort intervals and remove duplicates
+      const uniqueIntervals = [...new Set(intervals)].sort((a, b) => b - a);
+
+      for (const daysAgo of uniqueIntervals) {
         const date = new Date(currentDate);
-        date.setDate(date.getDate() - i);
+        date.setDate(date.getDate() - daysAgo);
 
-        const variation = (Math.random() - 0.5) * 0.15; // ±7.5% variation
-        const price = Math.round(basePrice * (1 + variation));
+        // More realistic price variations with seasonal and market factors
+        const seasonalFactor = getSeasonalFactor(daysAgo);
+        const categoryVolatility = getCategoryVolatility(product.category);
+        const trendFactor = 1 + (daysAgo * 0.0001); // Slight upward trend over time
+        
+        // Add more realistic price variations with occasional significant changes
+        let randomVariation;
+        
+        // 5% chance of significant price change (>10%)
+        if (Math.random() < 0.05) {
+          const significantChange = (Math.random() - 0.5) * 0.3; // ±15% change
+          randomVariation = significantChange;
+        } else {
+          // Normal variation
+          randomVariation = (Math.random() - 0.5) * categoryVolatility;
+        }
+        
+        // Add market events (10% chance of market-driven changes)
+        let marketEventFactor = 1;
+        if (Math.random() < 0.1) {
+          const eventTypes = ['supply_shortage', 'demand_surge', 'raw_material_cost', 'seasonal_demand'];
+          const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+          
+          switch (eventType) {
+            case 'supply_shortage':
+              marketEventFactor = 1.15; // 15% increase
+              break;
+            case 'demand_surge':
+              marketEventFactor = 1.12; // 12% increase
+              break;
+            case 'raw_material_cost':
+              marketEventFactor = 1.08; // 8% increase
+              break;
+            case 'seasonal_demand':
+              marketEventFactor = 1.05; // 5% increase
+              break;
+          }
+        }
+        
+        const finalVariation = seasonalFactor * trendFactor * marketEventFactor * (1 + randomVariation);
+        const price = Math.round(basePrice * finalVariation);
+        
         const change =
-          i === 0
+          daysAgo === 0
             ? 0
             : price -
               (priceHistory[priceHistory.length - 1]?.price || basePrice);
         const changePercent =
-          i === 0
+          daysAgo === 0
             ? 0
             : (change /
                 (priceHistory[priceHistory.length - 1]?.price || basePrice)) *
@@ -2486,27 +2580,106 @@ const seedData = async () => {
           date,
           change,
           changePercent: Math.round(changePercent * 100) / 100,
+          volume: Math.floor(Math.random() * 1000) + 100,
+          marketCondition: getMarketCondition(changePercent)
         });
       }
 
       const currentPrice = priceHistory[priceHistory.length - 1].price;
-      const weeklyChange =
-        currentPrice - priceHistory[priceHistory.length - 7].price;
-      const monthlyChange = currentPrice - priceHistory[0].price;
+      
+      // Calculate changes for different periods
+      const weeklyChange = currentPrice - (priceHistory[priceHistory.length - 7]?.price || currentPrice);
+      const monthlyChange = currentPrice - (priceHistory[priceHistory.length - 30]?.price || currentPrice);
+      const quarterlyChange = currentPrice - (priceHistory[priceHistory.length - 90]?.price || currentPrice);
+      const yearlyChange = currentPrice - (priceHistory[0]?.price || currentPrice);
 
-      await priceDetailModel.create({
+      // Calculate comprehensive changes object
+      const changes = {
+        daily: {
+          value: priceHistory[priceHistory.length - 1]?.change || 0,
+          percent: priceHistory[priceHistory.length - 1]?.changePercent || 0
+        },
+        weekly: {
+          value: weeklyChange,
+          percent: ((weeklyChange / (priceHistory[priceHistory.length - 7]?.price || currentPrice)) * 100)
+        },
+        monthly: {
+          value: monthlyChange,
+          percent: ((monthlyChange / (priceHistory[priceHistory.length - 30]?.price || currentPrice)) * 100)
+        },
+        quarterly: {
+          value: quarterlyChange,
+          percent: ((quarterlyChange / (priceHistory[priceHistory.length - 90]?.price || currentPrice)) * 100)
+        },
+        yearly: {
+          value: yearlyChange,
+          percent: ((yearlyChange / (priceHistory[0]?.price || currentPrice)) * 100)
+        }
+      };
+
+      // Calculate market indicators
+      const prices = priceHistory.map(p => p.price);
+      const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+      const variance = prices.reduce((acc, price) => acc + Math.pow(price - avg, 2), 0) / prices.length;
+      const volatility = Math.sqrt(variance);
+
+      await priceHistoryModel.create({
         productId: product._id,
+        location: location, // Add location data
         currentPrice,
         priceHistory,
-        marketTrend:
-          weeklyChange > 0 ? "up" : weeklyChange < 0 ? "down" : "stable",
+        marketTrend: changes.weekly.value > 0 ? 'up' : changes.weekly.value < 0 ? 'down' : 'stable',
         priceRange: {
-          min: Math.min(...priceHistory.map((p) => p.price)),
-          max: Math.max(...priceHistory.map((p) => p.price)),
+          min: Math.min(...prices),
+          max: Math.max(...prices),
+          avg: avg
         },
-        weeklyChange,
-        monthlyChange,
+        changes,
+        marketIndicators: {
+          volatility: Math.round(volatility * 100) / 100,
+          supportLevel: prices.sort((a, b) => a - b)[Math.floor(prices.length * 0.1)],
+          resistanceLevel: prices.sort((a, b) => a - b)[Math.floor(prices.length * 0.9)],
+          trendStrength: volatility < 2 ? 'weak' : volatility < 5 ? 'moderate' : 'strong'
+        },
+        lastUpdated: new Date()
       });
+    }
+
+    // Helper functions for price generation
+    function getSeasonalFactor(daysAgo) {
+      const date = new Date();
+      date.setDate(date.getDate() - daysAgo);
+      const month = date.getMonth();
+      
+      // Higher prices in monsoon (June-Sept) and winter (Dec-Feb)
+      if (month >= 5 && month <= 8) return 1.05; // Monsoon
+      if (month === 11 || month <= 1) return 1.03; // Winter
+      return 1.0; // Normal season
+    }
+
+    function getCategoryVolatility(category) {
+      const volatilityMap = {
+        'Cement & Concrete': 0.12,
+        'Steel & Iron': 0.18,
+        'Bricks & Blocks': 0.08,
+        'Tiles & Flooring': 0.14,
+        'Electrical': 0.20,
+        'Plumbing': 0.12,
+        'Tools & Equipment': 0.10,
+        'Paint & Chemicals': 0.15,
+        'Hardware & Fasteners': 0.08,
+        'Safety & Security': 0.10,
+        'Doors & Windows': 0.12
+      };
+      return volatilityMap[category] || 0.12;
+    }
+
+    function getMarketCondition(changePercent) {
+      if (changePercent > 8) return 'bullish';
+      if (changePercent < -8) return 'bearish';
+      if (Math.abs(changePercent) > 5) return 'volatile';
+      if (Math.abs(changePercent) > 2) return 'moderate';
+      return 'stable';
     }
 
     console.log(`   - ${allProducts.length} Price Details`);
