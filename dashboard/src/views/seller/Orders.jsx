@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { FaEye, FaTruck, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-import { MdPendingActions } from 'react-icons/md';
+import { MdPending } from 'react-icons/md';
 import moment from 'moment';
 
 const Orders = () => {
-    const dispatch = useDispatch();
     const { userInfo } = useSelector(state => state.auth);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -15,9 +14,9 @@ const Orders = () => {
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, [fetchOrders]);
 
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
@@ -37,7 +36,7 @@ const Orders = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [userInfo?._id]);
 
     const updateOrderStatus = async (orderId, status) => {
         try {
@@ -73,7 +72,7 @@ const Orders = () => {
 
     const getStatusBadge = (status) => {
         const statusConfig = {
-            pending: { color: 'bg-yellow-500', icon: MdPendingActions },
+            pending: { color: 'bg-yellow-500', icon: MdPending },
             processing: { color: 'bg-blue-500', icon: FaTruck },
             delivered: { color: 'bg-green-500', icon: FaCheckCircle },
             cancelled: { color: 'bg-red-500', icon: FaTimesCircle }

@@ -5,6 +5,7 @@ import "react-multi-carousel/lib/styles.css";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { FaChartLine, FaStar, FaFire, FaTag } from "react-icons/fa";
 import { useCommission } from "../../context/CommissionContext";
+import { getProductImage, handleImageError } from "../../utils/imageUtils";
 
 const Products = ({ title, products = [] }) => {
   const carouselRef = useRef(null);
@@ -198,11 +199,9 @@ const Products = ({ title, products = [] }) => {
                       <div className="relative overflow-hidden rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
                         <img
                           className="w-[120px] h-[120px] object-cover group-hover:scale-110 transition-transform duration-300"
-                          src={pl.images[0]}
+                          src={getProductImage(pl.images)}
                           alt={pl.name}
-                          onError={(e) => {
-                            e.target.src = "/images/placeholder-product.png";
-                          }}
+                          onError={(e) => handleImageError(e)}
                         />
                         {/* Section-specific Badges */}
                         {title === "Latest Product" && (

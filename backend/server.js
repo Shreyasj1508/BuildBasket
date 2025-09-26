@@ -18,6 +18,9 @@ app.use(cors({
     credentials: true
 }))
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static('uploads'))
+
 const io = socket(server, {
     cors: {
         origin: '*',
