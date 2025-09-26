@@ -434,3 +434,8 @@ const PriceGraph = ({ productId, productName, onClose, filters = {} }) => {
 }
 
 export default PriceGraph;
+
+
+
+
+

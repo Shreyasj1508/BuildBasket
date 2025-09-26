@@ -15,5 +15,6 @@ export const socket = {
     emit: () => {},
     connect: () => {},
     disconnect: () => {},
+    off: () => {}, // Add the missing off method
     connected: false
 }

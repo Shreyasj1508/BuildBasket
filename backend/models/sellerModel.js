@@ -38,6 +38,29 @@ const sellerSchema = new Schema({
         type: Object,
         default : {}
     },
+    regions: [{
+        type: String,
+        required: false
+    }],
+    regionFares: [{
+        region: {
+            type: String,
+            required: true
+        },
+        fare: {
+            type: Number,
+            required: true
+        }
+    }],
+    gstRate: {
+        type: Number,
+        default: 18
+    },
+    paymentMethod: {
+        type: String,
+        enum: ['direct', 'sg_finserv'],
+        default: 'direct'
+    },
 },{ timestamps: true })
 
 sellerSchema.index({

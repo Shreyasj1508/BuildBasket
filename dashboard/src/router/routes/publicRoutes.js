@@ -5,7 +5,6 @@ const AdminLogin = lazy(()=> import('../../views/auth/AdminLogin'))
 const Home = lazy(()=> import('../../views/Home'))   
 const UnAuthorized = lazy(()=> import('../../views/UnAuthorized'))   
 const Success = lazy(()=> import('../../views/Success'))
-const Debug = lazy(()=> import('../../views/Debug'))   
 
 const publicRoutes = [
     {
@@ -32,10 +31,6 @@ const publicRoutes = [
         path : '/success?',
         element : <Success/>
     },
-    {
-        path : '/debug',
-        element : <Debug/>
-    }
 ]
 
 export default publicRoutes

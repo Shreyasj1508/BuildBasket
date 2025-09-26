@@ -32,7 +32,11 @@ const authSchema = new Schema({
     date: {
         type: String,
         required : true
-    } 
+    },
+    delivery_invoice: {
+        type: String,
+        default: ''
+    }
 },{ timestamps: true })
 
 module.exports = model('authorOrders',authSchema)

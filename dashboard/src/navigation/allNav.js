@@ -1,6 +1,6 @@
 import { AiOutlineDashboard, AiOutlineShoppingCart } from "react-icons/ai";
 import { BiCategory } from "react-icons/bi";
-import { FaUserTimes, FaUsers, FaFileExcel, FaCog } from "react-icons/fa";
+import { FaUserTimes, FaUsers, FaFileExcel, FaCog, FaEdit } from "react-icons/fa";
 import { MdPayment, MdProductionQuantityLimits } from "react-icons/md";
 import { FaCodePullRequest } from "react-icons/fa6";
 import { IoIosChatbubbles } from "react-icons/io";
@@ -134,27 +134,34 @@ export const allNav = [
     },
     {
         id : 18,
+        title : 'Order Management',
+        icon : <FaEdit />,
+        role : 'seller',
+        path: '/seller/dashboard/order-management'
+    },
+    {
+        id : 19,
         title : 'Payments',
         icon : <MdPayment />,
         role : 'seller',
         path: '/seller/dashboard/payments'
     },
     {
-        id : 19,
+        id : 20,
         title : 'Chat-Customer',
         icon : <IoChatbubbles />,
         role : 'seller',
         path: '/seller/dashboard/chat-customer'
     },
     {
-        id : 20,
+        id : 21,
         title : 'Chat-Support',
         icon : <BsFillChatQuoteFill />,
         role : 'seller',
         path: '/seller/dashboard/chat-support'
     },
     {
-        id : 21,
+        id : 22,
         title : 'Profile',
         icon : <CgProfile />,
         role : 'seller',
