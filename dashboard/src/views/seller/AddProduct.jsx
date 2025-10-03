@@ -37,7 +37,74 @@ const AddProduct = () => {
     stock: "",
   });
 
+  // Region and fare management states
+  const [selectedRegions, setSelectedRegions] = useState([]);
+  const [regionFares, setRegionFares] = useState({});
+  const [gstRate, setGstRate] = useState(18); // Default GST rate
+  const [showRegionModal, setShowRegionModal] = useState(false);
+  const [newRegion, setNewRegion] = useState('');
+  const [newFare, setNewFare] = useState('');
+
+  // Available regions list (matching backend database regions)
+  const availableRegions = [
+    'Northern', 'Southern', 'Eastern', 'Western', 'Central'
+  ];
+
   const [errors, setErrors] = useState({});
+
+  // Region management functions
+  const addRegion = () => {
+    if (newRegion && newFare && parseFloat(newFare) > 0) {
+      if (!selectedRegions.includes(newRegion)) {
+        setSelectedRegions([...selectedRegions, newRegion]);
+        setRegionFares({
+          ...regionFares,
+          [newRegion]: parseFloat(newFare)
+        });
+        setNewRegion('');
+        setNewFare('');
+        setShowRegionModal(false);
+        toast.success(`Region ${newRegion} added with fare ₹${newFare}`);
+      } else {
+        toast.error('Region already selected');
+      }
+    } else {
+      toast.error('Please enter valid region and fare');
+    }
+  };
+
+  const removeRegion = (region) => {
+    setSelectedRegions(selectedRegions.filter(r => r !== region));
+    const newRegionFares = { ...regionFares };
+    delete newRegionFares[region];
+    setRegionFares(newRegionFares);
+    toast.success(`Region ${region} removed`);
+  };
+
+  const updateRegionFare = (region, fare) => {
+    if (fare && parseFloat(fare) > 0) {
+      setRegionFares({
+        ...regionFares,
+        [region]: parseFloat(fare)
+      });
+    }
+  };
+
+  // Calculate total cost with commission and GST
+  const calculateTotalCost = (basePrice, region) => {
+    const fare = regionFares[region] || 0;
+    const commission = (basePrice * 0.05); // 5% commission
+    const subtotal = basePrice + commission + fare;
+    const gst = (subtotal * gstRate) / 100;
+    return {
+      basePrice,
+      commission,
+      fare,
+      subtotal,
+      gst,
+      total: subtotal + gst
+    };
+  };
 
   const inputHandle = (e) => {
     setState({
@@ -136,6 +203,18 @@ const AddProduct = () => {
       newErrors.discount = 'Discount must be between 0 and 100'
     }
 
+    if (selectedRegions.length === 0) {
+      newErrors.regions = 'Please select at least one region'
+    }
+
+    // Validate region fares
+    for (const region of selectedRegions) {
+      if (!regionFares[region] || regionFares[region] <= 0) {
+        newErrors.regions = 'Please set valid fare for all selected regions'
+        break
+      }
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -194,6 +273,9 @@ const AddProduct = () => {
     formData.append("brand", state.brand.trim());
     formData.append("shopName", userInfo?.shopInfo?.shopName || 'BuildBasket');
     formData.append("category", category);
+    formData.append("selectedRegions", JSON.stringify(selectedRegions));
+    formData.append("regionFares", JSON.stringify(regionFares));
+    formData.append("gstRate", gstRate);
 
     for (let i = 0; i < images.length; i++) {
       formData.append("images", images[i]);
@@ -224,6 +306,9 @@ const AddProduct = () => {
       setImages([]);
       setCategory("");
       setErrors({});
+      setSelectedRegions([]);
+      setRegionFares({});
+      setGstRate(18);
       // Navigate to products page after successful creation
       navigate('/seller/dashboard/products');
     }
@@ -401,6 +486,115 @@ const AddProduct = () => {
               {errors.description && <span className='text-red-400 text-sm'>{errors.description}</span>}
             </div>
 
+            {/* Region Selection and Fare Management */}
+            <div className="flex flex-col w-full gap-4 mb-5 text-[#d0d2d6]">
+              <div className="flex justify-between items-center">
+                <label className="text-[#d0d2d6] font-semibold">
+                  Sales Regions & Fares *
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowRegionModal(true)}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm"
+                >
+                  Add Region
+                </button>
+              </div>
+              
+              {errors.regions && <span className='text-red-400 text-sm'>{errors.regions}</span>}
+
+              {/* Selected Regions */}
+              {selectedRegions.length > 0 && (
+                <div className="space-y-3">
+                  {selectedRegions.map((region, index) => {
+                    const costBreakdown = calculateTotalCost(parseFloat(state.price) || 0, region);
+                    return (
+                      <div key={index} className="bg-slate-800 p-4 rounded-lg border border-slate-600">
+                        <div className="flex justify-between items-start mb-3">
+                          <h4 className="font-semibold text-indigo-300">{region}</h4>
+                          <button
+                            type="button"
+                            onClick={() => removeRegion(region)}
+                            className="text-red-400 hover:text-red-300 text-sm"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm text-gray-300">Fixed Fare (₹)</label>
+                            <input
+                              type="number"
+                              value={regionFares[region] || ''}
+                              onChange={(e) => updateRegionFare(region, e.target.value)}
+                              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white text-sm"
+                              placeholder="Enter fare"
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="text-sm text-gray-300">GST Rate (%)</label>
+                            <input
+                              type="number"
+                              value={gstRate}
+                              onChange={(e) => setGstRate(parseFloat(e.target.value) || 18)}
+                              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white text-sm"
+                              min="0"
+                              max="100"
+                              step="0.01"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Cost Breakdown */}
+                        {state.price && (
+                          <div className="mt-3 p-3 bg-slate-900 rounded-md">
+                            <h5 className="text-sm font-semibold text-green-300 mb-2">Cost Breakdown for {region}:</h5>
+                            <div className="text-xs space-y-1">
+                              <div className="flex justify-between">
+                                <span>Base Price:</span>
+                                <span>₹{costBreakdown.basePrice.toFixed(2)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Commission (5%):</span>
+                                <span>₹{costBreakdown.commission.toFixed(2)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Region Fare:</span>
+                                <span>₹{costBreakdown.fare.toFixed(2)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Subtotal:</span>
+                                <span>₹{costBreakdown.subtotal.toFixed(2)}</span>
+                              </div>
+                              <div className="flex justify-between text-green-300">
+                                <span>GST ({gstRate}%):</span>
+                                <span>₹{costBreakdown.gst.toFixed(2)}</span>
+                              </div>
+                              <div className="flex justify-between text-yellow-300 font-semibold border-t border-slate-600 pt-1">
+                                <span>Total:</span>
+                                <span>₹{costBreakdown.total.toFixed(2)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {selectedRegions.length === 0 && (
+                <div className="text-center py-8 text-gray-400 border-2 border-dashed border-slate-600 rounded-lg">
+                  <p>No regions selected</p>
+                  <p className="text-sm">Click "Add Region" to start selling in specific regions</p>
+                </div>
+              )}
+            </div>
+
             <div className="grid lg:grid-cols-4 grid-cols-1 md:grid-cols-3 sm:grid-cols-2 sm:gap-4 md:gap-4 gap-3 w-full text-[#d0d2d6] mb-4">
               {imageShow.map((img, i) => (
                 <div key={i} className="h-[180px] relative">
@@ -470,6 +664,70 @@ const AddProduct = () => {
           </form>
         </div>
       </div>
+
+      {/* Region Selection Modal */}
+      {showRegionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#6a5fdf] p-6 rounded-lg w-full max-w-md mx-4">
+            <h3 className="text-[#d0d2d6] text-lg font-semibold mb-4">Add Sales Region</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="text-[#d0d2d6] text-sm">Select Region</label>
+                <select
+                  value={newRegion}
+                  onChange={(e) => setNewRegion(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white"
+                >
+                  <option value="">Choose a region</option>
+                  {availableRegions
+                    .filter(region => !selectedRegions.includes(region))
+                    .map(region => (
+                      <option key={region} value={region}>{region}</option>
+                    ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="text-[#d0d2d6] text-sm">Fixed Fare (₹)</label>
+                <input
+                  type="number"
+                  value={newFare}
+                  onChange={(e) => setNewFare(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white"
+                  placeholder="Enter fare amount"
+                  min="0"
+                  step="0.01"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  This fare will be added to the total cost along with commission and GST
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={addRegion}
+                className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
+              >
+                Add Region
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowRegionModal(false);
+                  setNewRegion('');
+                  setNewFare('');
+                }}
+                className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

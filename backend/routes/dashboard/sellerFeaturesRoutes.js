@@ -25,4 +25,7 @@ router.get('/orders', isSeller, sellerFeaturesController.get_seller_orders);
 router.put('/orders/:orderId/status', isSeller, sellerFeaturesController.update_order_status);
 router.post('/orders/:orderId/invoice', isSeller, sellerFeaturesController.upload_delivery_invoice);
 
+// Test Customer Order Creation (for demonstration)
+router.post('/test/create-order', sellerFeaturesController.create_test_customer_order);
+
 module.exports = router;
