@@ -8,6 +8,7 @@ import { add_product, messageClear } from "../../store/Reducers/productReducer";
 import { PropagateLoader } from "react-spinners";
 import { overrideStyle } from "../../utils/utils";
 import toast from "react-hot-toast";
+import VerificationStatus from "../../components/VerificationStatus";
 
 const AddProduct = () => {
   const dispatch = useDispatch();
@@ -259,6 +260,12 @@ const AddProduct = () => {
     console.log('Category:', category);
     console.log('Images count:', images.length);
 
+    // Check seller verification status
+    if (userInfo?.status !== 'active') {
+      toast.error('Your account is not verified yet. Please wait for admin approval before adding products.');
+      return;
+    }
+
     if (!validateForm()) {
       toast.error('Please fix the errors in the form')
       return
@@ -334,6 +341,14 @@ const AddProduct = () => {
             All Products
           </Link>
         </div>
+        
+        {/* Verification Status */}
+        {userInfo && userInfo.status !== 'active' && (
+          <div className="mb-4">
+            <VerificationStatus status={userInfo.status} />
+          </div>
+        )}
+        
         <div>
           <form onSubmit={add}>
             <div className="flex flex-col mb-3 md:flex-row gap-4 w-full text-[#d0d2d6]">
@@ -643,11 +658,18 @@ const AddProduct = () => {
 
             <div className="flex gap-4">
               <button
-                disabled={loader ? true : false}
-                className="btn-primary w-[280px] mb-3"
+                disabled={loader || userInfo?.status !== 'active'}
+                className={`w-[280px] mb-3 ${
+                  userInfo?.status !== 'active' 
+                    ? 'bg-gray-400 cursor-not-allowed text-white px-7 py-2 rounded-md' 
+                    : 'btn-primary'
+                }`}
+                title={userInfo?.status !== 'active' ? 'Account verification required' : ''}
               >
                 {loader ? (
                   <PropagateLoader color="#fff" cssOverride={overrideStyle} />
+                ) : userInfo?.status !== 'active' ? (
+                  "Verification Required"
                 ) : (
                   "Add Product"
                 )}

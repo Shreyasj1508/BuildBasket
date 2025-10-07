@@ -22,7 +22,7 @@ const Pagination = ({pageNumber,setPageNumber,totalItem,parPage,showItem}) => {
         const btns = []
         for (let i = startPage; i < endPage; i++) {
             btns.push(
-                <li onClick={()=>setPageNumber(i)} className={` ${pageNumber === i ? 'bg-indigo-300 shadow-lg shadow-indigo-300/50 text-white' : 'bg-slate-600 hover:bg-indigo-400 shadow-lg hover:shadow-indigo-500/50 hover:text-white text-[#d0d2d6]'} w-[33px] h-[33px] rounded-full flex justify-center items-center cursor-pointer `}>
+                <li onClick={()=>setPageNumber(i)} className={` ${pageNumber === i ? 'bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg shadow-orange-500/50 text-white transform scale-110' : 'bg-white/80 backdrop-blur-sm hover:bg-gradient-to-r hover:from-orange-500 hover:to-orange-600 shadow-lg hover:shadow-orange-500/50 hover:text-white text-gray-700 hover:text-white'} w-[40px] h-[40px] rounded-xl flex justify-center items-center cursor-pointer transition-all duration-300 transform hover:scale-105 font-semibold`}>
                     {i}                    
                 </li>
             ) 
@@ -33,7 +33,7 @@ const Pagination = ({pageNumber,setPageNumber,totalItem,parPage,showItem}) => {
     return (
         <ul className='flex gap-3'>
             {
-                pageNumber > 1 && <li onClick={() => setPageNumber(pageNumber - 1)} className='w-[33px] h-[33px] rounded-full flex justify-center items-center bg-slate-300 text-[#000000] cursor-pointer'>
+                pageNumber > 1 && <li onClick={() => setPageNumber(pageNumber - 1)} className='w-[40px] h-[40px] rounded-xl flex justify-center items-center bg-white/80 backdrop-blur-sm hover:bg-gradient-to-r hover:from-orange-500 hover:to-orange-600 text-gray-700 hover:text-white cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-orange-500/50 font-semibold'>
                     <MdOutlineKeyboardDoubleArrowLeft />
                 </li>
             }
@@ -41,7 +41,7 @@ const Pagination = ({pageNumber,setPageNumber,totalItem,parPage,showItem}) => {
                 createBtn()
             }
             {
-                pageNumber < totalPage && <li onClick={() => setPageNumber(pageNumber + 1)} className='w-[33px] h-[33px] rounded-full flex justify-center items-center bg-slate-300 text-[#000000] cursor-pointer'>
+                pageNumber < totalPage && <li onClick={() => setPageNumber(pageNumber + 1)} className='w-[40px] h-[40px] rounded-xl flex justify-center items-center bg-white/80 backdrop-blur-sm hover:bg-gradient-to-r hover:from-orange-500 hover:to-orange-600 text-gray-700 hover:text-white cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-orange-500/50 font-semibold'>
                     <MdOutlineKeyboardDoubleArrowRight  />
                 </li>
             }

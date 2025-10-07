@@ -179,38 +179,6 @@ const Orders = () => {
           </div>
         </div>
 
-         {/* Backend Database Info Banner */}
-         <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
-           <div className="flex items-center gap-3">
-             <div className="p-2 bg-green-500 rounded-lg">
-               <FaTruck className="text-white text-sm" />
-             </div>
-             <div className="flex-1">
-               <h3 className="font-semibold text-green-800">
-                 Direct Database Orders - NO MOCK DATA
-               </h3>
-               <p className="text-sm text-green-600">
-                 All orders fetched directly from MongoDB database. No sample/mock data used.
-                 Shows only real customer orders from the system.
-               </p>
-               <div className="mt-2 text-xs text-green-700">
-                 <div>Database Orders: {orders.length}</div>
-                 <div>Filtered Orders: {filteredOrders.length}</div>
-                 <div>API Status: {loading ? 'Loading...' : 'Connected'}</div>
-                 {error && <div className="text-red-600">Error: {error}</div>}
-               </div>
-             </div>
-             <div className="text-right text-sm text-green-700">
-               <div className="font-semibold">Total Revenue:</div>
-               <div className="text-lg font-bold">
-                 ₹
-                 {filteredOrders
-                   .reduce((sum, order) => sum + (order.price || 0), 0)
-                   .toFixed(2)}
-               </div>
-             </div>
-           </div>
-         </div>
 
         {/* Filter */}
         <div className="flex gap-3 mb-8">
@@ -232,46 +200,7 @@ const Orders = () => {
           </div>
         </div>
 
-         {/* API Status Panel */}
-         <div className="mb-6 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-4">
-           <div className="flex items-center justify-between">
-             <div className="flex items-center gap-3">
-               <div className={`p-2 rounded-lg ${loading ? 'bg-yellow-500' : error ? 'bg-red-500' : 'bg-green-500'}`}>
-                 <div className="w-3 h-3 bg-white rounded-full"></div>
-               </div>
-               <div>
-                 <h4 className="font-semibold text-indigo-800">
-                   API Connection Status
-                 </h4>
-                 <p className="text-sm text-indigo-600">
-                   {loading ? 'Fetching orders from database...' : 
-                    error ? 'Connection failed - Retrying...' : 
-                    `Successfully loaded ${orders.length} orders from database`}
-                 </p>
-               </div>
-             </div>
-             <button
-               onClick={fetchOrders}
-               className="bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-600 transition-colors"
-             >
-               Refresh Data
-             </button>
-           </div>
-         </div>
 
-         {/* Error Message */}
-         {error && (
-           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-             <strong className="font-bold">Database Connection Error: </strong>
-             <span className="block sm:inline">{error}</span>
-             <button
-               onClick={fetchOrders}
-               className="mt-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-             >
-               Retry Connection
-             </button>
-           </div>
-         )}
 
         {/* Orders Grid */}
         {filteredOrders.length > 0 ? (
@@ -540,28 +469,6 @@ const Orders = () => {
                 ? "No customer orders found in database. Orders will appear here when customers place orders from your products."
                 : `No orders with status "${filterStatus}" found. Try changing the filter.`}
             </p>
-            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4 max-w-lg mx-auto">
-              <h4 className="font-semibold text-blue-800 mb-2">
-                Backend Database Status:
-              </h4>
-              <p className="text-sm text-blue-600">
-                Orders are fetched directly from MongoDB database. No sample
-                data is used.
-              </p>
-              {error && (
-                <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-sm text-red-600 font-medium">
-                    Error: {error}
-                  </p>
-                  <button
-                    onClick={fetchOrders}
-                    className="mt-2 bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
-                  >
-                    Retry Fetch
-                  </button>
-                </div>
-              )}
-            </div>
             {filterStatus !== "all" && (
               <button
                 onClick={() => setFilterStatus("all")}

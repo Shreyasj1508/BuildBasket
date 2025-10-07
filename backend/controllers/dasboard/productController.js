@@ -2,6 +2,7 @@ const formidable = require("formidable")
 const { responseReturn } = require("../../utiles/response")
 const cloudinary = require('cloudinary').v2
 const productModel = require('../../models/productModel')
+const sellerModel = require('../../models/sellerModel')
 const path = require('path')
 const fs = require('fs')
  
@@ -10,6 +11,23 @@ class productController{
     add_product = async(req,res) => {
         const {id} = req;
         console.log('Product creation request from seller ID:', id);
+        
+        try {
+            // Check if seller is verified before allowing product creation
+            const seller = await sellerModel.findById(id);
+            if (!seller) {
+                return responseReturn(res, 404, { error: 'Seller not found' });
+            }
+            
+            if (seller.status !== 'active') {
+                return responseReturn(res, 403, { 
+                    error: 'Your account is not verified yet. Please wait for admin approval before adding products.',
+                    status: seller.status 
+                });
+            }
+        } catch (error) {
+            return responseReturn(res, 500, { error: 'Error checking seller status' });
+        }
         
         const form = formidable({ multiples: true })
 
@@ -43,39 +61,38 @@ class productController{
                 if (images) {
                     console.log('Processing uploaded images...');
                     
-                    if (!Array.isArray(images)) {
-                        images = [images]; 
-                    } 
+                    // Check if Cloudinary is configured
+                    if (process.env.cloud_name && process.env.api_key && process.env.api_secret) {
+                        console.log('Using Cloudinary for image upload');
+                        cloudinary.config({
+                            cloud_name: process.env.cloud_name,
+                            api_key: process.env.api_key,
+                            api_secret: process.env.api_secret,
+                            secure: true
+                        })
 
-                    for (let i = 0; i < images.length; i++) {
-                        try {
-                            const imageFile = images[i];
-                            const fileName = imageFile.originalFilename || `product-${Date.now()}-${i}.jpg`;
-                            const uploadDir = path.join(__dirname, '../../uploads/products');
-                            
-                            // Ensure upload directory exists
-                            if (!fs.existsSync(uploadDir)) {
-                                fs.mkdirSync(uploadDir, { recursive: true });
+                        if (!Array.isArray(images)) {
+                            images = [images]; 
+                        } 
+
+                        for (let i = 0; i < images.length; i++) {
+                            try {
+                                const result = await cloudinary.uploader.upload(images[i].filepath, {folder: 'products'});
+                                allImageUrl.push(result.url);
+                                console.log('Image uploaded to Cloudinary:', result.url);
+                            } catch (uploadError) {
+                                console.error('Cloudinary upload error:', uploadError);
+                                // Use a placeholder image if upload fails
+                                allImageUrl.push('https://via.placeholder.com/400x400?text=Product+Image');
                             }
-                            
-                            // Generate unique filename
-                            const uniqueFileName = `${Date.now()}-${Math.round(Math.random() * 1E9)}-${fileName}`;
-                            const filePath = path.join(uploadDir, uniqueFileName);
-                            
-                            // Copy file from temporary location to uploads directory
-                            fs.copyFileSync(imageFile.filepath, filePath);
-                            
-                            // Generate URL for the uploaded image
-                            const imageUrl = `/uploads/products/${uniqueFileName}`;
-                            allImageUrl.push(imageUrl);
-                            
-                            console.log('Image uploaded to local storage:', imageUrl);
-                            
-                        } catch (uploadError) {
-                            console.error('Local upload error:', uploadError);
-                            // Use enhanced placeholder image if upload fails
-                            const placeholderUrl = `https://via.placeholder.com/400x400/FF6B35/FFFFFF?text=${encodeURIComponent(name)}`;
-                            allImageUrl.push(placeholderUrl);
+                        }
+                    } else {
+                        console.log('Cloudinary not configured, using placeholder images');
+                        if (!Array.isArray(images)) {
+                            images = [images]; 
+                        } 
+                        for (let i = 0; i < images.length; i++) {
+                            allImageUrl.push('https://via.placeholder.com/400x400?text=Product+Image');
                         }
                     }
                 } else {

@@ -269,23 +269,14 @@ class sellerFeaturesController {
             const sellerId = req.seller.id;
             const { period = '6M' } = req.query;
 
-            console.log("=== SELLER ANALYTICS REQUEST ===");
-            console.log("Seller ID:", sellerId);
-            console.log("Period:", period);
+            // Analytics request processing
 
                 // Always use consistent sample data
                 let realDataAvailable = false;
                 let analyticsData = {};
 
-                // Force sample data - skip real data processing
-                console.log("Using consistent sample data for analytics");
-                
                 // Generate dynamic analytics data from real orders
-                console.log("=== GENERATING DYNAMIC ANALYTICS DATA ===");
-                
-                // Fetch real orders from database for analytics
                 const realOrders = await orderModel.find({ sellerId: sellerId });
-                console.log("Real orders found for analytics:", realOrders.length);
                 let totalRevenue = 0;
                 let totalOrders = 0;
                 let commodityStats = {};
@@ -350,11 +341,6 @@ class sellerFeaturesController {
                 const monthlySales = [];
                 const monthNames = ['Jan', 'Feb', 'Mar'];
                 
-                console.log("=== REAL ORDER PRICES DEBUG ===");
-                realOrders.forEach((order, index) => {
-                    console.log(`Order ${index + 1}: ₹${order.price}`);
-                });
-                
                 // Create monthly data based on actual orders with exact prices
                 realOrders.forEach((order, index) => {
                     if (index < 3) { // Only use first 3 orders for 3 months
@@ -368,12 +354,8 @@ class sellerFeaturesController {
                             revenue: orderPrice,
                             profit: Math.round(orderPrice * 0.77) // After commission & GST
                         });
-                        
-                        console.log(`Month ${monthName}: ₹${orderPrice}`);
                     }
                 });
-                
-                console.log(`Generated monthly sales for ${monthlySales.length} months with exact real prices`);
 
                 const avgOrderValue = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
                 const commission = Math.round(totalRevenue * 0.05);
@@ -405,17 +387,13 @@ class sellerFeaturesController {
                     }
                 };
 
-            console.log("=== FINAL ANALYTICS DATA ===");
-            console.log("Data Source:", realDataAvailable ? "REAL ORDERS" : "SAMPLE DATA");
-            console.log("MonthlySales Length:", analyticsData.monthlySales?.length);
-            console.log("Revenue Total:", analyticsData.revenueBreakdown?.total);
+            // Analytics data prepared
 
             return responseReturn(res, 200, {
                 success: true,
                 analytics: analyticsData
             });
         } catch (error) {
-            console.log("Analytics API Error:", error.message);
             responseReturn(res, 500, { error: error.message });
         }
     }
@@ -505,13 +483,7 @@ class sellerFeaturesController {
 
             const totalOrders = await orderModel.countDocuments(query);
 
-            console.log("=== ORDERS API DEBUG ===");
-            console.log("Real orders found:", orders.length);
-            console.log("Total orders count:", totalOrders);
-            console.log("Seller ID:", sellerId);
-
-            // Return ONLY real orders from database - NO SAMPLE DATA
-            console.log("Returning ONLY real database orders:", orders.length);
+            // Return real orders from database
             responseReturn(res, 200, {
                 success: true,
                 orders: orders,
