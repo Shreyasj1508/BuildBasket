@@ -84,14 +84,17 @@ export const getImageUrl = (imagePath) => {
     return imagePath;
   }
   
+  // Get backend URL from environment variable
+  const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  
   // If it's a local path, prepend the backend URL
   if (imagePath.startsWith('/uploads/')) {
-    return `http://localhost:5000${imagePath}`;
+    return `${backendUrl}${imagePath}`;
   }
   
   // If it's a relative path, prepend the backend URL
   if (imagePath.startsWith('uploads/')) {
-    return `http://localhost:5000/${imagePath}`;
+    return `${backendUrl}/${imagePath}`;
   }
   
   return imagePath;

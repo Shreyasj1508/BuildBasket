@@ -22,7 +22,7 @@ import toast from 'react-hot-toast';
 import { add_to_card,messageClear,add_to_wishlist, get_card_products, quantity_inc, quantity_dec } from '../store/reducers/cardReducer';
 import { useHomeState, useAuthState, useCardState } from '../hooks/useSafeSelector';
 import { useCommission } from '../context/CommissionContext'
-import { getProductImage, getAllProductImages, handleImageError } from '../utils/imageUtils';
+import { getProductImage, getAllProductImages, handleImageError, getImageUrl } from '../utils/imageUtils';
  
 
 const Details = () => {
@@ -282,7 +282,7 @@ const Details = () => {
             <div className='grid grid-cols-2 md-lg:grid-cols-1 gap-8'>
                 <div>
                 <div className='p-5 border'>
-                    <img className='h-[400px] w-full' src={image ? image : getProductImage(product.images)} alt="" />
+                    <img className='h-[400px] w-full' src={image ? getImageUrl(image) : getImageUrl(getProductImage(product.images))} alt="" />
                 </div>
             <div className='py-3'>
                 {
@@ -296,7 +296,7 @@ const Details = () => {
                        getAllProductImages(product.images).map((img, i) => {
                         return (
                             <div key={i}  onClick={() => setImage(img)}>
-                   <img className='h-[120px] cursor-pointer' src={img} alt="" onError={(e) => handleImageError(e)} /> 
+                   <img className='h-[120px] cursor-pointer' src={getImageUrl(img)} alt="" onError={(e) => handleImageError(e)} /> 
                             </div>
                         )
                        })

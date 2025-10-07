@@ -70,3 +70,32 @@ export const handleImageError = (event, fallback = '/images/placeholder-product.
     event.target.src = fallback;
   }
 };
+
+/**
+ * Convert local image path to full URL
+ * @param {string} imagePath - Local image path
+ * @returns {string} - Full URL for the image
+ */
+export const getImageUrl = (imagePath) => {
+  if (!imagePath) return '/images/placeholder-product.png';
+  
+  // If it's already a full URL, return as is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  
+  // Get backend URL from environment variable
+  const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  
+  // If it's a local path, prepend the backend URL
+  if (imagePath.startsWith('/uploads/')) {
+    return `${backendUrl}${imagePath}`;
+  }
+  
+  // If it's a relative path, prepend the backend URL
+  if (imagePath.startsWith('uploads/')) {
+    return `${backendUrl}/${imagePath}`;
+  }
+  
+  return imagePath;
+};

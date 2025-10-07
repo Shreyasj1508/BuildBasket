@@ -9,7 +9,7 @@ import { FaArrowLeft, FaChartLine, FaRupeeSign, FaFilter } from 'react-icons/fa'
 import { get_products } from '../store/reducers/homeReducer';
 import { useCommission } from '../context/CommissionContext';
 import api from '../api/api';
-import { getProductImage, handleImageError } from '../utils/imageUtils';
+import { getProductImage, handleImageError, getImageUrl } from '../utils/imageUtils';
 
 const PriceHistory = () => {
     const { productId } = useParams();
@@ -495,7 +495,7 @@ const PriceHistory = () => {
                     <div className="flex items-start space-x-4">
                         <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden">
                             <img
-                                src={getProductImage(product.images, '/images/demo.jpg')}
+                                src={getImageUrl(getProductImage(product.images, '/images/demo.jpg'))}
                                 alt={product.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => handleImageError(e, '/images/demo.jpg')}

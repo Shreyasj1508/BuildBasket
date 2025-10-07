@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaChartLine, FaRupeeSign, FaArrowUp, FaArrowDown, FaMinus, FaEye, FaShoppingCart, FaRegHeart } from 'react-icons/fa';
 import PriceGraph from './PriceGraph';
 import { useCommission } from '../../context/CommissionContext';
-import { getProductImage, handleImageError } from '../../utils/imageUtils';
+import { getProductImage, handleImageError, getImageUrl } from '../../utils/imageUtils';
 
 const ProductCardWithGraph = ({ product, add_card, add_wishlist }) => {
   const [showGraph, setShowGraph] = useState(false);
@@ -58,7 +58,7 @@ const ProductCardWithGraph = ({ product, add_card, add_wishlist }) => {
         {/* Product Image */}
         <div className="relative h-32 bg-gray-100">
           <img
-            src={getProductImage(product.images, '/images/demo.jpg')}
+            src={getImageUrl(getProductImage(product.images, '/images/demo.jpg'))}
             alt={product.name}
             className="w-full h-full object-cover"
             onError={(e) => handleImageError(e, '/images/demo.jpg')}
