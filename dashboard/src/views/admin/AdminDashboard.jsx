@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { MdCurrencyExchange,MdProductionQuantityLimits } from "react-icons/md";
-import { FaUsers } from "react-icons/fa";
+import { MdCurrencyExchange,MdProductionQuantityLimits, MdDashboard } from "react-icons/md";
+import { FaUsers, FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { FaCartShopping } from "react-icons/fa6"; 
 import Chart from 'react-apexcharts'
 import { Link } from 'react-router-dom';
@@ -37,7 +37,7 @@ const AdminDashboard = () => {
             },
         ],
         options : {
-            color : ['#181ee8','#181ee8'],
+            color : ['#eb8f34','#d17a1e','#f5a55a'],
             plotOptions: {
                 radius : 30
             },
@@ -92,50 +92,50 @@ const AdminDashboard = () => {
 
             <div className='w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-7'>
                 
-                <div className='stat-card bg-gradient-to-r from-primary/10 to-primary-light/10'>
-                    <div className='flex flex-col justify-start items-start text-dark'>
-                        <h2 className='text-3xl font-bold'>${totalSale}</h2>
-                        <span className='text-md font-medium'>Total Sales</span>
+                <div className='flex justify-between items-center p-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl gap-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105'>
+                    <div className='flex flex-col justify-start items-start text-white'>
+                        <h2 className='text-4xl font-bold'>₹{totalSale}</h2>
+                        <span className='text-lg font-semibold text-orange-100'>Total Sales</span>
                     </div>
 
-                    <div className='w-[40px] h-[47px] rounded-full bg-primary flex justify-center items-center text-xl'>
-                    <MdCurrencyExchange className='text-white shadow-lg' /> 
+                    <div className='w-[50px] h-[55px] rounded-2xl bg-white/20 backdrop-blur-sm flex justify-center items-center text-2xl shadow-lg'>
+                    <MdCurrencyExchange className='text-white' /> 
                     </div> 
                 </div>
 
 
-                <div className='flex justify-between items-center p-5 bg-[#fde2ff] rounded-md gap-3'>
-                    <div className='flex flex-col justify-start items-start text-dark'>
-                        <h2 className='text-3xl font-bold'>{totalProduct}</h2>
-                        <span className='text-md font-medium'>Products</span>
+                <div className='flex justify-between items-center p-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl gap-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105'>
+                    <div className='flex flex-col justify-start items-start text-white'>
+                        <h2 className='text-4xl font-bold'>{totalProduct}</h2>
+                        <span className='text-lg font-semibold text-orange-100'>Products</span>
                     </div>
 
-                    <div className='w-[40px] h-[47px] rounded-full bg-[#760077] flex justify-center items-center text-xl'>
-                    <MdProductionQuantityLimits  className='text-[#fae8e8] shadow-lg' /> 
+                    <div className='w-[50px] h-[55px] rounded-2xl bg-white/20 backdrop-blur-sm flex justify-center items-center text-2xl shadow-lg'>
+                    <MdProductionQuantityLimits className='text-white' /> 
                     </div> 
                 </div>
 
 
-                <div className='flex justify-between items-center p-5 bg-[#e9feea] rounded-md gap-3'>
-                    <div className='flex flex-col justify-start items-start text-dark'>
-                        <h2 className='text-3xl font-bold'>{totalSeller}</h2>
-                        <span className='text-md font-medium'>Sellers</span>
+                <div className='flex justify-between items-center p-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl gap-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105'>
+                    <div className='flex flex-col justify-start items-start text-white'>
+                        <h2 className='text-4xl font-bold'>{totalSeller}</h2>
+                        <span className='text-lg font-semibold text-orange-100'>Sellers</span>
                     </div>
 
-                    <div className='w-[40px] h-[47px] rounded-full bg-[#038000] flex justify-center items-center text-xl'>
-                    <FaUsers  className='text-[#fae8e8] shadow-lg' /> 
+                    <div className='w-[50px] h-[55px] rounded-2xl bg-white/20 backdrop-blur-sm flex justify-center items-center text-2xl shadow-lg'>
+                    <FaUsers className='text-white' /> 
                     </div> 
                 </div>
 
 
-                <div className='flex justify-between items-center p-5 bg-[#ecebff] rounded-md gap-3'>
-                    <div className='flex flex-col justify-start items-start text-dark'>
-                        <h2 className='text-3xl font-bold'>{totalOrder}</h2>
-                        <span className='text-md font-medium'>Orders</span>
+                <div className='flex justify-between items-center p-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl gap-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105'>
+                    <div className='flex flex-col justify-start items-start text-white'>
+                        <h2 className='text-4xl font-bold'>{totalOrder}</h2>
+                        <span className='text-lg font-semibold text-orange-100'>Orders</span>
                     </div>
 
-                    <div className='w-[40px] h-[47px] rounded-full bg-[#0200f8] flex justify-center items-center text-xl'>
-                    <FaCartShopping  className='text-[#fae8e8] shadow-lg' /> 
+                    <div className='w-[50px] h-[55px] rounded-2xl bg-white/20 backdrop-blur-sm flex justify-center items-center text-2xl shadow-lg'>
+                    <FaCartShopping className='text-white' /> 
                     </div> 
                 </div>
  
@@ -145,17 +145,17 @@ const AdminDashboard = () => {
         
         <div className='w-full flex flex-wrap mt-7'>
             <div className='w-full lg:w-7/12 lg:pr-3'>
-                <div className='w-full bg-[#6a5fdf] p-4 rounded-md'>
+                <div className='w-full bg-white/80 backdrop-blur-sm p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500'>
             <Chart options={state.options} series={state.series} type='bar' height={350} />
                 </div>
             </div>
 
         
         <div className='w-full lg:w-5/12 lg:pl-4 mt-6 lg:mt-0'>
-            <div className='w-full bg-[#6a5fdf] p-4 rounded-md text-[#d0d2d6]'>
+            <div className='w-full bg-white/80 backdrop-blur-sm p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 border border-orange-200'>
                 <div className='flex justify-between items-center'>
-                    <h2 className='font-semibold text-lg text-[#d0d2d6] pb-3'>Recent Seller Message</h2>
-                    <Link className='font-semibold text-sm text-[#d0d2d6]'>View All</Link>
+                    <h2 className='font-semibold text-lg text-gray-800 pb-3'>Recent Seller Message</h2>
+                    <Link className='font-semibold text-sm text-orange-600 hover:text-orange-700'>View All</Link>
                 </div>
 
         <div className='flex flex-col gap-2 pt-6 text-[#d0d2d6]'>

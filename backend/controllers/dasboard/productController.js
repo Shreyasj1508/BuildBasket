@@ -2,12 +2,32 @@ const formidable = require("formidable")
 const { responseReturn } = require("../../utiles/response")
 const cloudinary = require('cloudinary').v2
 const productModel = require('../../models/productModel')
+const sellerModel = require('../../models/sellerModel')
+const path = require('path')
+const fs = require('fs')
  
 class productController{
 
     add_product = async(req,res) => {
         const {id} = req;
         console.log('Product creation request from seller ID:', id);
+        
+        try {
+            // Check if seller is verified before allowing product creation
+            const seller = await sellerModel.findById(id);
+            if (!seller) {
+                return responseReturn(res, 404, { error: 'Seller not found' });
+            }
+            
+            if (seller.status !== 'active') {
+                return responseReturn(res, 403, { 
+                    error: 'Your account is not verified yet. Please wait for admin approval before adding products.',
+                    status: seller.status 
+                });
+            }
+        } catch (error) {
+            return responseReturn(res, 500, { error: 'Error checking seller status' });
+        }
         
         const form = formidable({ multiples: true })
 
@@ -39,6 +59,8 @@ class productController{
 
                 // Handle image uploads
                 if (images) {
+                    console.log('Processing uploaded images...');
+                    
                     // Check if Cloudinary is configured
                     if (process.env.cloud_name && process.env.api_key && process.env.api_secret) {
                         console.log('Using Cloudinary for image upload');
@@ -66,7 +88,6 @@ class productController{
                         }
                     } else {
                         console.log('Cloudinary not configured, using placeholder images');
-                        // If Cloudinary is not configured, use placeholder images
                         if (!Array.isArray(images)) {
                             images = [images]; 
                         } 
@@ -75,9 +96,10 @@ class productController{
                         }
                     }
                 } else {
-                    console.log('No images provided, using default placeholder');
-                    // No images provided, use default placeholder
-                    allImageUrl.push('https://via.placeholder.com/400x400?text=Product+Image');
+                    console.log('No images provided, using enhanced placeholder');
+                    // No images provided, use enhanced placeholder
+                    const placeholderUrl = `https://via.placeholder.com/400x400/FF6B35/FFFFFF?text=${encodeURIComponent(name)}`;
+                    allImageUrl.push(placeholderUrl);
                 }
 
                 console.log('Creating product with data:', {
@@ -240,8 +262,33 @@ class productController{
 
     })
   }
-  // End Method 
+    delete_product = async (req, res) => {
+        const { productId } = req.params;
+        const { id } = req; // seller ID from auth middleware
 
+        try {
+            // Check if the product exists and belongs to the seller
+            const product = await productModel.findOne({ _id: productId, sellerId: id });
+            
+            if (!product) {
+                return responseReturn(res, 404, { error: 'Product not found or you do not have permission to delete it' });
+            }
+
+            // Delete the product
+            await productModel.findByIdAndDelete(productId);
+            
+            responseReturn(res, 200, { 
+                message: 'Product deleted successfully',
+                productId: productId
+            });
+            
+        } catch (error) {
+            console.log('Delete product error:', error.message);
+            responseReturn(res, 500, { error: 'Failed to delete product' });
+        }
+    }
+
+  // End Method 
 
 
 }

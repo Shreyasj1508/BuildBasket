@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { get_orders } from '../../store/reducers/orderReducer';
-import { FaShoppingBag, FaEye, FaCreditCard, FaClock, FaCheckCircle, FaTimesCircle, FaTruck, FaBox } from 'react-icons/fa';
+import { FaShoppingBag, FaEye, FaCreditCard, FaClock, FaCheckCircle, FaTimesCircle, FaTruck, FaBox, FaFileInvoice } from 'react-icons/fa';
+import GSTInvoice from '../GSTInvoice';
 
 const Orders = () => {
     const [state, setState] = useState('all')
+    const [showInvoice, setShowInvoice] = useState(false)
+    const [selectedOrderId, setSelectedOrderId] = useState(null)
 
     const navigate = useNavigate()
     const dispatch = useDispatch() 
@@ -33,6 +36,11 @@ const Orders = () => {
                 orderId: ord._id 
             }
         }) 
+    }
+
+    const handleInvoiceClick = (orderId) => {
+        setSelectedOrderId(orderId);
+        setShowInvoice(true);
     }
 
 
@@ -131,7 +139,7 @@ const Orders = () => {
                                         </div>
                                     </div>
                                     <div className='text-right'>
-                                        <div className='text-2xl font-bold text-white'>${order.price}</div>
+                                        <div className='text-2xl font-bold text-white'>₹{order.price}</div>
                                         <p className='text-white/80 text-sm'>Total Amount</p>
                                     </div>
                                 </div>
@@ -194,6 +202,16 @@ const Orders = () => {
                                             Pay Now
                                         </button>
                                     )}
+
+                                    {order.payment_status === 'paid' && (
+                                        <button 
+                                            onClick={() => handleInvoiceClick(order._id)} 
+                                            className='w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                                        >
+                                            <FaFileInvoice className='w-4 h-4' />
+                                            GST Invoice
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -215,6 +233,17 @@ const Orders = () => {
                         </button>
                     </Link>
                 </div>
+            )}
+
+            {/* GST Invoice Modal */}
+            {showInvoice && (
+                <GSTInvoice 
+                    orderId={selectedOrderId} 
+                    onClose={() => {
+                        setShowInvoice(false);
+                        setSelectedOrderId(null);
+                    }} 
+                />
             )}
         </div>
     );

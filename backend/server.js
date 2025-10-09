@@ -14,9 +14,17 @@ const socket = require('socket.io')
 const http = require('http')
 const server = http.createServer(app)
 app.use(cors({
-    origin : ['http://localhost:3000','http://localhost:3001'],
+    origin : [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        process.env.FRONTEND_URL,
+        process.env.DASHBOARD_URL
+    ].filter(Boolean),
     credentials: true
 }))
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static('uploads'))
 
 const io = socket(server, {
     cors: {
@@ -137,6 +145,7 @@ app.use('/api',require('./routes/home/cardRoutes'))
 app.use('/api',require('./routes/dashboard/categoryRoutes'))
 app.use('/api',require('./routes/dashboard/productRoutes'))
 app.use('/api',require('./routes/dashboard/sellerRoutes'))
+app.use('/api/seller',require('./routes/dashboard/sellerFeaturesRoutes'))
 app.use('/api',require('./routes/home/customerAuthRoutes'))
 app.use('/api',require('./routes/chatRoutes'))
 app.use('/api',require('./routes/paymentRoutes'))
@@ -150,8 +159,41 @@ app.use('/api/excel',require('./routes/excelRoutes'))
 app.use('/api',require('./routes/admin/adminProductRoutes'))
 app.use('/api',require('./routes/admin/adminCategoryRoutes'))
 app.use('/api/admin/commission',require('./routes/admin/commissionRoutes'))
+app.use('/api/admin',require('./routes/admin/commodityRoutes'))
+app.use('/api/admin',require('./routes/admin/buyerRoutes'))
+app.use('/api/admin',require('./routes/admin/reportsRoutes'))
+app.use('/api/admin',require('./routes/admin/analyticsRoutes'))
+
+// Temporary seeding route (REMOVE AFTER SEEDING)
+// app.use('/api',require('./routes/seedRoutes'))
 
 app.get('/',(req,res) => res.send('Hello Server'))
+
+// Test database connection
+app.get('/test-db', async (req, res) => {
+    try {
+        const mongoose = require('mongoose');
+        const connectionState = mongoose.connection.readyState;
+        const states = {
+            0: 'disconnected',
+            1: 'connected',
+            2: 'connecting',
+            3: 'disconnecting'
+        };
+        
+        res.json({
+            status: 'success',
+            connectionState: states[connectionState],
+            dbUrl: process.env.DB_URL ? 'Set' : 'Not Set',
+            cloudinary: process.env.cloud_name ? 'Set' : 'Not Set'
+        });
+    } catch (error) {
+        res.json({
+            status: 'error',
+            error: error.message
+        });
+    }
+})
 const port = process.env.PORT || 5000
 console.log('Environment PORT:', process.env.PORT)
 console.log('Using port:', port)

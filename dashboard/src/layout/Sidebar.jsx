@@ -47,35 +47,35 @@ const Sidebar = ({showSidebar, setShowSidebar}) => {
             <div onClick={()=> setShowSidebar(false)} className={`fixed duration-200 ${!showSidebar ? 'invisible' : 'visible'} w-screen h-screen bg-black/50 top-0 left-0 z-10`} > 
             </div>
 
-    <div className={`w-[260px] fixed bg-white z-50 top-0 h-screen shadow-xl transition-all ${showSidebar ? 'left-0' : '-left-[260px] lg:left-0'} border-r border-gray-200`}>
-        <div className='h-[70px] flex justify-center items-center border-b border-gray-200 bg-primary/5'>
-            <Link to='/' className='flex items-center gap-3'>
-                <div className='w-[40px] h-[40px] bg-primary rounded-full flex items-center justify-center'>
-                    <span className='text-white font-bold text-lg'>SG</span>
+    <div className={`w-[260px] fixed bg-white/95 backdrop-blur-sm z-50 top-0 h-screen shadow-2xl transition-all duration-300 ${showSidebar ? 'left-0' : '-left-[260px] lg:left-0'} border-r border-orange-200`}>
+        {/* Enhanced Header */}
+        <div className='h-[70px] flex justify-center items-center border-b border-orange-200 bg-gradient-to-r from-orange-50/50 to-orange-100/50 backdrop-blur-sm'>
+            <Link to='/' className='flex items-center gap-4 hover:scale-105 transition-transform duration-300'>
+                <div className='w-[45px] h-[45px] bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300'>
+                    <span className='text-white font-bold text-xl'>SG</span>
                 </div>
-                <span className='text-dark font-bold text-xl tracking-wide'>BUILD BASKET</span>
+                <span className='text-gray-800 font-bold text-xl tracking-wide bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent'>BUILD BASKET</span>
             </Link> 
         </div>
 
-        <div className='px-[16px] py-4'>
-            <ul>
+        <div className='px-[16px] py-6'>
+            <ul className='space-y-2'>
                 {
-                    allNav.map((n,i) =><li key={i}>
-                       <Link to={n.path} className={`${pathname === n.path ? 'bg-primary shadow-lg text-white duration-500' : 'text-dark font-bold duration-200 hover:bg-primary/10' } px-[12px] py-[9px] rounded-lg flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1 `} >
-                        <span className={pathname === n.path ? 'text-white' : 'text-primary'}>{n.icon}</span>
-                        <span>{n.title}</span>
+                    allNav.map((n,i) =><li key={i} className='animate-fadeInUp' style={{ animationDelay: `${i * 50}ms` }}>
+                       <Link to={n.path} className={`group ${pathname === n.path ? 'bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg text-white' : 'text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-100 hover:text-orange-700' } px-4 py-3 rounded-xl flex justify-start items-center gap-4 transition-all duration-300 transform hover:scale-105 hover:shadow-lg w-full group-hover:translate-x-1`}>
+                        <span className={`text-xl ${pathname === n.path ? 'text-white' : 'text-orange-500 group-hover:text-orange-600'} transition-all duration-300`}>{n.icon}</span>
+                        <span className={`font-semibold text-sm ${pathname === n.path ? 'text-white' : 'text-gray-700 group-hover:text-orange-700'} transition-all duration-300`}>{n.title}</span>
                         </Link>
-
                     </li> )
                 }
 
-            <li className="mt-4 pt-4 border-t border-gray-200">
+            <li className="mt-6 pt-4 border-t border-orange-200 animate-fadeInUp" style={{ animationDelay: '800ms' }}>
                 <button 
                     onClick={handleLogout}
-                    className='text-red-600 hover:text-red-700 hover:bg-red-50 font-bold duration-200 px-[12px] py-[9px] rounded-lg flex justify-start items-center gap-[12px] hover:pl-4 transition-all w-full mb-1'
+                    className='group text-red-600 hover:text-white hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 font-semibold duration-300 px-4 py-3 rounded-xl flex justify-start items-center gap-4 transition-all transform hover:scale-105 hover:shadow-lg w-full group-hover:translate-x-1'
                 >
-                <span><BiLogOutCircle /></span>
-                <span>Logout</span>
+                <span className='text-lg group-hover:text-white transition-all duration-300'><BiLogOutCircle /></span>
+                <span className='text-sm'>Logout</span>
                 </button>
             </li>
  

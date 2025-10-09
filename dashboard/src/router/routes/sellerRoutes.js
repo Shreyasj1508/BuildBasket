@@ -10,7 +10,9 @@ const SellerToAdmin = lazy(()=> import('../../views/seller/SellerToAdmin'))
 const SellerToCustomer = lazy(()=> import('../../views/seller/SellerToCustomer'))
 const Profile = lazy(()=> import('../../views/seller/Profile'))
 const EditProduct = lazy(()=> import('../../views/seller/EditProduct'))
+const ViewProduct = lazy(()=> import('../../views/seller/ViewProduct'))
 const OrderDetails = lazy(()=> import('../../views/seller/OrderDetails'))
+const OrderManagement = lazy(()=> import('../../views/seller/OrderManagement'))
 const Pending = lazy(()=> import('./../../views/Pending')) 
 const Deactive = lazy(()=> import('./../../views/Deactive')) 
 const AddBanner = lazy(()=> import('../../views/seller/AddBanner')) 
@@ -46,8 +48,8 @@ export const sellerRoutes = [
         status : 'active'
     },
     {
-        path: '/seller/dashboard/edit-product/:productId',
-        element : <EditProduct/>,
+        path: '/seller/dashboard/view-product/:productId',
+        element : <ViewProduct/>,
         role : 'seller',
         status : 'active'
     },
@@ -68,6 +70,12 @@ export const sellerRoutes = [
         element : <Orders/>,
         role : 'seller',
         visibility : ['active','deactive']
+    },
+    {
+        path: '/seller/dashboard/order-management',
+        element : <OrderManagement/>,
+        role : 'seller',
+        status : 'active'
     },
     {
         path: '/seller/dashboard/order/details/:orderId',

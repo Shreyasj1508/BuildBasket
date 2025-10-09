@@ -13,6 +13,10 @@ const ExcelUpload = lazy(()=> import('../../views/admin/ExcelUpload'))
 const AdminProducts = lazy(()=> import('../../views/admin/AdminProducts'))
 const AdminCategories = lazy(()=> import('../../views/admin/AdminCategories'))
 const CommissionSettings = lazy(()=> import('../../views/admin/CommissionSettings'))  
+const CommodityManagement = lazy(()=> import('../../views/admin/CommodityManagement'))
+const BuyerManagement = lazy(()=> import('../../views/admin/BuyerManagement'))
+const ReportsExports = lazy(()=> import('../../views/admin/ReportsExports'))
+const AnalyticsDashboard = lazy(()=> import('../../views/admin/AnalyticsDashboard'))
 
 export const adminRoutes = [
     {
@@ -90,5 +94,24 @@ export const adminRoutes = [
         element : <CommissionSettings/> ,
         role : 'admin'
     },
- 
+    {
+        path: 'admin/dashboard/commodity-management',
+        element : <CommodityManagement/> ,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/buyer-management',
+        element : <BuyerManagement/> ,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/reports-exports',
+        element : <ReportsExports/> ,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/analytics',
+        element : <AnalyticsDashboard/> ,
+        role : 'admin'
+    }
 ]

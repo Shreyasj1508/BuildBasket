@@ -1,5 +1,5 @@
 import React from "react";
-import { FaEye, FaRegHeart, FaChartLine } from "react-icons/fa";
+import { FaEye, FaRegHeart, FaChartLine, FaCreditCard } from "react-icons/fa";
 import { RiShoppingCartLine } from "react-icons/ri";
 import { Link } from "react-router-dom";
 import Rating from "../Rating";
@@ -63,6 +63,12 @@ const ShopProducts = ({ styles, products }) => {
                 <Rating ratings={p.rating} />
               </div>
             </div>
+            {p.eligibleForCreditSale && (
+              <div className="flex items-center gap-1 mt-1">
+                <FaCreditCard className="text-green-600 text-sm" />
+                <span className="text-xs text-green-600 font-medium">Credit Sale Eligible</span>
+              </div>
+            )}
           </div>
         </Link>
       ))}
