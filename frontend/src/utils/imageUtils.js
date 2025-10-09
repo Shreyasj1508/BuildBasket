@@ -70,6 +70,7 @@ export const handleImageError = (event, fallback = '/images/placeholder-product.
     event.target.src = fallback;
   }
 };
+
 /**
  * Convert local image path to full URL
  * @param {string} imagePath - Local image path
