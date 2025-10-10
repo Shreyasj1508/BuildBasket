@@ -9,10 +9,8 @@ export const admin_login = createAsyncThunk(
         try {
             const {data} = await api.post('/admin-login',info,{withCredentials: true})
             localStorage.setItem('accessToken',data.token)
-            // console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Admin login failed' })
         }
     }
@@ -29,7 +27,6 @@ export const seller_login = createAsyncThunk(
             localStorage.setItem('accessToken',data.token) 
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Seller login failed' })
         }
     }
@@ -41,10 +38,8 @@ export const get_user_info = createAsyncThunk(
           
         try {
             const {data} = await api.get('/get-user',{withCredentials: true})
-            // console.log(data)            
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Failed to get user info' })
         }
     }
@@ -57,10 +52,8 @@ export const profile_image_upload = createAsyncThunk(
           
         try {
             const {data} = await api.post('/profile-image-upload',image,{withCredentials: true})
-            // console.log(data)            
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Image upload failed' })
         }
     }
@@ -77,7 +70,6 @@ export const seller_register = createAsyncThunk(
             //  console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Seller registration failed' })
         }
     }
@@ -92,7 +84,6 @@ export const profile_info_add = createAsyncThunk(
             const {data} = await api.post('/profile-info-add',info,{withCredentials: true}) 
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Profile info update failed' })
         }
     }
@@ -143,10 +134,8 @@ export const profile_info_add = createAsyncThunk(
               
             try {
                 const {data} = await api.post('/change-password',info,{withCredentials: true})
-                // console.log(data)            
                 return fulfillWithValue(data.message)
             } catch (error) {
-                // console.log(error.response.data)
                 return rejectWithValue(error.response?.data?.message || 'Password change failed')
             }
         }

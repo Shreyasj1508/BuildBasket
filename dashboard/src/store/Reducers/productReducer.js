@@ -7,10 +7,8 @@ export const add_product = createAsyncThunk(
         
         try { 
             const {data} = await api.post('/product-add',product,{withCredentials: true}) 
-            // console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Network error occurred' })
         }
     }
@@ -28,7 +26,6 @@ export const get_products = createAsyncThunk(
             console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Failed to fetch products' })
         }
     }
@@ -62,7 +59,6 @@ export const get_product = createAsyncThunk(
             console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Failed to fetch product' })
         }
     }
@@ -91,7 +87,6 @@ export const update_product = createAsyncThunk(
             console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Failed to update product' })
         }
     }
@@ -114,7 +109,6 @@ export const update_product = createAsyncThunk(
             console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response?.data || { error: 'Failed to update product image' })
         }
     }

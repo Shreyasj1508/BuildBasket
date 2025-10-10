@@ -13,7 +13,6 @@ export const get_seller_request = createAsyncThunk(
              console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response.data)
         }
     }
@@ -32,7 +31,6 @@ export const get_seller = createAsyncThunk(
              console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response.data)
         }
     }
@@ -51,7 +49,6 @@ export const get_seller = createAsyncThunk(
              console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response.data)
         }
     }
@@ -70,7 +67,6 @@ export const get_seller = createAsyncThunk(
            
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response.data)
         }
     }
@@ -88,7 +84,6 @@ export const get_seller = createAsyncThunk(
            
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response.data)
         }
     }
@@ -103,7 +98,6 @@ export const get_seller = createAsyncThunk(
             const {data: {url}} = await api.get(`/payment/create-stripe-connect-account`,{withCredentials: true}) 
             window.location.href = url
         } catch (error) {
-            // console.log(error.response.data) 
         }
     }
 )
@@ -117,7 +111,6 @@ export const get_seller = createAsyncThunk(
             const {data } = await api.put(`/payment/active-stripe-connect-account/${activeCode}`,{},{withCredentials: true}) 
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data) 
             return rejectWithValue(error.response.data)
         }
     }

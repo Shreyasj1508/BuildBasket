@@ -118,7 +118,6 @@ class ChatController{
             console.log(error)
          }
     }
-    // End Method 
 
     customer_message_add = async (req, res) => {
         const {userId,text,sellerId,name } = req.body
@@ -176,7 +175,6 @@ class ChatController{
             console.log(error)
         }
     }
-  // End Method 
 
   get_customers = async (req, res) => {
         const { sellerId } = req.params
@@ -189,7 +187,6 @@ class ChatController{
             console.log(error)
         }
   }
-    // End Method 
 
     get_customers_seller_message = async(req, res) => {
         const { customerId } = req.params 
@@ -230,7 +227,6 @@ class ChatController{
         } 
 
     }
-     // End Method 
 
 
      seller_message_add = async (req, res) => {
@@ -288,7 +284,6 @@ class ChatController{
             console.log(error)
         }
      }
-     // End Method 
 
 
      get_sellers = async (req, res) => { 
@@ -301,7 +296,6 @@ class ChatController{
             console.log(error)
         }
   }
-    // End Method 
 
     seller_admin_message_insert = async (req, res) => {
         const {senderId,receverId,message,senderName} = req.body
@@ -318,7 +312,6 @@ class ChatController{
             console.log(error)
         }
     } 
- // End Method 
 
  get_admin_messages = async (req, res) => {
     const { receverId } = req.params 
@@ -361,7 +354,6 @@ class ChatController{
         console.log(error)
     } 
  }
- // End Method 
 
 
  get_seller_messages = async (req, res) => {
@@ -400,7 +392,6 @@ class ChatController{
         console.log(error)
     } 
  }
- // End Method 
 
 
 }

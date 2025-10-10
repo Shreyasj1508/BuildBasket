@@ -169,12 +169,29 @@ const ExcelUpload = () => {
     }
   };
 
-  const downloadTemplate = () => {
-    // Create sample data based on upload type
-    const sampleData = getSampleData(uploadType);
-    const csvContent = convertToCSV(sampleData);
-    downloadCSV(csvContent, `${uploadType}_template.csv`);
-    toast.success("Template downloaded!");
+  const downloadTemplate = async () => {
+    try {
+      // Fetch real data from backend for template
+      const response = await api.get(`/excel/templates/${uploadType}`);
+      if (response.data && response.data.template) {
+        const csvContent = convertToCSV(response.data.template.sampleData);
+        downloadCSV(csvContent, `${uploadType}_template.csv`);
+        toast.success("Template downloaded with real data!");
+      } else {
+        // Fallback to local sample data
+        const sampleData = getSampleData(uploadType);
+        const csvContent = convertToCSV(sampleData);
+        downloadCSV(csvContent, `${uploadType}_template.csv`);
+        toast.success("Template downloaded!");
+      }
+    } catch (error) {
+      console.error('Error downloading template:', error);
+      // Fallback to local sample data
+      const sampleData = getSampleData(uploadType);
+      const csvContent = convertToCSV(sampleData);
+      downloadCSV(csvContent, `${uploadType}_template.csv`);
+      toast.success("Template downloaded!");
+    }
   };
 
   const getSampleData = (type) => {
@@ -196,33 +213,62 @@ const ExcelUpload = () => {
       case "products":
         return [
           {
-            name: "Sample Product 1",
-            slug: "sample-product-1",
-            price: 99.99,
-            category: "electronics",
+            name: "Steel Rod 12mm",
+            slug: "steel-rod-12mm",
+            price: 450.00,
+            category: "Construction",
+            brand: "Tata Steel",
             sellerId: "seller123",
-            shopName: "Sample Shop",
-            images: "image1.jpg,image2.jpg",
-            description: "Sample product description",
-            stock: 50,
-            discount: 10,
+            shopName: "Steel Suppliers Ltd",
+            images: "steel-rod-1.jpg,steel-rod-2.jpg",
+            description: "High quality steel rod for construction purposes",
+            stock: 100,
+            discount: 5,
             rating: 4.5,
             status: "active",
+            location_state: "Maharashtra",
+            location_city: "Mumbai",
+            location_region: "Western",
+            eligibleForCreditSale: true
           },
           {
-            name: "Sample Product 2",
-            slug: "sample-product-2",
-            price: 149.99,
-            category: "clothing",
+            name: "Portland Cement 50kg",
+            slug: "portland-cement-50kg",
+            price: 320.00,
+            category: "Construction",
+            brand: "UltraTech",
             sellerId: "seller456",
-            shopName: "Fashion Store",
-            images: "image3.jpg,image4.jpg",
-            description: "Another sample product",
+            shopName: "Cement Distributors",
+            images: "cement-1.jpg,cement-2.jpg",
+            description: "Premium quality Portland cement for construction",
+            stock: 50,
+            discount: 8,
+            rating: 4.3,
+            status: "active",
+            location_state: "Maharashtra",
+            location_city: "Pune",
+            location_region: "Western",
+            eligibleForCreditSale: true
+          },
+          {
+            name: "Fine Sand 1 Ton",
+            slug: "fine-sand-1-ton",
+            price: 1800.00,
+            category: "Construction",
+            brand: "River Sand",
+            sellerId: "seller789",
+            shopName: "Sand Traders",
+            images: "sand-1.jpg,sand-2.jpg",
+            description: "Clean fine sand for construction and masonry work",
             stock: 25,
-            discount: 15,
+            discount: 10,
             rating: 4.2,
             status: "active",
-          },
+            location_state: "Maharashtra",
+            location_city: "Nashik",
+            location_region: "Northern",
+            eligibleForCreditSale: false
+          }
         ];
       case "sellers":
         return [

@@ -153,7 +153,6 @@ class productController{
          
     }
 
-    /// end method 
 
     products_get = async (req, res) => {
         const {page,searchValue, parPage} = req.query 
@@ -185,7 +184,6 @@ class productController{
 
     }
 
-    // End Method 
 
     product_get = async (req, res) => {
         const { productId } = req.params;
@@ -196,7 +194,6 @@ class productController{
             console.log(error.message)
         }
     }
-    // End Method 
 
     product_update = async (req, res) => {
         let {name, description, stock,price,category, discount,brand,productId} = req.body;
@@ -216,7 +213,6 @@ class productController{
 
     } 
 
-  // End Method 
 
   product_image_update = async(req,res) => {
     const form = formidable({ multiples: true })
@@ -288,7 +284,6 @@ class productController{
         }
     }
 
-  // End Method 
 
 
 }

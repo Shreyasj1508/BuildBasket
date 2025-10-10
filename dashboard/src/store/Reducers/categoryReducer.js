@@ -10,10 +10,8 @@ export const categoryAdd = createAsyncThunk(
             formData.append('name', name)
             formData.append('image', image)
             const {data} = await api.post('/category-add',formData,{withCredentials: true}) 
-            // console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response.data)
         }
     }
@@ -28,10 +26,8 @@ export const get_category = createAsyncThunk(
         try {
              
             const {data} = await api.get(`/category-get?page=${page}&&searchValue=${searchValue}&&parPage=${parPage}`,{withCredentials: true}) 
-            // console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response.data)
         }
     }
@@ -50,10 +46,8 @@ export const get_category = createAsyncThunk(
                 formData.append('image', image)
             } 
             const {data} = await api.put(`/category-update/${id}`,formData,{withCredentials: true}) 
-            // console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
-            // console.log(error.response.data)
             return rejectWithValue(error.response.data)
         }
     }

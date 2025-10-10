@@ -13,10 +13,8 @@ class authControllers{
         const {email,password} = req.body
         try {
             const admin = await adminModel.findOne({email}).select('+password')
-            // console.log(admin)
             if (admin) {
                 const match = await bcrypt.compare(password, admin.password)
-                // console.log(match)
                 if (match) {
                     const token = await createToken({
                         id : admin.id,
@@ -29,10 +27,6 @@ class authControllers{
                 } else {
                     responseReturn(res,404,{error: "Password Wrong"})
                 }
-
-
-
-                 
             } else {
                 responseReturn(res,404,{error: "Email not Found"})
             }
@@ -40,19 +34,14 @@ class authControllers{
         } catch (error) {
             responseReturn(res,500,{error: error.message})
         }
- 
     }
-    // End Method 
-
 
     seller_login = async(req,res) => {
         const {email,password} = req.body
         try {
             const seller = await sellerModel.findOne({email}).select('+password')
-            // console.log(admin)
             if (seller) {
                 const match = await bcrypt.compare(password, seller.password)
-                // console.log(match)
                 if (match) {
                     const token = await createToken({
                         id : seller.id,
@@ -65,8 +54,6 @@ class authControllers{
                 } else {
                     responseReturn(res,404,{error: "Password Wrong"})
                 }
- 
-                 
             } else {
                 responseReturn(res,404,{error: "Email not Found"})
             }
@@ -74,10 +61,7 @@ class authControllers{
         } catch (error) {
             responseReturn(res,500,{error: error.message})
         }
- 
     }
-    // End Method 
-
 
     seller_register = async(req, res) => {
          const {email,name,password} = req.body
@@ -109,11 +93,6 @@ class authControllers{
             responseReturn(res,500,{error: error.message || 'Internal Server Error'})
          }
     }
-    // End Method 
-
-
-
-
 
 
 
@@ -132,9 +111,7 @@ class authControllers{
         } catch (error) {
             responseReturn(res,500,{error: 'Internal Server Error'})
         }
-
-
-    } // End getUser Method 
+    }
 
     profile_image_upload = async(req, res) => {
         const {id} = req
@@ -163,12 +140,8 @@ class authControllers{
             } catch (error) {
                 responseReturn(res, 500,{ error : error.message })
             }
- 
-
         })
     }
-
-    // End Method 
 
     profile_info_add = async (req, res) => {
        const { division,district,shopName,sub_district } = req.body;
@@ -189,10 +162,7 @@ class authControllers{
        } catch (error) {
         responseReturn(res, 500,{ error : error.message })
        }
-
-
     }
-// End Method 
 
  logout = async (req, res) => {
     try {
@@ -207,12 +177,9 @@ class authControllers{
         responseReturn(res, 500,{ error : error.message })
     }
  }
-// End Method 
 
-/// Change Password 
 change_password = async (req,res) => {
     const {email, old_password, new_password} = req.body;
-   // console.log(email,old_password,new_password)
    try {
     const user = await sellerModel.findOne({email}).select('+password');
     if (!user) return res.status(404).json({message: 'User not found'});
@@ -228,9 +195,7 @@ change_password = async (req,res) => {
     res.status(500).json({message: 'Server Error'});
    } 
 }
-// End Method 
 
-/// Admin Registration
 admin_register = async(req, res) => {
     const {email, name, password} = req.body
     try {
@@ -257,8 +222,6 @@ admin_register = async(req, res) => {
         responseReturn(res, 500, {error: error.message})
     }
 }
-// End Method 
-
 
 }
 

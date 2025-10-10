@@ -11,6 +11,7 @@ const sellerModel = require('../../models/sellerModel');
 const customerModel = require('../../models/customerModel');
 const bannerModel = require('../../models/bannerModel');
 const commodityModel = require('../../models/commodityModel');
+const { calculateCommissionSyncSync } = require('../../utiles/commissionUtils');
 
 // Configure multer for file uploads - using memory storage to avoid file locking issues
 const storage = multer.memoryStorage();
@@ -198,7 +199,18 @@ class ExcelController {
             stock: parseInt(row.stock) || 0,
             discount: parseInt(row.discount) || 0,
             rating: parseFloat(row.rating) || 0,
-            status: 'active'
+            status: row.status || 'active',
+            // Location fields
+            location: {
+              state: row.location_state || 'Maharashtra',
+              city: row.location_city || 'Mumbai',
+              region: row.location_region || 'Western'
+            },
+            // Credit eligibility
+            eligibleForCreditSale: row.eligibleForCreditSale === 'true' || row.eligibleForCreditSale === true || false,
+            // Commission fields (calculated)
+            ...calculateCommissionSyncSync(parseFloat(row.price) || 0),
+            lastCommissionUpdate: new Date()
           };
 
           console.log(`Creating product ${i + 1}/${data.length}: ${productData.name}`);
@@ -496,51 +508,120 @@ class ExcelController {
     }
   };
 
-  // Get sample Excel templates
+  // Get real Excel templates from database
   getSampleTemplates = async (req, res) => {
     try {
-      const templates = {
-        categories: {
-          headers: ['name', 'slug', 'image', 'description'],
-          sampleData: [
-            ['Electronics', 'electronics', 'https://example.com/electronics.jpg', 'Electronic products'],
-            ['Clothing', 'clothing', 'https://example.com/clothing.jpg', 'Clothing and apparel']
-          ]
-        },
-        products: {
-          headers: ['name', 'slug', 'price', 'category', 'sellerId', 'shopName', 'images', 'description', 'stock', 'discount', 'rating', 'status'],
-          sampleData: [
-            ['iPhone 15', 'iphone-15', '999', 'Electronics', 'seller123', 'TechStore', 'https://example.com/iphone1.jpg,https://example.com/iphone2.jpg', 'Latest iPhone', '50', '10', '4.5', 'active']
-          ]
-        },
-        sellers: {
-          headers: ['name', 'email', 'phone', 'password', 'shopName', 'address', 'city', 'state', 'pincode', 'image', 'status'],
-          sampleData: [
-            ['John Doe', 'john@example.com', '1234567890', 'password123', 'John\'s Store', '123 Main St', 'Mumbai', 'Maharashtra', '400001', 'https://example.com/john.jpg', 'active']
-          ]
-        },
-        customers: {
-          headers: ['name', 'email', 'phone', 'password', 'address', 'city', 'state', 'pincode', 'image', 'status'],
-          sampleData: [
-            ['Jane Smith', 'jane@example.com', '0987654321', 'password123', '456 Oak Ave', 'Delhi', 'Delhi', '110001', 'https://example.com/jane.jpg', 'active']
-          ]
-        },
-        banners: {
-          headers: ['title', 'image', 'description', 'link', 'status', 'order'],
-          sampleData: [
-            ['Summer Sale', 'https://example.com/summer-banner.jpg', 'Big summer sale', '/sale', 'active', '1']
-          ]
-        }
-      };
+      const { type } = req.params;
+      
+      let template = null;
+
+      switch (type) {
+        case 'categories':
+          const categories = await categoryModel.find({}).limit(3);
+          template = {
+            headers: ['name', 'slug', 'image', 'description'],
+            sampleData: categories.map(cat => [
+              cat.name,
+              cat.slug,
+              cat.image || '',
+              cat.description || ''
+            ])
+          };
+          break;
+
+        case 'products':
+          const products = await productModel.find({}).limit(2);
+          template = {
+            headers: ['name', 'slug', 'price', 'category', 'brand', 'sellerId', 'shopName', 'images', 'description', 'stock', 'discount', 'rating', 'status', 'location_state', 'location_city', 'location_region', 'eligibleForCreditSale'],
+            sampleData: products.map(prod => [
+              prod.name,
+              prod.slug,
+              prod.price,
+              prod.category,
+              prod.brand,
+              prod.sellerId,
+              prod.shopName,
+              prod.images.join(','),
+              prod.description,
+              prod.stock,
+              prod.discount,
+              prod.rating,
+              prod.status,
+              prod.location?.state || '',
+              prod.location?.city || '',
+              prod.location?.region || '',
+              prod.eligibleForCreditSale
+            ])
+          };
+          break;
+
+        case 'sellers':
+          const sellers = await sellerModel.find({}).limit(2);
+          template = {
+            headers: ['name', 'email', 'phone', 'password', 'shopName', 'address', 'city', 'state', 'pincode', 'image', 'status'],
+            sampleData: sellers.map(seller => [
+              seller.name,
+              seller.email,
+              seller.phone,
+              'password123',
+              seller.shopInfo?.shopName || seller.name,
+              seller.shopInfo?.address || '',
+              seller.shopInfo?.city || '',
+              seller.shopInfo?.state || '',
+              seller.shopInfo?.pincode || '',
+              seller.image || '',
+              seller.status
+            ])
+          };
+          break;
+
+        case 'customers':
+          const buyers = await buyerModel.find({}).limit(2);
+          template = {
+            headers: ['name', 'email', 'phone', 'password', 'address', 'city', 'state', 'pincode', 'image', 'status'],
+            sampleData: buyers.map(buyer => [
+              buyer.name,
+              buyer.email,
+              buyer.phone,
+              'password123',
+              buyer.address || '',
+              buyer.city || '',
+              buyer.state || '',
+              buyer.pincode || '',
+              buyer.image || '',
+              buyer.status || 'active'
+            ])
+          };
+          break;
+
+        case 'commodities':
+          const commodities = await commodityModel.find({}).limit(3);
+          template = {
+            headers: ['name', 'category', 'description', 'unit', 'basePrice', 'image', 'tags'],
+            sampleData: commodities.map(comm => [
+              comm.name,
+              comm.category,
+              comm.description || '',
+              comm.unit,
+              comm.basePrice,
+              comm.image || '',
+              comm.tags?.join(',') || ''
+            ])
+          };
+          break;
+
+        default:
+          return responseReturn(res, 400, { message: 'Invalid template type' });
+      }
 
       responseReturn(res, 200, {
-        message: 'Sample templates retrieved successfully',
-        templates: templates
+        message: 'Template retrieved successfully',
+        template: template
       });
 
     } catch (error) {
-      console.error('Error getting templates:', error);
-      responseReturn(res, 500, { message: 'Error retrieving templates', error: error.message });
+      console.error('Error getting template:', error);
+      responseReturn(res, 500, { message: 'Error retrieving template', error: error.message });
     }
   };
 

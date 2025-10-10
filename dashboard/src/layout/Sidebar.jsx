@@ -19,7 +19,6 @@ const Sidebar = ({showSidebar, setShowSidebar}) => {
         const navs = getNav(role)
         setAllNav(navs)
     },[role])
-    // console.log(allNav)
 
     const handleLogout = (e) => {
         e.preventDefault();

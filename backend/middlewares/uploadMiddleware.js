@@ -32,7 +32,20 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Configure multer
+// File filter to accept Excel files
+const excelFileFilter = (req, file, cb) => {
+    // Check if file is an Excel file
+    if (file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        file.mimetype === 'application/vnd.ms-excel' ||
+        file.originalname.endsWith('.xlsx') ||
+        file.originalname.endsWith('.xls')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only Excel files (.xlsx, .xls) are allowed!'), false);
+    }
+};
+
+// Configure multer for images
 const upload = multer({
     storage: storage,
     fileFilter: fileFilter,
@@ -42,11 +55,24 @@ const upload = multer({
     }
 });
 
+// Configure multer for Excel files
+const excelUpload = multer({
+    storage: storage,
+    fileFilter: excelFileFilter,
+    limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB limit for Excel files
+        files: 1 // Maximum 1 file for Excel uploads
+    }
+});
+
 // Middleware for single image upload
 const uploadSingle = upload.single('image');
 
 // Middleware for multiple images upload
 const uploadMultiple = upload.array('images', 5);
+
+// Middleware for Excel file upload
+const uploadExcel = excelUpload.single('file');
 
 // Error handling middleware
 const handleUploadError = (error, req, res, next) => {
@@ -84,5 +110,6 @@ const handleUploadError = (error, req, res, next) => {
 module.exports = {
     uploadSingle,
     uploadMultiple,
+    uploadExcel,
     handleUploadError
 };

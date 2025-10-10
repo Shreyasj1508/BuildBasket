@@ -43,7 +43,6 @@ class cardController{
             console.log(error.message)
         }
     }
-    // End Method 
 
     get_card_products = async(req, res) => {
        const {userId } = req.params
@@ -147,7 +146,6 @@ class cardController{
        }
        
     }
-    // End Method 
 
 
     delete_card_products = async (req, res) => {
@@ -161,7 +159,6 @@ class cardController{
         }
          
     }
-       // End Method 
 
        quantity_inc = async (req, res) => {
         const {card_id } = req.params
@@ -176,7 +173,6 @@ class cardController{
         }
          
     }
-       // End Method 
 
        quantity_dec = async (req, res) => {
         const {card_id } = req.params
@@ -191,7 +187,6 @@ class cardController{
         }
          
     }
-       // End Method 
 
 
        add_wishlist = async (req, res) => {
@@ -213,7 +208,6 @@ class cardController{
         }
 
        }
-       // End Method 
 
 
        get_wishlist = async (req, res) => {
@@ -231,7 +225,6 @@ class cardController{
             console.log(error.message)
         }
        } 
-        // End Method 
 
         remove_wishlist = async (req, res) => {
            const {wishlistId} = req.params
@@ -246,7 +239,6 @@ class cardController{
             console.log(error.message)
            }
         }
- // End Method 
 
 }
 

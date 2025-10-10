@@ -2,10 +2,17 @@ const mongoose = require('mongoose');
 
 module.exports.dbConnect = async()=>{
     try {
-        const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/almaMate'
-        await mongoose.connect(dbUrl)
-        console.log("Database connected..")
+        // Local MongoDB connection only
+        const dbUrl = 'mongodb://localhost:27017/almaMate';
+        
+        await mongoose.connect(dbUrl, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        
+        console.log("✅ Database connected to:", dbUrl);
     } catch (error) {
-        console.log(error.message)
+        console.log("❌ Database connection error:", error.message);
+        console.log("💡 Make sure MongoDB is running locally: 'mongod'");
     }
 }

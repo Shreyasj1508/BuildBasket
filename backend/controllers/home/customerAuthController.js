@@ -39,7 +39,6 @@ class customerAuthController{
             responseReturn(res, 500, { error: 'Server error occurred during registration' })
         }
     }
-    // End Method
 
     customer_login = async(req, res) => {
        const { email, password } = req.body;
@@ -69,7 +68,6 @@ class customerAuthController{
         responseReturn(res, 500, { error: `Server error occurred during login: ${error.message}` });
        }
     }
-  // End Method
 
   customer_logout = async(req, res) => {
     res.cookie('customerToken',"",{
@@ -77,7 +75,6 @@ class customerAuthController{
     })
     responseReturn(res, 200,{ message :  'Logout Success'})
   }
-    // End Method
 
 }
 

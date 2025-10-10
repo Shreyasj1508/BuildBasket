@@ -111,8 +111,6 @@ const Shops = () => {
       searchValue: urlSearch || "",
     };
 
-    // console.log('Querying products with params:', queryParams)
-
     dispatch(query_products(queryParams)).finally(() => {
       setIsLoading(false);
     });

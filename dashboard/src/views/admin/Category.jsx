@@ -54,8 +54,6 @@ const Category = () => {
         }else{
             dispatch(categoryAdd(state))
         }
-        
-        // console.log(state)
     }
 
     useEffect(() => {

@@ -6,7 +6,6 @@ export const add_friend = createAsyncThunk(
     async(info, { rejectWithValue,fulfillWithValue }) => {
         try {
             const {data} = await api.post('/chat/customer/add-customer-friend',info)
-           // console.log(data)
             return fulfillWithValue(data)
         } catch (error) {
             return rejectWithValue(error.response.data)

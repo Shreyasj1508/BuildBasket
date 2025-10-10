@@ -1,7 +1,6 @@
 require('dotenv').config()
-console.log('Environment variables loaded:')
-console.log('PORT:', process.env.PORT)
-console.log('DB_URL:', process.env.DB_URL)
+console.log('🚀 Starting AlmaMate Backend Server...')
+console.log('📍 Environment: LOCAL DEVELOPMENT ONLY')
 
 const express = require('express')
 const app = express()
@@ -164,6 +163,16 @@ app.use('/api/admin',require('./routes/admin/buyerRoutes'))
 app.use('/api/admin',require('./routes/admin/reportsRoutes'))
 app.use('/api/admin',require('./routes/admin/analyticsRoutes'))
 
+// New Admin Features Routes
+app.use('/api/admin/commodity', require('./routes/admin/adminCommodityRoutes'))
+app.use('/api/admin/users', require('./routes/admin/adminUserVerificationRoutes'))
+app.use('/api/admin/reports', require('./routes/admin/adminReportsRoutes'))
+app.use('/api/admin/analytics', require('./routes/admin/adminAnalyticsRoutes'))
+app.use('/api/admin', require('./routes/admin/adminActivitiesRoutes'))
+
+// Seeder Routes
+app.use('/api/admin', require('./routes/seedRealDataRoutes'))
+
 // Temporary seeding route (REMOVE AFTER SEEDING)
 // app.use('/api',require('./routes/seedRoutes'))
 
@@ -194,11 +203,19 @@ app.get('/test-db', async (req, res) => {
         });
     }
 })
-const port = process.env.PORT || 5000
-console.log('Environment PORT:', process.env.PORT)
-console.log('Using port:', port)
-// Make io available globally for commission updates
-global.io = io;
+const port = 5000; // Local development port
+global.io = io; // Make io available globally
 
-dbConnect()
-server.listen(port, () => console.log(`Server is running on port ${port}`))
+// Connect to MongoDB
+dbConnect();
+
+// Start server
+server.listen(port, () => {
+    console.log('✅ Server is running on port:', port);
+    console.log('🌐 Backend API: http://localhost:5000');
+    console.log('📁 Static files: http://localhost:5000/uploads');
+    console.log('');
+    console.log('💡 Make sure MongoDB is running: mongod');
+    console.log('🔗 Frontend should run on: http://localhost:3001');
+    console.log('📊 Dashboard should run on: http://localhost:3000');
+});

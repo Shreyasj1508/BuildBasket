@@ -49,6 +49,11 @@ const ProtectRoute = ({route,children}) => {
             } 
         } 
     }else {
+        // Allow access to login pages
+        if (route.path === '/admin/login') {
+            return <Suspense fallback={null} >{children}</Suspense>
+        }
+        
         // Check if we're in admin routes and redirect accordingly
         const isAdminRoute = route.path && route.path.includes('/admin')
         if (isAdminRoute) {

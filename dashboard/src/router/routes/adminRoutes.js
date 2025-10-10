@@ -1,4 +1,7 @@
 import { lazy } from "react";         
+
+// Main Admin Components
+const AdminLogin = lazy(()=> import('../../views/admin/AdminLogin'))
 const AdminDashboard = lazy(()=> import('../../views/admin/AdminDashboard'))  
 const Orders = lazy(()=> import('../../views/admin/Orders')) 
 const Category = lazy(()=> import('../../views/admin/Category'))  
@@ -13,15 +16,49 @@ const ExcelUpload = lazy(()=> import('../../views/admin/ExcelUpload'))
 const AdminProducts = lazy(()=> import('../../views/admin/AdminProducts'))
 const AdminCategories = lazy(()=> import('../../views/admin/AdminCategories'))
 const CommissionSettings = lazy(()=> import('../../views/admin/CommissionSettings'))  
+
+// New Admin Features
 const CommodityManagement = lazy(()=> import('../../views/admin/CommodityManagement'))
-const BuyerManagement = lazy(()=> import('../../views/admin/BuyerManagement'))
+const UserVerification = lazy(()=> import('../../views/admin/UserVerification'))
+const BuyerCreditManagement = lazy(()=> import('../../views/admin/BuyerCreditManagement'))
 const ReportsExports = lazy(()=> import('../../views/admin/ReportsExports'))
 const AnalyticsDashboard = lazy(()=> import('../../views/admin/AnalyticsDashboard'))
+const BuyerManagement = lazy(()=> import('../../views/admin/BuyerManagement'))
 
 export const adminRoutes = [
     {
-        path: 'admin/dashboard',
+        path: '/admin/login',
+        element : <AdminLogin/>,
+        role : null
+    },
+    {
+        path: '/admin/dashboard',
         element : <AdminDashboard/>,
+        role : 'admin'
+    },
+    {
+        path: '/admin/dashboard/commodity-management',
+        element : <CommodityManagement/>,
+        role : 'admin'
+    },
+    {
+        path: '/admin/dashboard/user-verification',
+        element : <UserVerification/>,
+        role : 'admin'
+    },
+    {
+        path: '/admin/dashboard/buyer-credit-management',
+        element : <BuyerCreditManagement/>,
+        role : 'admin'
+    },
+    {
+        path: '/admin/dashboard/reports-exports',
+        element : <ReportsExports/>,
+        role : 'admin'
+    },
+    {
+        path: '/admin/dashboard/analytics',
+        element : <AnalyticsDashboard/>,
         role : 'admin'
     },
     {
@@ -95,23 +132,8 @@ export const adminRoutes = [
         role : 'admin'
     },
     {
-        path: 'admin/dashboard/commodity-management',
-        element : <CommodityManagement/> ,
-        role : 'admin'
-    },
-    {
         path: 'admin/dashboard/buyer-management',
-        element : <BuyerManagement/> ,
-        role : 'admin'
-    },
-    {
-        path: 'admin/dashboard/reports-exports',
-        element : <ReportsExports/> ,
-        role : 'admin'
-    },
-    {
-        path: 'admin/dashboard/analytics',
-        element : <AnalyticsDashboard/> ,
+        element : <BuyerManagement/>,
         role : 'admin'
     }
 ]

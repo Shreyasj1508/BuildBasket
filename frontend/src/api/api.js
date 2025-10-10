@@ -1,10 +1,8 @@
 import axios from "axios";
 
-const local = 'http://localhost:5000'
-const production = process.env.REACT_APP_API_URL || 'https://backend-psi-livid-66.vercel.app/api'
-
+// Local development only
 const api = axios.create({
-    baseURL: process.env.NODE_ENV === 'production' ? production : `${local}/api`,
+    baseURL: 'http://localhost:5000/api',
     withCredentials: true,
     timeout: 10000
 })

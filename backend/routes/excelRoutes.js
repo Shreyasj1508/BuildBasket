@@ -11,8 +11,8 @@ router.post('/import/sellers', adminMiddleware, excelController.uploadExcel, exc
 router.post('/import/customers', adminMiddleware, excelController.uploadExcel, excelController.importCustomers);
 router.post('/import/banners', adminMiddleware, excelController.uploadExcel, excelController.importBanners);
 
-// Get sample templates
-router.get('/templates', excelController.getSampleTemplates);
+// Get real templates from database
+router.get('/templates/:type', excelController.getSampleTemplates);
 
 
 
