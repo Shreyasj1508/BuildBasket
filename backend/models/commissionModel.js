@@ -1,11 +1,6 @@
 const { Schema, model } = require("mongoose");
 
 const commissionSchema = new Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: true
-    },
     type: {
         type: String,
         enum: ['percentage', 'fixed'],
@@ -13,12 +8,13 @@ const commissionSchema = new Schema({
     },
     rate: {
         type: Number,
-        required: true,
         min: 0,
-        max: 100
+        max: 100,
+        default: 5
     },
     fixedAmount: {
         type: Number,
+        min: 0,
         default: 0
     },
     description: {

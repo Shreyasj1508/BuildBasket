@@ -8,7 +8,6 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { dbConnect } = require("./utiles/db");
-
 const socket = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);

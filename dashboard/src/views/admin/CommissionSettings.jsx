@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPercentage, FaSave, FaMoneyBillWave, FaEdit, FaHistory, FaCheckCircle } from 'react-icons/fa';
+import { FaPercentage, FaSave, FaMoneyBillWave, FaEdit, FaHistory, FaCheckCircle, FaSpinner, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 import api from '../../api/api';
 import toast from 'react-hot-toast';
 
@@ -20,6 +20,8 @@ const CommissionSettings = () => {
         fixedAmount: 0
     });
     const [commissionHistory, setCommissionHistory] = useState([]);
+    const [errors, setErrors] = useState({});
+    const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
         fetchCommissionConfig();
@@ -28,6 +30,7 @@ const CommissionSettings = () => {
 
     const fetchCommissionConfig = async () => {
         try {
+            setLoading(true);
             const response = await api.get('/admin/commission/get-config');
             if (response.data && response.data.config) {
                 setCommission(response.data.config);
@@ -36,6 +39,9 @@ const CommissionSettings = () => {
         } catch (error) {
             console.error('Error fetching commission:', error);
             toast.error('Failed to load commission settings');
+        } finally {
+            setLoading(false);
+            setIsInitialized(true);
         }
     };
 
@@ -50,9 +56,41 @@ const CommissionSettings = () => {
         }
     };
 
+    const validateCommission = () => {
+        const newErrors = {};
+        
+        if (!newCommission.type) {
+            newErrors.type = 'Commission type is required';
+        }
+        
+        if (newCommission.type === 'percentage') {
+            if (!newCommission.rate || newCommission.rate <= 0 || newCommission.rate > 100) {
+                newErrors.rate = 'Rate must be between 0 and 100';
+            }
+        } else if (newCommission.type === 'fixed') {
+            if (!newCommission.fixedAmount || newCommission.fixedAmount <= 0) {
+                newErrors.fixedAmount = 'Fixed amount must be greater than 0';
+            }
+        }
+        
+        if (!newCommission.description || newCommission.description.trim() === '') {
+            newErrors.description = 'Description is required';
+        }
+        
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSaveCommission = async () => {
+        if (!validateCommission()) {
+            toast.error('Please fix the validation errors before saving');
+            return;
+        }
+
         try {
             setSaving(true);
+            setErrors({});
+            
             const response = await api.post('/admin/commission/update-config', newCommission);
             
             if (response.data && response.data.success) {
@@ -61,11 +99,12 @@ const CommissionSettings = () => {
                 setEditMode(false);
                 fetchCommissionHistory();
             } else {
-                toast.error('Failed to update commission settings');
+                toast.error(response.data?.error || 'Failed to update commission settings');
             }
         } catch (error) {
             console.error('Error saving commission:', error);
-            toast.error('Failed to save commission settings');
+            const errorMessage = error.response?.data?.error || 'Failed to save commission settings';
+            toast.error(errorMessage);
         } finally {
             setSaving(false);
         }
@@ -92,15 +131,29 @@ const CommissionSettings = () => {
     const handleCancelEdit = () => {
         setNewCommission(commission);
         setEditMode(false);
+        setErrors({});
     };
+
+    if (!isInitialized && loading) {
+        return (
+            <div className='px-4 py-6 max-w-7xl mx-auto'>
+                <div className='flex items-center justify-center min-h-[400px]'>
+                    <div className='flex flex-col items-center gap-4'>
+                        <FaSpinner className='text-4xl text-blue-600 animate-spin' />
+                        <p className='text-gray-600 font-medium'>Loading commission settings...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className='px-4 py-6 max-w-7xl mx-auto'>
             {/* Header */}
-            <div className='bg-white rounded-2xl shadow-sm p-6 mb-6 border border-gray-100'>
+            <div className='bg-white rounded-2xl shadow-sm p-6 mb-6 border border-gray-100 animate-fadeIn'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-4'>
-                        <div className='w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg'>
+                        <div className='w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg animate-pulse'>
                             <FaPercentage className='text-2xl' />
                         </div>
                         <div>
@@ -111,7 +164,7 @@ const CommissionSettings = () => {
                     {!editMode && (
                         <button
                             onClick={() => setEditMode(true)}
-                            className='flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all shadow-sm hover:shadow-md'
+                            className='flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all shadow-sm hover:shadow-md transform hover:scale-105'
                         >
                             <FaEdit />
                             Edit Commission
@@ -122,7 +175,7 @@ const CommissionSettings = () => {
 
             {/* Current Commission Display */}
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-6'>
-                <div className='bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200 hover:shadow-lg transition-shadow'>
+                <div className='bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300 transform hover:scale-105'>
                     <div className='flex items-center justify-between mb-4'>
                         <h3 className='text-lg font-semibold text-gray-800'>Commission Rate</h3>
                         <FaPercentage className='text-2xl text-blue-600' />
@@ -136,7 +189,7 @@ const CommissionSettings = () => {
                     <p className='text-sm text-gray-600 mt-2'>Current platform commission</p>
                 </div>
 
-                <div className='bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200 hover:shadow-lg transition-shadow'>
+                <div className='bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200 hover:shadow-lg transition-all duration-300 transform hover:scale-105'>
                     <div className='flex items-center justify-between mb-4'>
                         <h3 className='text-lg font-semibold text-gray-800'>Commission Type</h3>
                         <FaMoneyBillWave className='text-2xl text-green-600' />
@@ -147,7 +200,7 @@ const CommissionSettings = () => {
                     <p className='text-sm text-gray-600 mt-2'>Applied to all products</p>
                 </div>
 
-                <div className='bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200 hover:shadow-lg transition-shadow'>
+                <div className='bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200 hover:shadow-lg transition-all duration-300 transform hover:scale-105'>
                     <div className='flex items-center justify-between mb-4'>
                         <h3 className='text-lg font-semibold text-gray-800'>Status</h3>
                         <div className='w-3 h-3 bg-green-500 rounded-full animate-pulse'></div>
@@ -171,22 +224,34 @@ const CommissionSettings = () => {
                         {/* Commission Type */}
                         <div>
                             <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                                Commission Type
+                                Commission Type <span className='text-red-500'>*</span>
                             </label>
                             <select
                                 value={newCommission.type}
-                                onChange={(e) => setNewCommission({...newCommission, type: e.target.value})}
-                                className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50'
+                                onChange={(e) => {
+                                    setNewCommission({...newCommission, type: e.target.value});
+                                    setErrors({...errors, type: ''});
+                                }}
+                                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-colors ${
+                                    errors.type ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                }`}
                             >
                                 <option value='percentage'>Percentage (%)</option>
                                 <option value='fixed'>Fixed Amount (₹)</option>
                             </select>
+                            {errors.type && (
+                                <p className='text-red-500 text-sm mt-1 flex items-center gap-1'>
+                                    <FaExclamationTriangle className='text-xs' />
+                                    {errors.type}
+                                </p>
+                            )}
                         </div>
 
                         {/* Commission Rate/Amount */}
                         <div>
                             <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                                {newCommission.type === 'percentage' ? 'Commission Percentage' : 'Fixed Amount'}
+                                {newCommission.type === 'percentage' ? 'Commission Percentage' : 'Fixed Amount'} 
+                                <span className='text-red-500'>*</span>
                             </label>
                             {newCommission.type === 'percentage' ? (
                                 <div className='relative'>
@@ -196,8 +261,13 @@ const CommissionSettings = () => {
                                         max='100'
                                         step='0.1'
                                         value={(newCommission.rate * 100).toFixed(1)}
-                                        onChange={(e) => setNewCommission({...newCommission, rate: parseFloat(e.target.value) / 100})}
-                                        className='w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50'
+                                        onChange={(e) => {
+                                            setNewCommission({...newCommission, rate: parseFloat(e.target.value) / 100});
+                                            setErrors({...errors, rate: ''});
+                                        }}
+                                        className={`w-full px-4 py-3 pr-12 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-colors ${
+                                            errors.rate ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                        }`}
                                         placeholder='5.0'
                                     />
                                     <span className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold'>%</span>
@@ -210,11 +280,22 @@ const CommissionSettings = () => {
                                         min='0'
                                         step='1'
                                         value={newCommission.fixedAmount || 0}
-                                        onChange={(e) => setNewCommission({...newCommission, fixedAmount: parseFloat(e.target.value)})}
-                                        className='w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50'
+                                        onChange={(e) => {
+                                            setNewCommission({...newCommission, fixedAmount: parseFloat(e.target.value)});
+                                            setErrors({...errors, fixedAmount: ''});
+                                        }}
+                                        className={`w-full pl-12 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-colors ${
+                                            errors.fixedAmount ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                                        }`}
                                         placeholder='50'
                                     />
                                 </div>
+                            )}
+                            {(errors.rate || errors.fixedAmount) && (
+                                <p className='text-red-500 text-sm mt-1 flex items-center gap-1'>
+                                    <FaExclamationTriangle className='text-xs' />
+                                    {errors.rate || errors.fixedAmount}
+                                </p>
                             )}
                         </div>
                     </div>
@@ -222,15 +303,26 @@ const CommissionSettings = () => {
                     {/* Description */}
                     <div className='mb-6'>
                         <label className='block text-sm font-semibold text-gray-700 mb-2'>
-                            Description
+                            Description <span className='text-red-500'>*</span>
                         </label>
                         <textarea
                             value={newCommission.description}
-                            onChange={(e) => setNewCommission({...newCommission, description: e.target.value})}
+                            onChange={(e) => {
+                                setNewCommission({...newCommission, description: e.target.value});
+                                setErrors({...errors, description: ''});
+                            }}
                             rows='3'
-                            className='w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50'
+                            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 transition-colors resize-none ${
+                                errors.description ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                            }`}
                             placeholder='Enter commission description...'
                         />
+                        {errors.description && (
+                            <p className='text-red-500 text-sm mt-1 flex items-center gap-1'>
+                                <FaExclamationTriangle className='text-xs' />
+                                {errors.description}
+                            </p>
+                        )}
                     </div>
 
                     {/* Example Calculation */}
@@ -258,13 +350,22 @@ const CommissionSettings = () => {
                             disabled={saving}
                             className='flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed'
                         >
-                            <FaCheckCircle />
-                            {saving ? 'Saving...' : 'Save Changes'}
+                            {saving ? (
+                                <>
+                                    <FaSpinner className='animate-spin' />
+                                    Saving...
+                                </>
+                            ) : (
+                                <>
+                                    <FaCheckCircle />
+                                    Save Changes
+                                </>
+                            )}
                         </button>
                         <button
                             onClick={handleCancelEdit}
                             disabled={saving}
-                            className='flex items-center gap-2 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-semibold transition-all'
+                            className='flex items-center gap-2 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-semibold transition-all disabled:opacity-50'
                         >
                             Cancel
                         </button>
@@ -338,13 +439,22 @@ const CommissionSettings = () => {
                                 flex items-center gap-2 px-6 py-3 rounded-xl font-semibold
                                 transition-all duration-200 shadow-sm hover:shadow-md
                                 ${loading 
-                                    ? 'bg-gray-400 cursor-not-allowed' 
+                                    ? 'bg-gray-400 cursor-not-allowed text-white' 
                                     : 'bg-blue-600 hover:bg-blue-700 text-white'
                                 }
                             `}
                         >
-                            <FaSave />
-                            {loading ? 'Updating...' : 'Update All Products'}
+                            {loading ? (
+                                <>
+                                    <FaSpinner className='animate-spin' />
+                                    Updating...
+                                </>
+                            ) : (
+                                <>
+                                    <FaSave />
+                                    Update All Products
+                                </>
+                            )}
                         </button>
                     </div>
 

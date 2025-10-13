@@ -50,17 +50,24 @@ class commissionController {
             const { rate, type, description, fixedAmount } = req.body;
             
             // Validate input
-            if (!rate && !fixedAmount) {
-                return responseReturn(res, 400, { 
-                    success: false, 
-                    error: 'Commission rate or fixed amount is required' 
-                });
-            }
-            
             if (!type || !['percentage', 'fixed'].includes(type)) {
                 return responseReturn(res, 400, { 
                     success: false, 
                     error: 'Valid commission type is required (percentage or fixed)' 
+                });
+            }
+
+            if (type === 'percentage' && (!rate || rate <= 0 || rate > 100)) {
+                return responseReturn(res, 400, { 
+                    success: false, 
+                    error: 'For percentage type, rate must be between 0 and 100' 
+                });
+            }
+
+            if (type === 'fixed' && (!fixedAmount || fixedAmount <= 0)) {
+                return responseReturn(res, 400, { 
+                    success: false, 
+                    error: 'For fixed type, fixed amount must be greater than 0' 
                 });
             }
 
