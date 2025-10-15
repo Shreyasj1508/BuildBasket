@@ -115,7 +115,7 @@ io.on("connection", (soc) => {
     admin.socketId = soc.id;
     io.emit("activeSeller", allSeller);
   });
-
+  
   soc.on("disconnect", () => {
     console.log("user disconnect");
     remove(soc.id);

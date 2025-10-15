@@ -42,14 +42,27 @@ export const CommissionProvider = ({ children }) => {
     /**
      * Calculate commission for a given price
      * @param {Number} basePrice - The base price
+     * @param {Object} product - The product object (optional, for stored finalPrice)
      * @returns {Object} - Commission details
      */
-    const calculateCommission = (basePrice) => {
+    const calculateCommission = (basePrice, product = null) => {
         if (!basePrice || isNaN(basePrice)) {
             return {
                 basePrice: 0,
                 commissionAmount: 0,
                 finalPrice: 0
+            };
+        }
+
+        // If product has stored finalPrice, use it instead of calculating
+        if (product && product.finalPrice && product.finalPrice > 0) {
+            return {
+                basePrice: parseFloat(basePrice),
+                commissionAmount: product.commissionAmount || 0,
+                finalPrice: product.finalPrice,
+                commissionRate: commission.rate,
+                commissionType: commission.type,
+                isStored: true // Flag to indicate this is from database
             };
         }
 
@@ -70,7 +83,8 @@ export const CommissionProvider = ({ children }) => {
             commissionAmount: commissionAmount,
             finalPrice: finalPrice,
             commissionRate: commission.rate,
-            commissionType: commission.type
+            commissionType: commission.type,
+            isStored: false // Flag to indicate this is calculated
         };
     };
 

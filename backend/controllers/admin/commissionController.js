@@ -92,11 +92,28 @@ class commissionController {
 
             await newCommission.save();
 
-            responseReturn(res, 200, { 
-                success: true, 
-                message: 'Commission configuration updated successfully',
-                commission: newCommission
-            });
+            // Automatically update all product prices with new commission
+            try {
+                console.log('Updating all product prices with new commission...');
+                const updateResult = await updateAllProductsCommission();
+                console.log('Product price update result:', updateResult);
+                
+                responseReturn(res, 200, { 
+                    success: true, 
+                    message: 'Commission configuration updated successfully and all product prices have been updated',
+                    commission: newCommission,
+                    productUpdateResult: updateResult
+                });
+            } catch (updateError) {
+                console.error('Error updating product prices:', updateError);
+                // Still return success for commission update, but mention product update failed
+                responseReturn(res, 200, { 
+                    success: true, 
+                    message: 'Commission configuration updated successfully, but failed to update some product prices',
+                    commission: newCommission,
+                    warning: 'Some product prices may not reflect the new commission. Please use "Update All Products" button to fix this.'
+                });
+            }
         } catch (error) {
             console.error('Error updating commission config:', error);
             responseReturn(res, 500, { 

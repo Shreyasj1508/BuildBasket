@@ -94,7 +94,22 @@ const CommissionSettings = () => {
             const response = await api.post('/admin/commission/update-config', newCommission);
             
             if (response.data && response.data.success) {
-                toast.success('Commission settings updated successfully!');
+                // Show success message with product update info
+                if (response.data.productUpdateResult) {
+                    const { successCount, totalProducts } = response.data.productUpdateResult.data;
+                    toast.success(`Commission updated successfully! ${successCount}/${totalProducts} products updated with new prices.`);
+                } else if (response.data.warning) {
+                    toast.success('Commission updated successfully!', {
+                        duration: 4000,
+                        icon: '⚠️'
+                    });
+                    toast.warning(response.data.warning, {
+                        duration: 6000
+                    });
+                } else {
+                    toast.success('Commission settings updated successfully!');
+                }
+                
                 setCommission(newCommission);
                 setEditMode(false);
                 fetchCommissionHistory();
@@ -343,6 +358,20 @@ const CommissionSettings = () => {
                         </p>
                     </div>
 
+                    {/* Auto Update Notice */}
+                    <div className='bg-green-50 border border-green-200 rounded-xl p-4 mb-6'>
+                        <div className='flex items-start gap-3'>
+                            <FaInfoCircle className='text-green-600 mt-1 flex-shrink-0' />
+                            <div>
+                                <h4 className='font-semibold text-gray-800 mb-1'>Automatic Product Price Update</h4>
+                                <p className='text-gray-700 text-sm'>
+                                    When you save these commission settings, all product prices in the database will be automatically updated 
+                                    to reflect the new commission rates. This ensures that customers see the correct prices immediately.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Action Buttons */}
                     <div className='flex items-center gap-4'>
                         <button
@@ -353,12 +382,12 @@ const CommissionSettings = () => {
                             {saving ? (
                                 <>
                                     <FaSpinner className='animate-spin' />
-                                    Saving...
+                                    Updating Commission & Product Prices...
                                 </>
                             ) : (
                                 <>
                                     <FaCheckCircle />
-                                    Save Changes
+                                    Save Changes & Update All Products
                                 </>
                             )}
                         </button>

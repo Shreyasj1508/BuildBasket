@@ -7,6 +7,8 @@ router.post('/home/order/calculate-total',orderController.calculate_order_total)
 router.get('/home/customer/get-dashboard-data/:userId',orderController.get_customer_dashboard_data)
 router.get('/home/customer/get-orders/:customerId/:status',orderController.get_orders)
 router.get('/home/customer/get-order-details/:orderId',orderController.get_order_details)
+router.get('/home/customer/track-order/:orderNumber',orderController.track_order_by_number)
+router.put('/home/customer/update-order-status/:orderId',orderController.update_order_status)
 
 router.post('/order/create-payment',orderController.create_payment)
 router.get('/order/confirm/:orderId',orderController.order_confirm)

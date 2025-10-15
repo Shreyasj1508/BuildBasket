@@ -33,6 +33,7 @@ import {
   useAuthState,
   useCardState,
 } from "../hooks/useSafeSelector";
+import CartSidebar from "./CartSidebar";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -45,6 +46,7 @@ const Header = () => {
 
   const [showShidebar, setShowShidebar] = useState(true);
   const [categoryShow, setCategoryShow] = useState(true);
+  const [cartSidebarOpen, setCartSidebarOpen] = useState(false);
 
   const [searchValue, setSearchValue] = useState("");
   const [category, setCategory] = useState("");
@@ -86,6 +88,14 @@ const Header = () => {
     }
   };
 
+  const toggleCartSidebar = () => {
+    if (userInfo) {
+      setCartSidebarOpen(!cartSidebarOpen);
+    } else {
+      navigate("/login");
+    }
+  };
+
   const logout = async () => {
     try {
       const { data } = await api.get("/customer/logout");
@@ -117,18 +127,6 @@ const Header = () => {
           <div className="flex w-full justify-between items-center min-h-[50px] py-2 text-white">
             {/* Left side - Navigation buttons */}
             <div className="flex justify-start items-center gap-2 md:gap-4 lg:gap-6 flex-wrap ml-[40px]">
-              <button
-                onClick={() => navigate("/about")}
-                className="flex justify-center items-center gap-1 text-sm md:text-base text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10"
-              >
-                <span>About Us</span>
-              </button>
-              <button
-                onClick={() => navigate("/prices")}
-                className="flex justify-center items-center gap-1 text-sm md:text-base text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10"
-              >
-                <span>Prices</span>
-              </button>
               <button
                 onClick={() => navigate("/track-order")}
                 className="flex justify-center items-center gap-1 text-sm md:text-base text-white hover:text-gray-200 transition-colors cursor-pointer px-4 py-2 rounded hover:bg-white/10"
@@ -303,13 +301,13 @@ const Header = () => {
               {/* My Cart Button */}
               {userInfo ? (
                 <button
-                  onClick={redirect_card_page}
-                  className="flex justify-center items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10 relative"
+                  onClick={toggleCartSidebar}
+                  className="flex justify-center items-center gap-1 text-sm text-primary hover:text-primary-dark transition-colors cursor-pointer px-4 py-2 rounded hover:bg-primary/10 relative group"
                 >
-                  <FaCartShopping className="text-sm" />
+                  <FaCartShopping className="text-sm transition-transform group-hover:scale-110" />
                   <span>My Cart</span>
                   {card_product_count > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold animate-pulse shadow-lg">
                       {card_product_count}
                     </span>
                   )}
@@ -466,7 +464,7 @@ const Header = () => {
               <li>
                 {userInfo ? (
                   <button
-                    onClick={redirect_card_page}
+                    onClick={toggleCartSidebar}
                     className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 flex items-center gap-3 w-full text-left ${
                       pathname === "/card"
                         ? "text-primary bg-primary/10 border-l-4 border-primary"
@@ -476,7 +474,7 @@ const Header = () => {
                     <FaCartShopping className="text-sm" />
                     My Cart
                     {card_product_count > 0 && (
-                      <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                      <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold animate-pulse shadow-lg">
                         {card_product_count}
                       </span>
                     )}
@@ -519,30 +517,6 @@ const Header = () => {
                 >
                   <FaStore className="text-sm" />
                   Shop
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/about"
-                  className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 ${
-                    pathname === "/about"
-                      ? "text-primary bg-primary/10 border-l-4 border-primary"
-                      : "text-slate-600 hover:text-primary hover:bg-gray-50"
-                  }`}
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/prices"
-                  className={`py-3 px-4 block text-sm font-semibold rounded-lg transition-all duration-300 ${
-                    pathname === "/prices"
-                      ? "text-primary bg-primary/10 border-l-4 border-primary"
-                      : "text-slate-600 hover:text-primary hover:bg-gray-50"
-                  }`}
-                >
-                  Prices
                 </Link>
               </li>
               <li>
@@ -624,6 +598,12 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      {/* Cart Sidebar */}
+      <CartSidebar 
+        isOpen={cartSidebarOpen} 
+        onClose={() => setCartSidebarOpen(false)} 
+      />
     </div>
   );
 };

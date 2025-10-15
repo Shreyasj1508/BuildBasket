@@ -1,138 +1,160 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { FaEye, FaRegHeart, FaChartLine, FaShoppingCart, FaRupeeSign } from "react-icons/fa";
+import Rating from '../Rating';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaChartLine, FaRupeeSign, FaArrowUp, FaArrowDown, FaMinus, FaEye, FaShoppingCart, FaRegHeart } from 'react-icons/fa';
-import { AiFillStar } from "react-icons/ai";
-import { CiStar } from "react-icons/ci";
-import { useDispatch } from 'react-redux';
-import { add_to_card, add_to_wishlist, messageClear } from '../../store/reducers/cardReducer';
-import { useAuthState, useCardState } from '../../hooks/useSafeSelector';
+import { useDispatch, useSelector } from 'react-redux';
+import { add_to_card, add_to_wishlist, messageClear, get_card_products } from '../../store/reducers/cardReducer';
 import toast from 'react-hot-toast';
-import api from '../../api/api';
+import { useAuthState, useCardState } from '../../hooks/useSafeSelector';
 import { useCommission } from '../../context/CommissionContext';
+import CartNotification from '../CartNotification';
 
-const ShopProductsWithGraph = ({ products = [], grid }) => {
+const ShopProductsWithGraph = ({ products = [], grid = true }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { userInfo } = useAuthState();
     const { errorMessage, successMessage } = useCardState();
+    const { card_products = [], card_product_count = 0, outofstock_products = [] } = useSelector(state => state.card);
     const { calculateCommission } = useCommission();
-    const [productsWithPrices, setProductsWithPrices] = useState([]);
-    const [loading, setLoading] = useState(true);
+    
+    const [showNotification, setShowNotification] = useState(false);
+    const [addedProduct, setAddedProduct] = useState(null);
 
-    useEffect(() => {
-        fetchProductsWithPrices();
-    }, [products]);
-
-    const fetchProductsWithPrices = async () => {
-        try {
-            setLoading(true);
-            const { data } = await api.get('/home/products-with-prices');
-            
-            if (data.success) {
-                // Filter products that match the current products list
-                const filteredProducts = data.products.filter(product => 
-                    products.some(p => p._id === product._id)
-                );
-                setProductsWithPrices(filteredProducts);
-            } else {
-                // Fallback to original products if API fails
-                setProductsWithPrices(products);
-            }
-        } catch (error) {
-            console.error('Error fetching products with prices:', error);
-            // Fallback to original products
-            setProductsWithPrices(products);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const add_card = (id) => {
+    const add_card = (product) => {
         if (userInfo) {
+            console.log('Adding product to cart:', product._id);
+            dispatch(messageClear());
             dispatch(add_to_card({
                 userId: userInfo.id,
                 quantity: 1,
-                productId: id
-            }))
+                productId: product._id
+            })).then(() => {
+                console.log('Product added, refreshing cart');
+                dispatch(get_card_products(userInfo.id));
+                setAddedProduct(product);
+                setShowNotification(true);
+            }).catch((error) => {
+                console.error('Error adding to cart:', error);
+            });
         } else {
-            window.location.href = '/login'
+            navigate('/login');
         }
-    }
+    };
 
-    const add_wishlist = (id) => {
-        if (userInfo) {
-            dispatch(add_to_wishlist({
-                userId: userInfo.id,
-                productId: id
-            }))
-        } else {
-            window.location.href = '/login'
-        }
-    }
+    const getProductQuantity = (productId) => {
+        let totalQuantity = 0;
+        
+        card_products.forEach(sellerGroup => {
+            if (sellerGroup.products) {
+                sellerGroup.products.forEach(product => {
+                    if (product.productInfo && product.productInfo._id === productId) {
+                        totalQuantity += product.quantity;
+                    }
+                });
+            }
+        });
+        
+        outofstock_products.forEach(product => {
+            if (product.productId === productId) {
+                totalQuantity += product.quantity;
+            }
+        });
+        
+        return totalQuantity;
+    };
+
+    useEffect(() => { 
+        if (successMessage) {
+            toast.success(successMessage);
+            dispatch(messageClear());  
+        } 
+        if (errorMessage) {
+            toast.error(errorMessage);
+            dispatch(messageClear());  
+        } 
+    }, [successMessage, errorMessage]);
 
     useEffect(() => {
-        if (errorMessage) {
-            toast.error(errorMessage)
-            dispatch(messageClear())
+        if (userInfo && userInfo.id) {
+            dispatch(get_card_products(userInfo.id));
         }
-        if (successMessage) {
-            toast.success(successMessage)
-            dispatch(messageClear())
-        }
-    }, [errorMessage, successMessage])
+    }, [userInfo, dispatch]);
+
+    const add_wishlist = (pro) => {
+        dispatch(add_to_wishlist({
+            userId: userInfo.id,
+            productId: pro._id,
+            name: pro.name,
+            price: pro.price,
+            image: pro.images[0],
+            discount: pro.discount,
+            rating: pro.rating,
+            slug: pro.slug
+        }));
+    };
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
             currency: 'INR',
             minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
+            maximumFractionDigits: 0
         }).format(price);
     };
 
     const getTrendIcon = (trend) => {
         switch (trend) {
-            case 'up':
-                return <FaArrowUp className="text-green-500" />;
-            case 'down':
-                return <FaArrowDown className="text-red-500" />;
-            default:
-                return <FaMinus className="text-gray-500" />;
+            case 'up': return <span className="text-green-500">↗</span>;
+            case 'down': return <span className="text-red-500">↘</span>;
+            case 'stable': return <span className="text-gray-500">→</span>;
+            default: return <span className="text-gray-500">→</span>;
         }
     };
 
     const getTrendColor = (trend) => {
         switch (trend) {
-            case 'up':
-                return 'text-green-500';
-            case 'down':
-                return 'text-red-500';
-            default:
-                return 'text-gray-500';
+            case 'up': return 'text-green-600';
+            case 'down': return 'text-red-600';
+            case 'stable': return 'text-gray-600';
+            default: return 'text-gray-600';
         }
     };
 
     const getPriceChangeColor = (value) => {
-        return value >= 0 ? 'text-green-500' : 'text-red-500';
+        if (value > 0) return 'text-green-600';
+        if (value < 0) return 'text-red-600';
+        return 'text-gray-600';
     };
 
-    if (loading) {
+    // Add mock price history data for demonstration
+    const productsWithPrices = products.map(product => ({
+        ...product,
+        priceHistory: {
+            marketTrend: 'up',
+            changes: {
+                weekly: { value: Math.random() * 100 - 50 },
+                monthly: { value: Math.random() * 200 - 100 }
+            }
+        }
+    }));
+
+    if (products.length === 0) {
         return (
             <div className="flex justify-center items-center h-64">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading products with price data...</p>
+                    <p className="text-gray-500">Loading products...</p>
                 </div>
             </div>
         );
     }
 
-    if (productsWithPrices.length === 0) {
+    if (products.length === 0) {
         return (
             <div className="text-center py-12">
                 <div className="text-gray-500 text-6xl mb-4">📦</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Products Found</h3>
-                <p className="text-gray-600">No products match your current filters.</p>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">No products found</h3>
+                <p className="text-gray-500">Try adjusting your search criteria</p>
             </div>
         );
     }
@@ -156,20 +178,20 @@ const ShopProductsWithGraph = ({ products = [], grid }) => {
                                         -{product.discount}%
                                     </div>
                                 )}
+                                
+                                {/* Action Buttons */}
                                 <div className="absolute top-2 right-2 flex space-x-2">
                                     <button
-                                        onClick={() => navigate(`/price-history/${product._id}`)}
-                                        className="bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full shadow-md transition-all duration-200 hover:scale-110"
-                                        title="View Price Graph"
+                                        onClick={() => add_wishlist(product)}
+                                        className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors shadow-md"
                                     >
-                                        <FaChartLine className="text-primary text-lg" />
+                                        <FaRegHeart className="text-sm" />
                                     </button>
                                     <Link
                                         to={`/product/details/${product.slug}`}
-                                        className="bg-white bg-opacity-90 hover:bg-opacity-100 p-2 rounded-full shadow-md transition-all duration-200 hover:scale-110"
-                                        title="View Details"
+                                        className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-colors shadow-md"
                                     >
-                                        <FaEye className="text-gray-600 text-lg" />
+                                        <FaEye className="text-sm" />
                                     </Link>
                                 </div>
                             </div>
@@ -177,18 +199,14 @@ const ShopProductsWithGraph = ({ products = [], grid }) => {
                             {/* Product Info */}
                             <div className="p-4">
                                 <div className="mb-2">
-                                    <span className="bg-primary text-white px-2 py-1 rounded-full text-xs font-semibold">
-                                        {product.brand}
-                                    </span>
+                                    <h3 className="font-semibold text-gray-900 text-lg mb-1 line-clamp-2">
+                                        {product.name}
+                                    </h3>
+                                    <div className="flex items-center space-x-2 mb-2">
+                                        <Rating ratings={product.rating} />
+                                        <span className="text-sm text-gray-500">({product.rating})</span>
+                                    </div>
                                 </div>
-                                
-                                <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
-                                    {product.name}
-                                </h3>
-                                
-                                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                                    {product.description}
-                                </p>
 
                                 {/* Price Section */}
                                 <div className="mb-4">
@@ -196,7 +214,7 @@ const ShopProductsWithGraph = ({ products = [], grid }) => {
                                         <div className="flex items-center space-x-2">
                                             <FaRupeeSign className="text-primary" />
                                             <span className="text-2xl font-bold text-gray-900">
-                                                {formatPrice(Math.round(calculateCommission(product.price).finalPrice))}
+                                                {formatPrice(Math.round(calculateCommission(product.price, product).finalPrice))}
                                             </span>
                                         </div>
                                         <div className="text-right">
@@ -240,35 +258,35 @@ const ShopProductsWithGraph = ({ products = [], grid }) => {
                                 <div className="space-y-2">
                                     <div className="flex space-x-2">
                                         <button
-                                            onClick={() => navigate(`/price-history/${product._id}`)}
-                                            className="flex-1 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark transition-colors flex items-center justify-center space-x-2"
-                                        >
-                                            <FaChartLine />
-                                            <span>Price Graph</span>
-                                        </button>
-                                        <Link
-                                            to={`/product/details/${product.slug}`}
-                                            className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
-                                        >
-                                            <FaEye />
-                                            <span>View Details</span>
-                                        </Link>
-                                    </div>
-                                    
-                                    <div className="flex space-x-2">
-                                        <button
-                                            onClick={() => add_card(product._id)}
-                                            className="flex-1 bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2 font-semibold"
+                                            onClick={() => add_card(product)}
+                                            className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors flex items-center space-x-2 font-semibold flex-1"
                                         >
                                             <FaShoppingCart />
                                             <span>ADD TO CART</span>
                                         </button>
                                         <button
-                                            onClick={() => add_wishlist(product._id)}
-                                            className="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center space-x-2"
+                                            onClick={() => add_wishlist(product)}
+                                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors flex items-center space-x-2"
                                         >
                                             <FaRegHeart />
                                             <span>Wishlist</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="flex space-x-2">
+                                        <Link
+                                            to={`/product/details/${product.slug}`}
+                                            className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors flex items-center space-x-2 flex-1 justify-center"
+                                        >
+                                            <FaEye />
+                                            <span>View Details</span>
+                                        </Link>
+                                        <button
+                                            onClick={() => navigate(`/price-history/${product._id}`)}
+                                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center space-x-2"
+                                        >
+                                            <FaChartLine />
+                                            <span>Price History</span>
                                         </button>
                                     </div>
                                 </div>
@@ -293,48 +311,38 @@ const ShopProductsWithGraph = ({ products = [], grid }) => {
                                 
                                 <div className="flex-1">
                                     <div className="flex justify-between items-start mb-2">
-                                        <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
-                                            {product.name}
-                                        </h3>
+                                        <h3 className="font-semibold text-gray-900 text-lg">{product.name}</h3>
                                         <div className="flex space-x-2">
-                                            <button
-                                                onClick={() => navigate(`/price-history/${product._id}`)}
-                                                className="p-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-                                                title="View Price Graph"
-                                            >
-                                                <FaChartLine />
+                                            <button onClick={() => add_wishlist(product)} className="text-red-500 hover:text-red-700">
+                                                <FaRegHeart />
                                             </button>
-                                            <Link
-                                                to={`/product/details/${product.slug}`}
-                                                className="p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                                                title="View Details"
-                                            >
+                                            <Link to={`/product/details/${product.slug}`} className="text-primary hover:text-primary-dark">
                                                 <FaEye />
                                             </Link>
                                         </div>
                                     </div>
                                     
-                                    <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                                        {product.description}
-                                    </p>
+                                    <div className="flex items-center space-x-2 mb-2">
+                                        <Rating ratings={product.rating} />
+                                        <span className="text-sm text-gray-500">({product.rating})</span>
+                                    </div>
                                     
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex items-center space-x-2">
                                             <FaRupeeSign className="text-primary" />
                                             <span className="text-xl font-bold text-gray-900">
-                                                {formatPrice(Math.round(calculateCommission(product.price).finalPrice))}
+                                                {formatPrice(Math.round(calculateCommission(product.price, product).finalPrice))}
                                             </span>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm text-gray-500">Stock: {product.stock}</p>
                                         </div>
                                     </div>
-
-                                    {/* Price History Info for List View */}
+                                    
                                     {product.priceHistory && (
                                         <div className="bg-gray-50 rounded-lg p-2 mb-2">
                                             <div className="flex items-center justify-between text-sm">
-                                                <span className="font-semibold text-gray-700">Market Price: {formatPrice(product.priceHistory.currentPrice)}</span>
+                                                <span className="font-semibold text-gray-700">Market Trend</span>
                                                 <div className="flex items-center space-x-1">
                                                     {getTrendIcon(product.priceHistory.marketTrend)}
                                                     <span className={`font-semibold capitalize ${getTrendColor(product.priceHistory.marketTrend)}`}>
@@ -347,14 +355,14 @@ const ShopProductsWithGraph = ({ products = [], grid }) => {
                                     
                                     <div className="flex space-x-2">
                                         <button
-                                            onClick={() => add_card(product._id)}
+                                            onClick={() => add_card(product)}
                                             className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors flex items-center space-x-2 font-semibold"
                                         >
                                             <FaShoppingCart />
                                             <span>ADD TO CART</span>
                                         </button>
                                         <button
-                                            onClick={() => add_wishlist(product._id)}
+                                            onClick={() => add_wishlist(product)}
                                             className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors flex items-center space-x-2"
                                         >
                                             <FaRegHeart />

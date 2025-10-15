@@ -10,7 +10,7 @@ import { FaCreditCard, FaWallet, FaCheckCircle } from "react-icons/fa";
 
 const Payment = () => {
   const {
-    state: { price, items, orderId },
+    state: { price, items, orderId, orderNumber, trackingNumber, estimatedDelivery },
   } = useLocation();
   const [paymentMethod, setPaymentMethod] = useState("stripe");
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,14 @@ const Payment = () => {
       // For COD, we'll mark the order as paid immediately
       await api.get(`/order/confirm/${orderId}`);
       toast.success("Order confirmed! You will pay on delivery.");
-      navigate("/dashboard/my-orders");
+      navigate("/dashboard/my-orders", {
+        state: { 
+          orderSuccess: true, 
+          orderNumber, 
+          trackingNumber, 
+          estimatedDelivery 
+        }
+      });
     } catch (error) {
       console.error("COD payment error:", error);
       toast.error("Failed to confirm order. Please try again.");
@@ -84,7 +91,14 @@ const Payment = () => {
 
       if (response.data.success) {
         toast.success("Order paid successfully using credit limit!");
-        navigate("/dashboard/my-orders");
+        navigate("/dashboard/my-orders", {
+        state: { 
+          orderSuccess: true, 
+          orderNumber, 
+          trackingNumber, 
+          estimatedDelivery 
+        }
+      });
       } else {
         toast.error(response.data.message || "Credit payment failed.");
       }

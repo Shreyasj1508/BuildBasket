@@ -8,6 +8,7 @@ import { add_to_card,add_to_wishlist,messageClear, get_card_products } from '../
 import toast from 'react-hot-toast';
 import { useAuthState, useCardState } from '../../hooks/useSafeSelector';
 import { useCommission } from '../../context/CommissionContext';
+import CartNotification from '../CartNotification';
 
 const FeatureProducts = ({products = []}) => {
     const navigate = useNavigate()
@@ -16,19 +17,25 @@ const FeatureProducts = ({products = []}) => {
     const {errorMessage, successMessage} = useCardState()
     const {card_products = [], card_product_count = 0, outofstock_products = []} = useSelector(state => state.card)
     const { calculateCommission } = useCommission();
+    
+    const [showNotification, setShowNotification] = useState(false);
+    const [addedProduct, setAddedProduct] = useState(null);
 
-    const add_card = (id) => {
+    const add_card = (product) => {
         if (userInfo) {
-           console.log('Adding product to cart:', id)
+           console.log('Adding product to cart:', product._id)
            // Clear any previous error messages
            dispatch(messageClear())
            dispatch(add_to_card({
             userId: userInfo.id,
             quantity : 1,
-            productId : id
+            productId : product._id
            })).then(() => {
                console.log('Product added, refreshing cart')
                dispatch(get_card_products(userInfo.id))
+               // Show notification
+               setAddedProduct(product);
+               setShowNotification(true);
            }).catch((error) => {
                console.error('Error adding to cart:', error)
            })
@@ -127,7 +134,7 @@ const FeatureProducts = ({products = []}) => {
             <Link to={`/product/details/${p.slug}`} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-primary hover:text-white hover:rotate-[720deg] transition-all shadow-md'>
             <FaEye />
             </Link> 
-            <li onClick={() => add_card(p._id)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-orange-500 hover:text-white hover:rotate-[720deg] transition-all shadow-md relative'>
+            <li onClick={() => add_card(p)} className='w-[38px] h-[38px] cursor-pointer bg-white flex justify-center items-center rounded-full hover:bg-orange-500 hover:text-white hover:rotate-[720deg] transition-all shadow-md relative'>
             <RiShoppingCartLine />
             {getProductQuantity(p._id) > 0 && (
                 <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold border-2 border-white">
@@ -144,7 +151,7 @@ const FeatureProducts = ({products = []}) => {
         <div className='py-3 text-slate-600 px-2'>
             <h2 className='font-bold'>{p.name} </h2>
                                     <div className='flex justify-start items-center gap-3'>
-                                            <span className='text-md font-semibold'>₹{Math.round(calculateCommission(p.price).finalPrice)}</span>
+                                            <span className='text-md font-semibold'>₹{Math.round(calculateCommission(p.price, p).finalPrice)}</span>
                                             <div className='flex'>
                                                     <Rating ratings={p.rating} />
                                             </div>
@@ -159,8 +166,14 @@ const FeatureProducts = ({products = []}) => {
     }
 
         </div>
-            
-        </div>
+        
+        {/* Cart Notification */}
+        <CartNotification 
+            show={showNotification}
+            onClose={() => setShowNotification(false)}
+            product={addedProduct}
+        />
+    </div>
     );
 };
 

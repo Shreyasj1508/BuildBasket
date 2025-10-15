@@ -17,7 +17,7 @@ const updateSingleProductCommission = async (productId, basePrice) => {
         }
 
         // Calculate commission
-        const commissionInfo = calculateCommissionSync(basePrice);
+        const commissionInfo = await calculateCommissionSync(basePrice);
 
         // Update product in database
         const updatedProduct = await productModel.findByIdAndUpdate(

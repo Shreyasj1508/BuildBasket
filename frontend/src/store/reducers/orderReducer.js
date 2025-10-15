@@ -8,11 +8,26 @@ export const place_order = createAsyncThunk(
             const { data } = await api.post('/home/order/place-order',{
                 price,products,shipping_fee,items,shippingInfo,userId,navigate
             })
+            
+            // Show success message with order number
+            if (data.orderNumber) {
+                // You can add a toast notification here
+                console.log('Order placed successfully!', {
+                    orderId: data.orderId,
+                    orderNumber: data.orderNumber,
+                    trackingNumber: data.trackingNumber,
+                    estimatedDelivery: data.estimatedDelivery
+                });
+            }
+            
             navigate('/payment',{
                 state: {
                     price:price + shipping_fee,
                     items,
-                    orderId: data.orderId 
+                    orderId: data.orderId,
+                    orderNumber: data.orderNumber,
+                    trackingNumber: data.trackingNumber,
+                    estimatedDelivery: data.estimatedDelivery
                 }
             })
             return fulfillWithValue(data)
@@ -66,10 +81,17 @@ export const track_order = createAsyncThunk(
     'order/track_order',
     async(orderId, { rejectWithValue, fulfillWithValue }) => {
         try {
-            const {data} = await api.get(`/home/customer/get-order-details/${orderId}`) 
+            // Try tracking by order number first
+            const {data} = await api.get(`/home/customer/track-order/${orderId}`) 
             return fulfillWithValue(data)
         } catch (error) {
-            return rejectWithValue(error.response?.data || { error: 'Order not found' })
+            // If order number fails, try by order ID
+            try {
+                const {data} = await api.get(`/home/customer/get-order-details/${orderId}`) 
+                return fulfillWithValue(data)
+            } catch (secondError) {
+                return rejectWithValue(error.response?.data || { error: 'Order not found' })
+            }
         }
     }
 )
@@ -157,7 +179,7 @@ export const orderReducer = createSlice({
         })
         .addCase(track_order.fulfilled, (state, { payload }) => { 
             state.loader = false
-            state.trackedOrder = payload.order
+            state.trackedOrder = payload || null
         })
         .addCase(track_order.rejected, (state, { payload }) => { 
             state.loader = false

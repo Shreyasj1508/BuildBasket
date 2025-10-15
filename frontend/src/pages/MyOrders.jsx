@@ -153,11 +153,16 @@ const MyOrders = () => {
                                             </div>
                                             <div>
                                                 <h3 className='font-semibold text-gray-800'>
-                                                    Order #{order._id.slice(-8)}
+                                                    {order.orderNumber ? `Order #${order.orderNumber}` : `Order #${order._id.slice(-8)}`}
                                                 </h3>
                                                 <p className='text-sm text-gray-600'>
                                                     Placed on {new Date(order.date).toLocaleDateString()}
                                                 </p>
+                                                {order.trackingNumber && (
+                                                    <p className='text-xs text-blue-600 font-medium'>
+                                                        Tracking: {order.trackingNumber}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                         <div className='text-right'>
@@ -189,10 +194,22 @@ const MyOrders = () => {
                                             </p>
                                         </div>
                                         <div>
-                                            <h4 className='font-semibold text-gray-700 mb-2'>Order ID</h4>
-                                            <p className='text-sm text-gray-600 font-mono'>
-                                                {order._id}
-                                            </p>
+                                            <h4 className='font-semibold text-gray-700 mb-2'>Order Details</h4>
+                                            <div className='text-sm text-gray-600'>
+                                                {order.orderNumber && (
+                                                    <p className='font-medium text-blue-600'>
+                                                        Order #: {order.orderNumber}
+                                                    </p>
+                                                )}
+                                                {order.trackingNumber && (
+                                                    <p className='font-medium text-green-600'>
+                                                        Tracking: {order.trackingNumber}
+                                                    </p>
+                                                )}
+                                                <p className='font-mono text-xs text-gray-500'>
+                                                    ID: {order._id.slice(-8)}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -235,10 +252,10 @@ const MyOrders = () => {
                                     <div className='flex items-center justify-between pt-4 border-t border-gray-200'>
                                         <div className='flex gap-2'>
                                             <Link
-                                                to={`/track-order?orderId=${order._id}`}
+                                                to={`/track-order?orderId=${order.orderNumber || order._id}`}
                                                 className='flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors'
                                             >
-                                                <FaEye />
+                                                <FaTruck />
                                                 Track Order
                                             </Link>
                                             <Link

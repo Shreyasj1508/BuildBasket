@@ -23,6 +23,7 @@ import { add_to_card,messageClear,add_to_wishlist, get_card_products, quantity_i
 import { useHomeState, useAuthState, useCardState } from '../hooks/useSafeSelector';
 import { useCommission } from '../context/CommissionContext'
 import { getProductImage, getAllProductImages, handleImageError, getImageUrl } from '../utils/imageUtils';
+import CartNotification from '../components/CartNotification';
  
 
 const Details = () => {
@@ -35,6 +36,8 @@ const Details = () => {
     const {errorMessage,successMessage } = useCardState()
     const {card_products = [], outofstock_products = []} = useSelector(state => state.card)
     const { calculateCommission } = useCommission()
+    
+    const [showNotification, setShowNotification] = useState(false);
 
   // Get current price from price history or fallback to product price
   const getCurrentPrice = () => {
@@ -158,6 +161,8 @@ const Details = () => {
             productId : product._id
            })).then(() => {
                dispatch(get_card_products(userInfo.id))
+               // Show notification
+               setShowNotification(true);
            })
         } else {
             navigate('/login')
@@ -321,14 +326,14 @@ const Details = () => {
          <div className='text-2xl text-red-500 font-bold flex gap-3'>
             {
                 product.discount !== 0 ? <>
-                Price : <h2 className='line-through'>₹{Math.round(calculateCommission(getCurrentPrice()).finalPrice)}</h2>
-                <h2>₹{Math.round(calculateCommission(getCurrentPrice() - Math.floor((getCurrentPrice() * product.discount) / 100)).finalPrice)} (-{product.discount}%) </h2>
+                Price : <h2 className='line-through'>₹{Math.round(calculateCommission(getCurrentPrice(), product).finalPrice)}</h2>
+                <h2>₹{Math.round(calculateCommission(getCurrentPrice() - Math.floor((getCurrentPrice() * product.discount) / 100), product).finalPrice)} (-{product.discount}%) </h2>
                 
-                </> : <h2> Price : ₹{Math.round(calculateCommission(getCurrentPrice()).finalPrice)} </h2>
+                </> : <h2> Price : ₹{Math.round(calculateCommission(getCurrentPrice(), product).finalPrice)} </h2>
             }
             {product?.priceHistory?.currentPrice && product.priceHistory.currentPrice !== product.price && (
                 <span className="text-sm text-gray-500 ml-2">
-                    (Updated from ₹{Math.round(calculateCommission(product.price).finalPrice)})
+                    (Updated from ₹{Math.round(calculateCommission(product.price, product).finalPrice)})
                 </span>
             )}
           </div> 
@@ -553,6 +558,13 @@ const Details = () => {
 
 
             <Footer/> 
+            
+            {/* Cart Notification */}
+            <CartNotification 
+                show={showNotification}
+                onClose={() => setShowNotification(false)}
+                product={product}
+            />
         </div>
     );
 };
