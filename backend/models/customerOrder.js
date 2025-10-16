@@ -87,6 +87,62 @@ const customerOrder = new Schema({
     notes: {
         type: String,
         default: null
+    },
+    // Admin approval system
+    adminApproval: {
+        status: {
+            type: String,
+            enum: ['pending', 'approved', 'rejected'],
+            default: 'pending'
+        },
+        approvedBy: {
+            type: Schema.ObjectId,
+            ref: 'admins',
+            default: null
+        },
+        approvedAt: {
+            type: Date,
+            default: null
+        },
+        rejectionReason: {
+            type: String,
+            default: null
+        }
+    },
+    // Seller confirmation system
+    sellerConfirmation: {
+        status: {
+            type: String,
+            enum: ['pending', 'confirmed', 'rejected'],
+            default: 'pending'
+        },
+        confirmedAt: {
+            type: Date,
+            default: null
+        },
+        sellerNotes: {
+            type: String,
+            default: null
+        }
+    },
+    // PDF Receipt system
+    receipt: {
+        generated: {
+            type: Boolean,
+            default: false
+        },
+        downloadAllowed: {
+            type: Boolean,
+            default: false
+        },
+        pdfPath: {
+            type: String,
+            default: null
+        },
+        generatedAt: {
+            type: Date,
+            default: null
+        }
     }
 },{timestamps : true})
 

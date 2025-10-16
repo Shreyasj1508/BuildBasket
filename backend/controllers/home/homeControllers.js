@@ -446,21 +446,39 @@ getMarketCondition = (changePercent) => {
 // end method 
 
 submit_review = async (req, res) => {
-     const {productId,rating,review,name} = req.body
+     const {productId, rating, review, name, title, userId, email, verifiedPurchase} = req.body
 
      try {
-        await reviewModel.create({
-            productId,
-            name,
-            rating,
-            review,
-            date: moment(Date.now()).format('LL')
+        // Check if user already reviewed this product
+        const existingReview = await reviewModel.findOne({
+            productId: new ObjectId(productId),
+            userId: new ObjectId(userId)
         })
 
-        let rat = 0;
-        const reviews = await reviewModel.find({
-            productId
+        if (existingReview) {
+            return responseReturn(res, 400, {
+                message: "You have already reviewed this product"
+            })
+        }
+
+        await reviewModel.create({
+            productId: new ObjectId(productId),
+            userId: new ObjectId(userId),
+            name,
+            email,
+            rating,
+            review,
+            title: title || '',
+            date: moment(Date.now()).format('LL'),
+            verifiedPurchase: verifiedPurchase || false
         })
+
+        // Calculate average rating
+        const reviews = await reviewModel.find({
+            productId: new ObjectId(productId)
+        })
+        
+        let rat = 0;
         for (let i = 0; i < reviews.length; i++) {
             rat = rat + reviews[i].rating 
         }
@@ -472,6 +490,7 @@ submit_review = async (req, res) => {
         await productModel.findByIdAndUpdate(productId,{
             rating : productRating
         })
+        
         responseReturn(res, 201, {
             message: "Review Added Successfully"
         })
@@ -479,32 +498,35 @@ submit_review = async (req, res) => {
         
      } catch (error) {
         console.log(error.message)
+        responseReturn(res, 500, {
+            message: "Internal Server Error"
+        })
      }
 }
 // end method 
 
 get_reviews = async (req, res) => {
     const {productId} = req.params
-    let {pageNo} = req.query 
-    pageNo = parseInt(pageNo)
-    const limit = 5
+    let {pageNo, filter} = req.query 
+    pageNo = parseInt(pageNo) || 1
+    const limit = 10
     const skipPage = limit * (pageNo - 1) 
 
     try {
+        // Build match criteria
+        let matchCriteria = {
+            productId: new ObjectId(productId)
+        }
+
+        // Add rating filter if provided
+        if (filter && !isNaN(filter)) {
+            matchCriteria.rating = parseInt(filter)
+        }
+
         let getRating = await reviewModel.aggregate([{
             $match: {
-                productId: {
-                    $eq : new ObjectId(productId)
-                },
-                rating: {
-                    $not: {
-                        $size: 0
-                    }
-                }
+                productId: new ObjectId(productId)
             }
-        },
-        {
-            $unwind: "$rating"
         },
         {
             $group: {
@@ -515,6 +537,7 @@ get_reviews = async (req, res) => {
             }
         } 
     ])
+    
     let rating_review = [{
         rating: 5,
         sum : 0
@@ -536,6 +559,7 @@ get_reviews = async (req, res) => {
         sum: 0
     }
    ]
+   
    for (let i = 0; i < rating_review.length; i++) {
         for (let j = 0; j < getRating.length; j++) {
             if (rating_review[i].rating === getRating[j]._id) {
@@ -546,20 +570,59 @@ get_reviews = async (req, res) => {
    }
 
    const getAll = await reviewModel.find({
-    productId
-   })
-   const reviews = await reviewModel.find({
-    productId
-   }).skip(skipPage).limit(limit).sort({createdAt: -1})
+    productId: new ObjectId(productId)
+   }).countDocuments()
+
+   const reviews = await reviewModel.find(matchCriteria)
+   .skip(skipPage)
+   .limit(limit)
+   .sort({createdAt: -1})
+   .populate('userId', 'name email')
+   .select('-email') // Don't expose email in response
 
    responseReturn(res, 200, {
     reviews,
-    totalReview: getAll.length,
-    rating_review
+    totalReview: getAll,
+    rating_review,
+    currentPage: pageNo,
+    totalPages: Math.ceil(getAll / limit)
    })
         
     } catch (error) {
         console.log(error.message)
+        responseReturn(res, 500, {
+            message: "Internal Server Error"
+        })
+    }
+}
+// end method
+
+mark_review_helpful = async (req, res) => {
+    const {reviewId} = req.params
+    
+    try {
+        const review = await reviewModel.findByIdAndUpdate(
+            reviewId,
+            { $inc: { helpful: 1 } },
+            { new: true }
+        )
+
+        if (!review) {
+            return responseReturn(res, 404, {
+                message: "Review not found"
+            })
+        }
+
+        responseReturn(res, 200, {
+            message: "Thank you for your feedback",
+            helpful: review.helpful
+        })
+        
+    } catch (error) {
+        console.log(error.message)
+        responseReturn(res, 500, {
+            message: "Internal Server Error"
+        })
     }
 }
 // end method

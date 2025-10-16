@@ -11,6 +11,7 @@ import { BsCartCheck } from "react-icons/bs";
 import { IoChatbubbles } from "react-icons/io5";
 import { BsFillChatQuoteFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
+import { FaCheckCircle, FaCreditCard } from "react-icons/fa";
 
 export const allNav = [
     {
@@ -26,6 +27,34 @@ export const allNav = [
         icon : <AiOutlineShoppingCart />,
         role : 'admin',
         path: '/admin/dashboard/orders'
+    },
+    {
+        id : 2.5,
+        title : 'Purchase Tracking',
+        icon : <BsCartCheck />,
+        role : 'admin',
+        path: '/admin/dashboard/purchase-tracking'
+    },
+    {
+        id : 2.6,
+        title : 'Order Management',
+        icon : <FaEdit />,
+        role : 'admin',
+        path: '/admin/dashboard/order-management'
+    },
+    {
+        id : 2.7,
+        title : 'Order Approval',
+        icon : <FaCheckCircle />,
+        role : 'admin',
+        path: '/admin/dashboard/order-approval'
+    },
+    {
+        id : 2.8,
+        title : 'Payment Management',
+        icon : <FaCreditCard />,
+        role : 'admin',
+        path: '/admin/dashboard/payment-management'
     },
     {
         id : 3,

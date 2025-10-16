@@ -12,6 +12,7 @@ router.get('/product-by-id/:productId',homeControllers.get_product_by_id)
 
 router.post('/customer/submit-review',homeControllers.submit_review)
 router.get('/customer/get-reviews/:productId',homeControllers.get_reviews)
+router.put('/customer/review-helpful/:reviewId',homeControllers.mark_review_helpful)
 
 // Page data routes
 router.get('/about-data', pageController.get_about_data)

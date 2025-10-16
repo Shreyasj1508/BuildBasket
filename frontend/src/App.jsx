@@ -17,9 +17,10 @@ import { useDispatch } from "react-redux";
 import CategoryShop from "./pages/CategoryShop";
 import SearchProducts from "./pages/SearchProducts";
 import Payment from "./pages/Payment";
+import PaymentPage from "./pages/PaymentPage";
 import Dashboard from "./pages/Dashboard";
 import DashboardHome from "./pages/DashboardHome";
-import MyOrders from "./pages/MyOrders";
+import CustomerOrderDashboard from "./components/CustomerOrderDashboard";
 import ProtectUser from "./utils/ProtectUser";
 import Index from "./components/dashboard/Index";
 import Orders from "./components/dashboard/Orders";
@@ -71,6 +72,7 @@ function App() {
           <Route path="/card" element={<Card />} />
           <Route path="/shipping" element={<Shipping />} />
           <Route path="/payment" element={<Payment />} />
+          <Route path="/payment-page" element={<PaymentPage />} />
           <Route path="/about" element={<About />} />
           <Route path="/prices" element={<Prices />} />
           <Route path="/track-order" element={<TrackOrder />} />
@@ -84,7 +86,7 @@ function App() {
           <Route path="/dashboard" element={<ProtectUser />}>
             <Route path="" element={<Dashboard />}>
               <Route path="" element={<DashboardHome />} />
-              <Route path="my-orders" element={<MyOrders />} />
+              <Route path="my-orders" element={<CustomerOrderDashboard />} />
               <Route path="change-password" element={<ChangePassword />} />
               <Route path="my-wishlist" element={<Wishlist />} />
               <Route path="order-details/:orderId" element={<OrderDetails />} />

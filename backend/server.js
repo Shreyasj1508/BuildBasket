@@ -174,6 +174,7 @@ app.use("/api/admin", require("./routes/admin/adminActivitiesRoutes"));
 
 // Seeder Routes
 app.use("/api/admin", require("./routes/seedRealDataRoutes"));
+app.use("/api", require("./routes/seedProductRoutes"));
 
 // Temporary seeding route (REMOVE AFTER SEEDING)
 // app.use('/api',require('./routes/seedRoutes'))

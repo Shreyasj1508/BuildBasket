@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from 'react-redux';
 import { place_order } from '../store/reducers/orderReducer';
+import toast from 'react-hot-toast';
 
 const Shipping = () => {
 
@@ -24,6 +25,14 @@ const Shipping = () => {
         area: ''
     })
 
+    // Check authentication on component mount
+    useEffect(() => {
+        if (!userInfo || !userInfo.id) {
+            toast.error('Please login to place an order');
+            navigate('/login');
+        }
+    }, [userInfo, navigate]);
+
     const inputHandle = (e) => {
         setState({
             ...state,
@@ -41,18 +50,28 @@ const Shipping = () => {
     }
 
     const placeOrder = () => {
+        // Check if user is authenticated
+        if (!userInfo || !userInfo.id) {
+            console.error('User not authenticated. Please login first.');
+            toast.error('Please login to place an order');
+            navigate('/login');
+            return;
+        }
+
         console.log('Placing order with userInfo:', userInfo);
         console.log('Order data:', { price, products, shipping_fee, items, shippingInfo: state, userId: userInfo.id });
-        dispatch(place_order({
-            price,
-            products,
-            shipping_fee,
-            items,
-            shippingInfo : state,
-            userId: userInfo.id,
-            navigate 
-
-        }))
+        
+        // Navigate to payment page instead of using the old place_order action
+        navigate('/payment-page', {
+            state: {
+                price,
+                products,
+                shipping_fee,
+                items,
+                shippingInfo: state,
+                userId: userInfo.id
+            }
+        })
     }
 
     return (

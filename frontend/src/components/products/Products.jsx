@@ -188,7 +188,7 @@ const Products = ({ title, products = [] }) => {
               {p.map((pl, j) => (
                 <div
                   key={j}
-                  className={`group bg-white rounded-xl p-4 shadow-lg hover:shadow-xl border border-gray-200 hover:border-primary/30 transition-all duration-300 hover:transform hover:scale-[1.02] h-[180px] ${sectionConfig.bgGradient}`}
+                  className={`group bg-white rounded-xl p-5 shadow-lg hover:shadow-2xl border border-gray-200 hover:border-primary/30 transition-all duration-500 hover:transform hover:scale-[1.03] hover:-translate-y-1 h-[200px] ${sectionConfig.bgGradient} backdrop-blur-sm`}
                 >
                   <div className="flex justify-start items-start relative">
                     <Link
@@ -196,13 +196,15 @@ const Products = ({ title, products = [] }) => {
                       to={`/product/details/${pl.slug}`}
                     >
                       {/* Enhanced Product Image */}
-                      <div className="relative overflow-hidden rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
+                      <div className="relative overflow-hidden rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-500 border-2 border-gray-100 group-hover:border-primary/20">
                         <img
-                          className="w-[120px] h-[120px] object-cover group-hover:scale-110 transition-transform duration-300"
+                          className="w-[130px] h-[130px] object-cover group-hover:scale-110 transition-transform duration-500"
                           src={getImageUrl(getProductImage(pl.images))}
                           alt={pl.name}
                           onError={(e) => handleImageError(e)}
                         />
+                        {/* Image overlay effect */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         {/* Section-specific Badges */}
                         {title === "Latest Product" && (
                           <div className="absolute top-2 left-2 bg-gradient-to-r from-primary to-primary-dark text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
@@ -226,19 +228,19 @@ const Products = ({ title, products = [] }) => {
                       </div>
 
                       {/* Enhanced Product Info */}
-                      <div className="flex-1 flex flex-col justify-start gap-2">
-                        <h2 className="text-lg font-bold text-gray-800 group-hover:text-primary transition-colors duration-300 line-clamp-2">
+                      <div className="flex-1 flex flex-col justify-start gap-3">
+                        <h2 className="text-xl font-bold text-gray-800 group-hover:text-primary transition-colors duration-300 line-clamp-2 leading-tight">
                           {pl.name}
                         </h2>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
                             ₹
                             {Math.round(
                               calculateCommission(pl.price).finalPrice
                             )}
                           </span>
                           {pl.discount && pl.discount > 0 && (
-                            <span className="text-sm text-gray-500 line-through">
+                            <span className="text-sm text-gray-500 line-through bg-gray-100 px-2 py-1 rounded-md">
                               ₹
                               {Math.round(
                                 calculateCommission(
@@ -250,40 +252,69 @@ const Products = ({ title, products = [] }) => {
                         </div>
                         {/* Enhanced Rating Display */}
                         {pl.rating && (
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg">
                             <div className="flex text-yellow-400">
                               {[...Array(5)].map((_, idx) => (
                                 <FaStar
                                   key={idx}
-                                  className={`text-xs ${
+                                  className={`text-sm ${
                                     idx < Math.floor(pl.rating)
-                                      ? "text-yellow-400"
+                                      ? "text-yellow-400 drop-shadow-sm"
                                       : "text-gray-300"
                                   }`}
                                 />
                               ))}
                             </div>
                             <span
-                              className={`text-xs font-semibold ml-1 ${
+                              className={`text-sm font-bold ${
                                 title === "Top Rated Product"
-                                  ? "text-yellow-600 font-bold"
-                                  : "text-gray-600"
+                                  ? "text-yellow-600 bg-yellow-100 px-2 py-1 rounded-md"
+                                  : "text-gray-700"
                               }`}
                             >
-                              ({pl.rating})
+                              {pl.rating}
                             </span>
                           </div>
                         )}
+                        
+                        {/* Stock Status */}
+                        <div className="flex items-center gap-2">
+                          <div className={`w-3 h-3 rounded-full ${
+                            pl.stock > 0 
+                              ? 'bg-green-500 shadow-green-500/50 shadow-sm' 
+                              : 'bg-red-500 shadow-red-500/50 shadow-sm'
+                          }`}></div>
+                          <span className={`text-sm font-medium ${
+                            pl.stock > 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {pl.stock > 0 ? `${pl.stock} in stock` : 'Out of stock'}
+                          </span>
+                        </div>
                       </div>
                     </Link>
 
-                    {/* Enhanced Chart Button */}
-                    <Link
-                      to={`/price-detail/${pl._id}`}
-                      className={`absolute top-3 right-3 w-10 h-10 ${sectionConfig.iconBg} rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 group-hover:opacity-100 transform hover:scale-110`}
-                    >
-                      <FaChartLine className="text-sm text-white" />
-                    </Link>
+                    {/* Enhanced Action Buttons */}
+                    <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <Link
+                        to={`/price-detail/${pl._id}`}
+                        className={`w-10 h-10 ${sectionConfig.iconBg} rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110`}
+                        title="View Price Details"
+                      >
+                        <FaChartLine className="text-sm text-white" />
+                      </Link>
+                      <button
+                        className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+                        title="Quick Add to Cart"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Add quick add to cart functionality here
+                        }}
+                      >
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h6.5M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

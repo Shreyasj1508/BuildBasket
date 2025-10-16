@@ -30,7 +30,7 @@ const Dashboard = () => {
   const { dashboardData, loader } = useSelector((state) => state.order);
 
   useEffect(() => {
-    if (userInfo?.id) {
+    if (userInfo && userInfo.id) {
       dispatch(get_customer_dashboard_data(userInfo.id));
     }
   }, [userInfo, dispatch]);

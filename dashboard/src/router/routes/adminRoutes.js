@@ -24,6 +24,10 @@ const BuyerCreditManagement = lazy(()=> import('../../views/admin/BuyerCreditMan
 const ReportsExports = lazy(()=> import('../../views/admin/ReportsExports'))
 const AnalyticsDashboard = lazy(()=> import('../../views/admin/AnalyticsDashboard'))
 const BuyerManagement = lazy(()=> import('../../views/admin/BuyerManagement'))
+const PurchaseTracking = lazy(()=> import('../../views/admin/PurchaseTracking'))
+const OrderManagement = lazy(()=> import('../../views/admin/OrderManagement'))
+const OrderApproval = lazy(()=> import('../../views/admin/OrderApproval'))
+const PaymentManagement = lazy(()=> import('../../views/admin/PaymentManagement'))
 
 export const adminRoutes = [
     {
@@ -134,6 +138,26 @@ export const adminRoutes = [
     {
         path: 'admin/dashboard/buyer-management',
         element : <BuyerManagement/>,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/purchase-tracking',
+        element : <PurchaseTracking/>,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/order-management',
+        element : <OrderManagement/>,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/order-approval',
+        element : <OrderApproval/>,
+        role : 'admin'
+    },
+    {
+        path: 'admin/dashboard/payment-management',
+        element : <PaymentManagement/>,
         role : 'admin'
     }
 ]

@@ -17,7 +17,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
     if (isOpen) {
       setIsVisible(true);
       // Load fresh cart data when sidebar opens
-      if (userInfo?.id) {
+      if (userInfo && userInfo.id) {
         dispatch(get_card_products(userInfo.id));
       }
     } else {

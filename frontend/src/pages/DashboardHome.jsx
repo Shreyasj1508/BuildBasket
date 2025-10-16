@@ -21,7 +21,7 @@ const DashboardHome = () => {
 
     useEffect(() => {
         console.log('DashboardHome - userInfo:', userInfo);
-        if (userInfo?.id) {
+        if (userInfo && userInfo.id) {
             console.log('Fetching dashboard data for userId:', userInfo.id);
             dispatch(get_customer_dashboard_data(userInfo.id));
         }

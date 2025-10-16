@@ -69,10 +69,7 @@ const Details = () => {
         
     },[successMessage,errorMessage])
 
-    const images = [1,2,3,4,5,6]
     const [image, setImage] = useState('')
-    const discount = 10
-    const stock = 3
     const [state, setState] = useState('reviews')
 
     const responsive = {
@@ -250,32 +247,16 @@ const Details = () => {
     return (
         <div>
             <Header/>
-    <section className='bg-[url("http://localhost:3000/images/banner/shop.png")] h-[220px] mt-6 bg-cover bg-no-repeat relative bg-left'>
-    <div className='absolute left-0 top-0 w-full h-full bg-[#2422228a]'>
-        <div className='w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto'>
-            <div className='flex flex-col justify-center gap-1 items-center h-full w-full text-white'>
-        <h2 className='text-3xl font-bold'>Product Details </h2>
-        <div className='flex justify-center items-center gap-2 text-2xl w-full'>
-                <Link to='/'>Home</Link>
-                <span className='pt-1'>
-                <IoIosArrowForward />
-                </span>
-                <span>Product Details </span>
-                </div>
-            </div> 
-        </div> 
-    </div> 
-    </section>
 
     <section>
-        <div className='bg-slate-100 py-5 mb-5'>
+        <div className='bg-gradient-to-r from-gray-50 to-gray-100 py-6 mb-6'>
             <div className='w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto'>
-                <div className='flex justify-start items-center text-md text-slate-600 w-full'>
-                    <Link to='/'>Home</Link>
-                    <span className='pt-1'><IoIosArrowForward /></span>
-                    <Link to='/'>{ product.category }</Link>
-                    <span className='pt-1'><IoIosArrowForward /></span>
-                    <span>{ product.name } </span>
+                <div className='flex justify-start items-center text-md text-gray-600 w-full'>
+                    <Link to='/' className='hover:text-primary transition-colors duration-300 font-medium'>Home</Link>
+                    <span className='pt-1 mx-2 text-primary'><IoIosArrowForward /></span>
+                    <Link to='/' className='hover:text-primary transition-colors duration-300 font-medium'>{ product.category }</Link>
+                    <span className='pt-1 mx-2 text-primary'><IoIosArrowForward /></span>
+                    <span className='text-dark font-semibold'>{ product.name } </span>
                 </div>
 
             </div>
@@ -286,13 +267,13 @@ const Details = () => {
         <div className='w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto pb-16'>
             <div className='grid grid-cols-2 md-lg:grid-cols-1 gap-8'>
                 <div>
-                <div className='p-5 border'>
-                    <img className='h-[400px] w-full' src={image ? getImageUrl(image) : getImageUrl(getProductImage(product.images))} alt="" />
+                <div className='p-4 border-2 border-gray-200 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white group'>
+                    <img className='h-[350px] w-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-500' src={image ? getImageUrl(image) : getImageUrl(getProductImage(product.images))} alt="" />
                 </div>
-            <div className='py-3'>
+            <div className='py-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4'>
                 {
                     product.images && <Carousel
-                    autoPlay={true}
+                    autoPlay={false}
                     infinite={true} 
                     responsive={responsive}
                     transitionDuration={500}
@@ -300,8 +281,13 @@ const Details = () => {
                     { 
                        getAllProductImages(product.images).map((img, i) => {
                         return (
-                            <div key={i}  onClick={() => setImage(img)}>
-                   <img className='h-[120px] cursor-pointer' src={getImageUrl(img)} alt="" onError={(e) => handleImageError(e)} /> 
+                            <div key={i} className="px-2">
+                                <div 
+                                    onClick={() => setImage(img)} 
+                                    className="cursor-pointer border-2 border-transparent hover:border-primary rounded-lg overflow-hidden transition-all duration-300 hover:shadow-md hover:scale-105"
+                                >
+                                    <img className='h-[120px] w-full object-cover' src={getImageUrl(img)} alt="" onError={(e) => handleImageError(e)} /> 
+                                </div>
                             </div>
                         )
                        })
@@ -312,53 +298,55 @@ const Details = () => {
            </div>    
            </div>
 
-        <div className='flex flex-col gap-5'>
-                <div className='text-3xl text-slate-600 font-bold'>
-                    <h3>{product.name} </h3>
+        <div className='flex flex-col gap-4 bg-white p-6 rounded-2xl shadow-lg border border-gray-100'>
+                <div className='text-2xl text-gray-800 font-bold leading-tight'>
+                    <h3 className='text-gradient'>{product.name}</h3>
                 </div>
-                <div className='flex justify-start items-center gap-4'>
-                    <div className='flex text-xl'>
+                
+                <div className='flex justify-start items-center gap-4 flex-wrap'>
+                    <div className='flex text-lg'>
                         <Rating ratings={4.5} />
                     </div>
-                    <span className='text-green-500'>(24 reviews)</span> 
+                    <span className='text-green-600 font-semibold bg-green-100 px-2 py-1 rounded-full text-sm'>(24 reviews)</span>
+                    <span className='text-gray-600 font-medium text-sm'>Brand: <span className='text-primary font-semibold'>{product.brand}</span></span>
                 </div>
 
-         <div className='text-2xl text-red-500 font-bold flex gap-3'>
+         <div className='text-xl font-bold flex items-center gap-4'>
             {
                 product.discount !== 0 ? <>
-                Price : <h2 className='line-through'>₹{Math.round(calculateCommission(getCurrentPrice(), product).finalPrice)}</h2>
-                <h2>₹{Math.round(calculateCommission(getCurrentPrice() - Math.floor((getCurrentPrice() * product.discount) / 100), product).finalPrice)} (-{product.discount}%) </h2>
-                
-                </> : <h2> Price : ₹{Math.round(calculateCommission(getCurrentPrice(), product).finalPrice)} </h2>
+                <div className='flex flex-col'>
+                    <span className='text-gray-500 text-base line-through'>₹{Math.round(calculateCommission(getCurrentPrice(), product).finalPrice)}</span>
+                    <span className='text-primary text-2xl font-extrabold'>₹{Math.round(calculateCommission(getCurrentPrice() - Math.floor((getCurrentPrice() * product.discount) / 100), product).finalPrice)}</span>
+                </div>
+                </> : <h2 className='text-2xl text-primary font-extrabold'>₹{Math.round(calculateCommission(getCurrentPrice(), product).finalPrice)}</h2>
             }
-            {product?.priceHistory?.currentPrice && product.priceHistory.currentPrice !== product.price && (
-                <span className="text-sm text-gray-500 ml-2">
-                    (Updated from ₹{Math.round(calculateCommission(product.price, product).finalPrice)})
-                </span>
-            )}
           </div> 
 
-          <div className='text-slate-600'>
-            <p>{product.description}  </p>
-            <p className='text-slate-600 py-1 font-bold'>Shop Name : {product.shopName}</p>
+          <div className='text-gray-600 leading-relaxed'>
+            <p className='text-base mb-3 text-dark'>{product.description}</p>
+            <div className='bg-gradient-to-r from-gray-50 to-gray-100 p-3 rounded-xl border border-gray-200'>
+                <p className='text-gray-800 font-semibold text-sm'>Shop Name: <span className='text-primary font-bold text-base'>{product.shopName}</span></p>
+            </div>
            </div>
 
-
-            <div className='flex gap-3 pb-10 border-b'>
+            <div className='flex gap-4 pb-8 border-b border-gray-200'>
                 {
                     product.stock ? <>
-        <div className='flex bg-slate-200 h-[50px] justify-center items-center text-xl'>
-            <div onClick={dec} className='px-6 cursor-pointer'>-</div>
-            <div className='px-6'>
+        <div className='flex bg-gradient-to-r from-gray-100 to-gray-200 h-[50px] justify-center items-center text-lg rounded-xl border-2 border-gray-200 shadow-md'>
+            <div onClick={dec} className='px-4 cursor-pointer hover:bg-primary hover:text-white rounded-l-xl transition-all duration-300 font-bold text-gray-700'>-</div>
+            <div className='px-4 font-bold text-gray-800 bg-white min-w-[50px] text-center border-x border-gray-200'>
                 {getProductQuantity(product._id).quantity > 0 ? getProductQuantity(product._id).quantity : quantity}
             </div>
-            <div onClick={inc} className='px-6 cursor-pointer'>+</div>
+            <div onClick={inc} className='px-4 cursor-pointer hover:bg-primary hover:text-white rounded-r-xl transition-all duration-300 font-bold text-gray-700'>+</div>
         </div>
                     <div className="relative">
-                        <button onClick={add_card} className='btn-primary h-[50px] px-8 flex items-center gap-2'>
+                        <button onClick={add_card} className='bg-gradient-to-r from-primary to-primary-dark h-[50px] px-6 flex items-center gap-2 text-white font-semibold rounded-xl hover:from-primary-dark hover:to-primary transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105'>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m0 0h6.5M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6" />
+                            </svg>
                             Add To Cart
                             {getProductQuantity(product._id).quantity > 0 && (
-                                <span className="bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold border-2 border-white">
+                                <span className="bg-white text-primary text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold border-2 border-white shadow-md">
                                     {getProductQuantity(product._id).quantity}
                                 </span>
                             )}
@@ -369,49 +357,23 @@ const Details = () => {
                 }
 
                 <div>
-                    <div onClick={add_wishlist} className='h-[50px] w-[50px] flex justify-center items-center cursor-pointer hover:shadow-lg hover:shadow-red-500/40 bg-red-500 text-white rounded-lg transition-all'>
-                    <FaHeart />
+                    <div onClick={add_wishlist} className='h-[50px] w-[50px] flex justify-center items-center cursor-pointer hover:shadow-lg hover:shadow-danger/40 bg-gradient-to-r from-danger to-red-600 text-white rounded-xl transition-all duration-300 hover:scale-105'>
+                    <FaHeart className='text-base' />
                     </div> 
                 </div> 
             </div>  
 
 
-        <div className='flex py-5 gap-5'>
-            <div className='w-[150px] text-black font-bold text-xl flex flex-col gap-5'>
-                 
-                <span>Availability</span>
-                <span>Share On</span> 
-            </div> 
-            <div className='flex flex-col gap-5'>
-                <span className={`text-${product.stock ? 'green' : 'red'}-500`}>
-                    {product.stock ? `In Stock(${product.stock})` : 'Out Of Stock'}
-                </span> 
 
-    <ul className='flex justify-start items-center gap-3'>
-        <li>
-            <a className='w-[38px] h-[38px] hover:bg-[#059473] hover:text-white flex justify-center items-center bg-indigo-500 rounded-full text-white' href="#"> <FaFacebookF /> </a>
-        </li>
-        <li>
-            <a className='w-[38px] h-[38px] hover:bg-[#059473] hover:text-white flex justify-center items-center bg-cyan-500 rounded-full text-white' href="#"> <FaTwitter /> </a>
-        </li>
-        <li>
-            <a className='w-[38px] h-[38px] hover:bg-[#059473] hover:text-white flex justify-center items-center bg-purple-500 rounded-full text-white' href="#"> <FaLinkedin /> </a>
-        </li>
-        <li>
-            <a className='w-[38px] h-[38px] hover:bg-[#059473] hover:text-white flex justify-center items-center bg-blue-500 rounded-full text-white' href="#"> <FaGithub /> </a>
-        </li>
-    </ul> 
-
-            </div>
-          </div>
-
-          <div className='flex gap-3'>
+          <div className='flex gap-4 pt-4'>
                 {
-                    product.stock ? <button onClick={buynow} className='btn-secondary h-[50px] px-8'>Buy Now</button> : ''
+                    product.stock ? <button onClick={buynow} className='bg-gradient-to-r from-success to-green-600 hover:from-green-600 hover:to-green-700 text-white h-[50px] px-6 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2 hover:scale-105'>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                        Buy Now
+                    </button> : ''
                 }
-                <Link to={`/dashboard/chat/${product.sellerId}`} className='bg-info hover:bg-blue-600 text-white px-8 py-3 h-[50px] rounded-lg transition-all flex items-center justify-center'>
-                    Chat Seller
-                </Link>
             </div>
 
 
@@ -421,138 +383,45 @@ const Details = () => {
         </section>
 
 
-        <section>
-        <div className='w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto pb-16'>
-           <div className='flex flex-wrap'>
-            <div className='w-[72%] md-lg:w-full'>
-                <div className='pr-4 md-lg:pr-0'>
-                    <div className='grid grid-cols-2'>
-                    <button onClick={() => setState('reviews')} className={`py-1 hover:text-white px-5 hover:bg-primary ${state === 'reviews' ? 'bg-primary text-white' : 'bg-slate-200 text-slate-700'} rounded-sm transition-colors`}>Reviews </button>
+        <section className='py-16 bg-gradient-to-br from-gray-50 to-gray-100'>
+        <div className='w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto'>
+           <div className='bg-white rounded-3xl shadow-xl p-8 border border-gray-100'>
+                <div className='flex gap-2 mb-8'>
+                    <button onClick={() => setState('reviews')} className={`py-3 px-8 hover:text-white font-semibold rounded-2xl transition-all duration-300 ${state === 'reviews' ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-primary hover:text-white'}`}>
+                        <span className='flex items-center gap-2'>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                            </svg>
+                            Reviews
+                        </span>
+                    </button>
                     
-                    <button onClick={() => setState('description')} className={`py-1 hover:text-white px-5 hover:bg-primary ${state === 'description' ? 'bg-primary text-white' : 'bg-slate-200 text-slate-700' } rounded-sm transition-colors`}>Description </button>
-                    </div>
-
-    <div>
-        {
-            state === 'reviews' ? <Reviews product={product} /> : <p className='py-5 text-slate-600'>
-    {product.description}
-            </p>
-        }
-    </div> 
-         </div> 
-         </div>
-
-<div className='w-[28%] md-lg:w-full'>
-<div className='pl-4 md-lg:pl-0'>
-    <div className='px-3 py-2 text-slate-600 bg-slate-200'>
-        <h2 className='font-bold'>From {product.shopName}</h2>
-    </div>
-    <div className='flex flex-col gap-5 mt-3 border p-3'>
-        {
-            moreProducts.map((p,i) => {
-                return (
-        <Link className='block'>
-            <div className='relative h-[270px]'>
-            <img className='w-full h-full' src={getProductImage(p.images)} alt="" onError={(e) => handleImageError(e)} /> 
-            {
-            p.discount !== 0 && <div className='flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2'>{p.discount}%
-            </div>
-            }
-            </div>
-
-            <h2 className='text-slate-600 py-1 font-bold'>{p.name} </h2>
-            <div className='flex gap-2'>
-                <h2 className='text-lg font-bold text-slate-600'>₹{Math.round(calculateCommission(p.price).finalPrice)}</h2>
-                <div className='flex items-center gap-2'>
-                    <Rating ratings={p.rating}  />
+                    <button onClick={() => setState('description')} className={`py-3 px-8 hover:text-white font-semibold rounded-2xl transition-all duration-300 ${state === 'description' ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-primary hover:text-white'}`}>
+                        <span className='flex items-center gap-2'>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Description
+                        </span>
+                    </button>
                 </div>
-            </div>
-            
-        </Link>
-                )
-            })
-        }
 
-    </div>
-</div>
-</div> 
-
-    </div>  
+                <div className='py-8'>
+                    {
+                        state === 'reviews' ? <Reviews product={product} /> : 
+                        <div className='space-y-6'>
+                            <h3 className='text-2xl font-bold text-dark mb-6 text-gradient'>Product Description</h3>
+                            <p className='text-lg text-gray-600 leading-relaxed bg-gradient-to-r from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200'>
+                                {product.description}
+                            </p>
+                        </div>
+                    }
+                </div> 
+           </div>
         </div>
         </section>
 
 
-<section>
-<div className='w-[85%] md:w-[80%] sm:w-[90%] lg:w-[90%] h-full mx-auto'>
-<h2 className='text-2xl py-8 text-slate-600'>Related Products </h2>
-<div>
-    <Swiper
-    slidesPerView='auto'
-    breakpoints={{
-        1280 : {
-            slidesPerView: 3
-        },
-        565 : {
-            slidesPerView: 2
-        }
-    }}
-    spaceBetween={25}
-    loop={true}
-    pagination={{
-        clickable: true,
-        el: '.custom_bullet'
-    }}
-    modules={[Pagination]}
-    className='mySwiper' 
-    > 
-
-    {
-        relatedProducts.map((p, i) => {
-            return (
-
-                <SwiperSlide key={i}>
-                    <Link className='block'>
-                        <div className='relative h-[270px]'>
-                            <div className='w-full h-full'>
-                    <img className='w-full h-full' src={p.images[0] } alt="" />
-                    <div className='absolute h-full w-full top-0 left-0 bg-[#000] opacity-25 hover:opacity-50 transition-all duration-500'> 
-                    </div>
-                           </div>
-            {
-            p.discount !== 0 && <div className='flex justify-center items-center absolute text-white w-[38px] h-[38px] rounded-full bg-red-500 font-semibold text-xs left-2 top-2'>{p.discount}%
-            </div>
-            } 
-                </div>
-
-            <div className='p-4 flex flex-col gap-1'>
-            <h2 className='text-slate-600 text-lg font-bold'>{p.name} </h2>
-            <div className='flex justify-start items-center gap-3'>
-                <h2 className='text-lg font-bold text-slate-600'>₹{Math.round(calculateCommission(p.price).finalPrice)}</h2>
-                <div className='flex'>
-                    <Rating ratings={p.rating}  />
-                </div>
-            </div>
-            </div>
-
-                    </Link>
-
-                </SwiperSlide>
-
-            )
-        })
-    }
-    
-    </Swiper>
-</div>
-
-      <div className='w-full flex justify-center items-center py-8'>
-        <div className='custom_bullet justify-center gap-3 !w-auto'> 
-        </div>
-
-      </div>
-
-</div>
-</section>
 
 
 

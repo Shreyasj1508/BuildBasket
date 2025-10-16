@@ -14,7 +14,9 @@ const Wishlist = () => {
     const {wishlist,successMessage } = useSelector(state => state.card)
    
     useEffect(() => {
-        dispatch(get_wishlist_products(userInfo.id))
+        if (userInfo && userInfo.id) {
+            dispatch(get_wishlist_products(userInfo.id))
+        }
     },[])
 
     useEffect(() => { 
