@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt')
 const { createToken } = require('../utiles/tokenCreate')
 const cloudinary = require('cloudinary').v2
 const formidable = require("formidable")
+const emailService = require('../utiles/emailService')
 
 class authControllers{
    
@@ -75,6 +76,7 @@ class authControllers{
                     email,
                     password: await bcrypt.hash(password, 10),
                     method : 'manually',
+                    status: 'pending',
                     shopInfo: {}
                 })
                await sellerCustomerModel.create({
@@ -86,7 +88,16 @@ class authControllers{
                 expires : new Date(Date.now() + 7*24*60*60*1000 )
                })
 
-               responseReturn(res,201,{token,message: 'Register Success'})
+               try {
+                   await emailService.sendAdminSellerNotification({
+                       name: seller.name,
+                       email: seller.email
+                   });
+               } catch (emailError) {
+                   console.error('Email notification error:', emailError);
+               }
+
+               responseReturn(res,201,{token,message: 'Register Success - Awaiting Admin Verification'})
             }
          } catch (error) {
             console.log('Seller registration error:', error)

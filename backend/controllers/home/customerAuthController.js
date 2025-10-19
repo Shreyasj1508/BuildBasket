@@ -3,6 +3,7 @@ const { responseReturn } = require('../../utiles/response')
 const bcrypt = require('bcrypt')
 const sellerCustomerModel = require('../../models/chat/sellerCustomerModel')
 const {createToken} = require('../../utiles/tokenCreate')
+const emailService = require('../../utiles/emailService')
 
 class customerAuthController{
 
@@ -20,9 +21,9 @@ class customerAuthController{
                     password: await bcrypt.hash(password, 10),
                     method: 'manually'
                 })
-                            await sellerCustomerModel.create({
-                myId: createCustomer._id
-            })
+                await sellerCustomerModel.create({
+                    myId: createCustomer._id
+                })
                 const token = await createToken({
                     id : createCustomer._id,
                     name: createCustomer.name,
@@ -32,6 +33,20 @@ class customerAuthController{
                 res.cookie('customerToken',token,{
                     expires : new Date(Date.now() + 7*24*60*60*1000 )
                 })
+
+                try {
+                    await emailService.sendCustomerWelcomeEmail({
+                        name: createCustomer.name,
+                        email: createCustomer.email
+                    });
+                    await emailService.sendAdminCustomerNotification({
+                        name: createCustomer.name,
+                        email: createCustomer.email
+                    });
+                } catch (emailError) {
+                    console.error('Email notification error:', emailError);
+                }
+
                 responseReturn(res,201,{message: "User Register Success", token})
             }
         } catch (error) {

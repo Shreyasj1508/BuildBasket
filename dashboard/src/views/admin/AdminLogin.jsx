@@ -5,7 +5,6 @@ import { admin_login } from '../../store/Reducers/authReducer';
 import toast from 'react-hot-toast';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaShieldAlt } from 'react-icons/fa';
 
-// Custom CSS for animations
 const customStyles = `
     @keyframes fadeInUp {
         from {
@@ -49,7 +48,6 @@ const AdminLogin = () => {
     const submit = (e) => {
         e.preventDefault();
         
-        // Basic validation
         if (!state.email || !state.password) {
             toast.error('Please fill in all fields');
             return;
@@ -83,19 +81,16 @@ const AdminLogin = () => {
         <>
             <style>{customStyles}</style>
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 p-4 relative overflow-hidden" style={{ minHeight: '100vh' }}>
-            {/* Enhanced Background Decorations */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-orange-400 to-red-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
                 <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" style={{ animationDelay: '2s' }}></div>
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" style={{ animationDelay: '4s' }}></div>
                 
-                {/* Additional floating elements */}
                 <div className="absolute top-20 left-20 w-4 h-4 bg-orange-300 rounded-full animate-bounce" style={{ animationDelay: '1s' }}></div>
                 <div className="absolute top-40 right-32 w-6 h-6 bg-yellow-300 rounded-full animate-bounce" style={{ animationDelay: '3s' }}></div>
                 <div className="absolute bottom-32 left-32 w-5 h-5 bg-amber-300 rounded-full animate-bounce" style={{ animationDelay: '5s' }}></div>
             </div>
 
-            {/* Login Card */}
             <div className="relative w-full max-w-md">
                 {/* Logo/Brand Section */}
                 <div className="text-center mb-8 animate-fadeInUp">

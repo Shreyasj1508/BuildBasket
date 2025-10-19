@@ -18,7 +18,6 @@ const Home = () => {
   const navigate = useNavigate();
   const homeState = useHomeState();
 
-  // Safely destructure with fallbacks
   const products = homeState?.products || [];
   const latest_product = homeState?.latest_product || [];
   const topRated_product = homeState?.topRated_product || [];
@@ -32,10 +31,7 @@ const Home = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        // Add a small delay to ensure store is initialized
         await new Promise((resolve) => setTimeout(resolve, 200));
-
-        // Check if dispatch is available
         if (dispatch && typeof dispatch === "function") {
           await dispatch(get_products());
           await dispatch(get_category());
@@ -48,34 +44,23 @@ const Home = () => {
         setIsLoading(false);
       }
     };
-
-    // Fetch data on component mount only
     fetchData();
   }, [dispatch]);
 
   const search = () => {
-    // Build search parameters
     const params = new URLSearchParams();
-    
-    // Only include category parameter if a specific category is selected
-    // When "All Categories" is selected (empty string), don't include category parameter
     if (category && category.trim() !== "") {
       params.append("category", category);
     }
-    
     if (searchValue && searchValue.trim() !== "") {
       params.append("search", searchValue);
     }
-
-    // Navigate to shops with search parameters
     const queryString = params.toString();
     navigate(`/shops${queryString ? `?${queryString}` : ""}`);
   };
 
-  // Handle category selection
   const handleCategoryChange = (selectedCategory) => {
     setCategory(selectedCategory);
-    // No automatic navigation - user must click search button to search
   };
 
   const handleKeyPress = (e) => {

@@ -39,15 +39,10 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // Add a small delay to ensure store is fully initialized
         await new Promise((resolve) => setTimeout(resolve, 100));
-
-        // Check if dispatch is available before using it
         if (dispatch && typeof dispatch === "function") {
           dispatch(get_category());
         }
-
-        // Check if current path is admin dashboard and redirect to login
         const currentPath = window.location.pathname;
         if (currentPath.startsWith('/admin')) {
           window.location.href = '/login';
@@ -56,9 +51,8 @@ function App() {
         console.error("Error initializing app:", error);
       }
     };
-
     initializeApp();
-  }, []); // Remove dispatch from dependencies to prevent re-runs
+  }, []);
 
   return (
     <ReduxErrorBoundary>
@@ -95,10 +89,7 @@ function App() {
             </Route>
           </Route>
 
-          {/* Admin routes - redirect to login */}
           <Route path="/admin/*" element={<Navigate to="/login" replace />} />
-
-          {/* Catch-all route for undefined paths - redirect to login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </BrowserRouter>

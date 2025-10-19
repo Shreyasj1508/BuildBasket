@@ -61,6 +61,18 @@ const sellerSchema = new Schema({
         enum: ['direct', 'sg_finserv'],
         default: 'direct'
     },
+    verificationReason: {
+        type: String,
+        default: ''
+    },
+    verifiedAt: {
+        type: Date,
+        default: null
+    },
+    verifiedBy: {
+        type: String,
+        default: null
+    },
 },{ timestamps: true })
 
 sellerSchema.index({

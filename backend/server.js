@@ -172,6 +172,12 @@ app.use("/api/admin/reports", require("./routes/admin/adminReportsRoutes"));
 app.use("/api/admin/analytics", require("./routes/admin/adminAnalyticsRoutes"));
 app.use("/api/admin", require("./routes/admin/adminActivitiesRoutes"));
 
+// Seller Verification Routes
+app.use("/api/admin", require("./routes/admin/sellerVerificationRoutes"));
+
+// Email Test Routes
+app.use("/api/admin/email", require("./routes/admin/emailTestRoutes"));
+
 // Seeder Routes
 app.use("/api/admin", require("./routes/seedRealDataRoutes"));
 app.use("/api", require("./routes/seedProductRoutes"));
