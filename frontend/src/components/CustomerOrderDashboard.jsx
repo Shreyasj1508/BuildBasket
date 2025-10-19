@@ -15,7 +15,10 @@ import {
     FaMapMarkerAlt,
     FaFilePdf,
     FaReceipt,
-    FaStore
+    FaStore,
+    FaUser,
+    FaPhone,
+    FaEnvelope
 } from 'react-icons/fa';
 import api from '../api/api';
 import toast from 'react-hot-toast';

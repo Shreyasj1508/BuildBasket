@@ -11,7 +11,7 @@ import { BsCartCheck } from "react-icons/bs";
 import { IoChatbubbles } from "react-icons/io5";
 import { BsFillChatQuoteFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
-import { FaCheckCircle, FaCreditCard } from "react-icons/fa";
+import { FaCheckCircle, FaCreditCard, FaUserCheck } from "react-icons/fa";
 
 export const allNav = [
     {
@@ -139,6 +139,20 @@ export const allNav = [
         icon : <FaUsers />,
         role : 'admin',
         path: '/admin/dashboard/buyer-management'
+    },
+    {
+        id : 14.1,
+        title : 'User Verification',
+        icon : <FaUserCheck />,
+        role : 'admin',
+        path: '/admin/dashboard/user-verification'
+    },
+    {
+        id : 14.2,
+        title : 'Buyer Credit Management',
+        icon : <FaCreditCard />,
+        role : 'admin',
+        path: '/admin/dashboard/buyer-credit-management'
     },
     {
         id : 15,

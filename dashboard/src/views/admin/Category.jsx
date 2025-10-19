@@ -110,9 +110,9 @@ const Category = () => {
     return (
         <div className='px-2 lg:px-7 pt-5'>
 
-        <div className='flex lg:hidden justify-between items-center mb-5 p-4 bg-[#6a5fdf] rounded-md'>
-            <h1 className='text-[#d0d2d6] font-semibold text-lg'>Category</h1>
-            <button onClick={() => setShow(true)} className='btn-primary px-4 py-2 text-sm'>Add Category</button>
+        <div className='flex lg:hidden justify-between items-center mb-5 p-4 bg-gradient-to-r from-[#eb8f34] to-[#d17a1e] rounded-md shadow-lg'>
+            <h1 className='text-white font-semibold text-lg'>Category</h1>
+            <button onClick={() => setShow(true)} className='bg-white text-[#eb8f34] hover:bg-gray-100 font-semibold px-4 py-2 text-sm rounded-lg transition-all duration-300 shadow-md hover:shadow-lg'>Add Category</button>
 
         </div>
 
@@ -121,13 +121,13 @@ const Category = () => {
 
             <div className='flex flex-wrap w-full'>
                 <div className='w-full lg:w-7/12'>
-                <div className='w-full p-4 bg-[#6a5fdf] rounded-md'>
+                <div className='w-full p-4 bg-gradient-to-br from-[#eb8f34] to-[#d17a1e] rounded-md shadow-lg'>
                 
                <Search setParPage={setParPage} setSearchValue={setSearchValue} searchValue={searchValue}  />
 
    <div className='relative overflow-x-auto'>
-    <table className='w-full text-sm text-left text-[#d0d2d6]'>
-        <thead className='text-sm text-[#d0d2d6] uppercase border-b border-slate-700'>
+    <table className='w-full text-sm text-left text-white'>
+        <thead className='text-sm text-white uppercase border-b border-white/30'>
         <tr>
             <th scope='col' className='py-3 px-4'>No</th>
             <th scope='col' className='py-3 px-4'>Image</th>
@@ -139,16 +139,16 @@ const Category = () => {
         <tbody>
             {
                 categorys.map((d, i) => <tr key={i}>
-                <td scope='row' className='py-1 px-4 font-medium whitespace-nowrap'>{i+1}</td>
+                <td scope='row' className='py-1 px-4 font-medium whitespace-nowrap text-white'>{i+1}</td>
                 <td scope='row' className='py-1 px-4 font-medium whitespace-nowrap'>
-                    <img className='w-[45px] h-[45px]' src={d.image} alt="" />
+                    <img className='w-[45px] h-[45px] rounded-lg shadow-md' src={d.image} alt="" />
                 </td>
-                <td scope='row' className='py-1 px-4 font-medium whitespace-nowrap'>{d.name}</td>
+                <td scope='row' className='py-1 px-4 font-medium whitespace-nowrap text-white'>{d.name}</td>
                  
                 <td scope='row' className='py-1 px-4 font-medium whitespace-nowrap'>
                     <div className='flex justify-start items-center gap-4'>
-                    <Link className='p-[6px] bg-warning rounded hover:shadow-lg hover:shadow-warning/50 transition-all' onClick={() => handleEdit(d)} > <FaEdit/> </Link> 
-                    <Link className='p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50 transition-all' onClick={() => handleDelete(d._id)}  > <FaTrash/> </Link> 
+                    <Link className='p-[6px] bg-white text-[#eb8f34] rounded-lg hover:bg-gray-100 hover:shadow-lg transition-all duration-300' onClick={() => handleEdit(d)} > <FaEdit/> </Link> 
+                    <Link className='p-[6px] bg-red-500 text-white rounded-lg hover:bg-red-600 hover:shadow-lg transition-all duration-300' onClick={() => handleDelete(d._id)}  > <FaTrash/> </Link> 
                     </div>
                     
                     </td>
@@ -178,10 +178,10 @@ const Category = () => {
 
     <div className={`w-[320px] lg:w-5/12 translate-x-100 lg:relative lg:right-0 fixed ${show ? 'right-0' : '-right-[340px]'} z-[9999] top-0 transition-all duration-500 `} >
     <div className='w-full pl-5'>
-        <div className='bg-[#6a5fdf] h-screen lg:h-auto px-3 py-2 lg:rounded-md text-[#d0d2d6]'>
+        <div className='bg-gradient-to-br from-[#eb8f34] to-[#d17a1e] h-screen lg:h-auto px-3 py-2 lg:rounded-md text-white shadow-lg'>
 
             <div className='flex justify-between items-center mb-4' >
-            <h1 className='text-[#d0d2d6] font-semibold text-xl mb-4 w-full text-center '> { isEdit ? 'Edit Category' : 'Add Category' } </h1>
+            <h1 className='text-white font-semibold text-xl mb-4 w-full text-center '> { isEdit ? 'Edit Category' : 'Add Category' } </h1>
 
             <div onClick={() => setShow(false) } className='block lg:hidden'>
             <IoMdCloseCircle /> 
@@ -192,13 +192,13 @@ const Category = () => {
             <form onSubmit={addOrUpdateCategory}>
                 <div className='flex flex-col w-full gap-1 mb-3'>
                     <label htmlFor="name"> Category Name</label>
-                    <input value={state.name} onChange={(e)=>setState({...state,name : e.target.value})} className='px-4 py-2 focus:border-indigo-500 outline-none bg-[#ffffff] border border-slate-700 rounded-md text-[#000000]' type="text" id='name' name='category_name' placeholder='Category Name' />
+                    <input value={state.name} onChange={(e)=>setState({...state,name : e.target.value})} className='px-4 py-2 focus:border-[#eb8f34] focus:ring-2 focus:ring-[#eb8f34]/20 outline-none bg-white border border-gray-300 rounded-md text-gray-800 placeholder-gray-500 transition-all duration-300' type="text" id='name' name='category_name' placeholder='Category Name' />
                  </div>
 
                  <div>
-                    <label className='flex justify-center items-center flex-col h-[238px] cursor-pointer border border-dashed hover:border-red-500 w-full border-[#d0d2d6]'  htmlFor="image">
+                    <label className='flex justify-center items-center flex-col h-[238px] cursor-pointer border border-dashed hover:border-white hover:bg-white/10 w-full border-white/50 rounded-lg transition-all duration-300'  htmlFor="image">
                         {
-                          imageShow ? <img className='w-full h-full' src={imageShow} /> : <>
+                          imageShow ? <img className='w-full h-full rounded-lg object-cover' src={imageShow} /> : <>
                         <span><FaImage/> </span>
                         <span>Select Image</span> 
                           </>
@@ -207,9 +207,9 @@ const Category = () => {
                     </label>
                     <input onChange={imageHandle} className='hidden' type="file" name="image" id="image" />
             <div className='mt-4'>
-            <button disabled={loader ? true : false}  className='btn-primary w-full mb-3'>
+            <button disabled={loader ? true : false}  className='bg-white text-[#eb8f34] hover:bg-gray-100 font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg w-full mb-3 disabled:opacity-50 disabled:cursor-not-allowed'>
             {
-               loader ? <PropagateLoader color='#fff' cssOverride={overrideStyle} /> : isEdit ? 'Update Category' : 'Add Category'
+               loader ? <PropagateLoader color='#eb8f34' cssOverride={overrideStyle} /> : isEdit ? 'Update Category' : 'Add Category'
             } 
             </button> 
 

@@ -7,6 +7,26 @@ import { logout } from '../store/Reducers/authReducer';
 import { FaLock } from "react-icons/fa";
 import api from '../api/api';
 
+// Custom CSS for scrollbar styling
+const customStyles = `
+    .sidebar-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .sidebar-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+        background: #eb8f34;
+        border-radius: 3px;
+    }
+    
+    .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+        background: #d17a1e;
+    }
+`;
+
 const Sidebar = ({showSidebar, setShowSidebar}) => {
 
     const dispatch = useDispatch()
@@ -42,13 +62,15 @@ const Sidebar = ({showSidebar, setShowSidebar}) => {
 
 
     return (
-        <div>
+        <>
+            <style>{customStyles}</style>
+            <div>
             <div onClick={()=> setShowSidebar(false)} className={`fixed duration-200 ${!showSidebar ? 'invisible' : 'visible'} w-screen h-screen bg-black/50 top-0 left-0 z-10`} > 
             </div>
 
-    <div className={`w-[260px] fixed bg-white/95 backdrop-blur-sm z-50 top-0 h-screen shadow-2xl transition-all duration-300 ${showSidebar ? 'left-0' : '-left-[260px] lg:left-0'} border-r border-orange-200`}>
+    <div className={`w-[260px] fixed bg-white/95 backdrop-blur-sm z-50 top-0 h-screen shadow-2xl transition-all duration-300 ${showSidebar ? 'left-0' : '-left-[260px] lg:left-0'} border-r border-orange-200 flex flex-col`}>
         {/* Enhanced Header */}
-        <div className='h-[70px] flex justify-center items-center border-b border-orange-200 bg-gradient-to-r from-orange-50/50 to-orange-100/50 backdrop-blur-sm'>
+        <div className='h-[70px] flex justify-center items-center border-b border-orange-200 bg-gradient-to-r from-orange-50/50 to-orange-100/50 backdrop-blur-sm flex-shrink-0'>
             <Link to='/' className='flex items-center gap-4 hover:scale-105 transition-transform duration-300'>
                 <div className='w-[45px] h-[45px] bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300'>
                     <span className='text-white font-bold text-xl'>SG</span>
@@ -57,7 +79,7 @@ const Sidebar = ({showSidebar, setShowSidebar}) => {
             </Link> 
         </div>
 
-        <div className='px-[16px] py-6'>
+        <div className='flex-1 overflow-y-auto px-[16px] py-6 sidebar-scroll'>
             <ul className='space-y-2'>
                 {
                     allNav.map((n,i) =><li key={i} className='animate-fadeInUp' style={{ animationDelay: `${i * 50}ms` }}>
@@ -87,6 +109,7 @@ const Sidebar = ({showSidebar, setShowSidebar}) => {
     </div>
 
         </div>
+        </>
     );
 };
 

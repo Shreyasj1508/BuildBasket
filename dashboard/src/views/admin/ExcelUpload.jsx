@@ -363,17 +363,17 @@ const ExcelUpload = () => {
 
   return (
     <div className="px-2 md:px-7 py-5">
-      <div className="w-full bg-white rounded-md p-6">
+      <div className="w-full bg-gradient-to-br from-[#eb8f34] to-[#d17a1e] rounded-xl p-6 shadow-xl">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-            <FaFileExcel className="text-2xl text-green-600" />
+          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <FaFileExcel className="text-2xl text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-bold text-white">
               Excel Data Upload
             </h2>
-            <p className="text-gray-600">Upload data to update your database</p>
+            <p className="text-white/90">Upload data to update your database</p>
           </div>
         </div>
 
