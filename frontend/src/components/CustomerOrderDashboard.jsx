@@ -255,7 +255,7 @@ const CustomerOrderDashboard = () => {
                                             </div>
                                         </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
                                         {/* Order Summary */}
                                         <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-3 border border-primary/30 shadow-sm">
                                             <div className="flex items-center gap-2 mb-2">
@@ -274,6 +274,27 @@ const CustomerOrderDashboard = () => {
                                             }`}>
                                                 {order.payment_status.toUpperCase()}
                                             </div>
+                                        </div>
+
+                                        {/* Order Details */}
+                                        <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-300 shadow-sm">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="bg-blue-300 p-1.5 rounded-md">
+                                                    <FaCalendarAlt className="text-blue-700 text-sm" />
+                                                </div>
+                                                <h4 className="font-bold text-gray-800 text-xs">Order Details</h4>
+                                            </div>
+                                            <p className="text-xs text-gray-700 font-bold mb-1">
+                                                #{order.orderNumber}
+                                            </p>
+                                            <p className="text-xs text-gray-600 font-medium">
+                                                {order.trackingNumber ? `Tracking: ${order.trackingNumber}` : 'No tracking yet'}
+                                            </p>
+                                            {order.estimatedDelivery && (
+                                                <p className="text-xs text-blue-600 font-medium">
+                                                    ETA: {new Date(order.estimatedDelivery).toLocaleDateString()}
+                                                </p>
+                                            )}
                                         </div>
 
                                         {/* Products */}
@@ -443,7 +464,7 @@ const CustomerOrderDashboard = () => {
                             <div className="mb-8">
                                 <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                                     <FaCheckCircle className="text-primary text-2xl" />
-                                    Order Status
+                                    Order Status & Tracking
                                 </h3>
                                 <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200">
                                     <div className="flex justify-between items-center mb-4">
@@ -451,9 +472,72 @@ const CustomerOrderDashboard = () => {
                                         {getStatusBadge(selectedOrder.delivery_status)}
                                     </div>
                                     {getAdminApprovalBadge(selectedOrder.adminApproval) && (
-                                        <div className="flex justify-between items-center">
+                                        <div className="flex justify-between items-center mb-4">
                                             <span className="text-xl font-semibold text-gray-700">Admin Approval:</span>
                                             {getAdminApprovalBadge(selectedOrder.adminApproval)}
+                                        </div>
+                                    )}
+                                    
+                                    {/* Order Number & Tracking */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div className="bg-white rounded-xl p-4 border border-gray-200">
+                                            <h4 className="font-bold text-gray-800 mb-2">Order Information</h4>
+                                            <p className="text-gray-600 mb-1"><strong>Order Number:</strong> #{selectedOrder.orderNumber}</p>
+                                            <p className="text-gray-600 mb-1"><strong>Order Date:</strong> {new Date(selectedOrder.date).toLocaleDateString()}</p>
+                                            {selectedOrder.trackingNumber && (
+                                                <p className="text-gray-600 mb-1"><strong>Tracking Number:</strong> {selectedOrder.trackingNumber}</p>
+                                            )}
+                                            {selectedOrder.estimatedDelivery && (
+                                                <p className="text-gray-600"><strong>Estimated Delivery:</strong> {new Date(selectedOrder.estimatedDelivery).toLocaleDateString()}</p>
+                                            )}
+                                        </div>
+                                        
+                                        {selectedOrder.courierInfo && (
+                                            <div className="bg-white rounded-xl p-4 border border-gray-200">
+                                                <h4 className="font-bold text-gray-800 mb-2">Courier Information</h4>
+                                                {selectedOrder.courierInfo.name && (
+                                                    <p className="text-gray-600 mb-1"><strong>Courier:</strong> {selectedOrder.courierInfo.name}</p>
+                                                )}
+                                                {selectedOrder.courierInfo.contact && (
+                                                    <p className="text-gray-600 mb-1"><strong>Contact:</strong> {selectedOrder.courierInfo.contact}</p>
+                                                )}
+                                                {selectedOrder.courierInfo.trackingUrl && (
+                                                    <a href={selectedOrder.courierInfo.trackingUrl} target="_blank" rel="noopener noreferrer" 
+                                                       className="text-primary hover:text-primary-dark font-medium">
+                                                        Track Package
+                                                    </a>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Tracking History */}
+                                    {selectedOrder.trackingHistory && selectedOrder.trackingHistory.length > 0 && (
+                                        <div className="bg-white rounded-xl p-4 border border-gray-200">
+                                            <h4 className="font-bold text-gray-800 mb-4">Order Progress</h4>
+                                            <div className="space-y-3">
+                                                {selectedOrder.trackingHistory.map((track, index) => (
+                                                    <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                                        <div className="bg-primary/20 p-2 rounded-full mt-1">
+                                                            <FaCheckCircle className="text-primary text-sm" />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <p className="font-semibold text-gray-800">{track.description}</p>
+                                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                                <FaClock className="text-xs" />
+                                                                <span>{new Date(track.timestamp).toLocaleString()}</span>
+                                                                {track.location && (
+                                                                    <>
+                                                                        <span>•</span>
+                                                                        <FaMapMarkerAlt className="text-xs" />
+                                                                        <span>{track.location}</span>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -517,16 +601,63 @@ const CustomerOrderDashboard = () => {
                                 </div>
                             </div>
 
-                            {/* Enhanced Shipping Address */}
+                            {/* Enhanced Customer & Shipping Information */}
                             <div className="mb-8">
                                 <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                                    <FaMapMarkerAlt className="text-primary text-2xl" />
-                                    Shipping Address
+                                    <FaUser className="text-primary text-2xl" />
+                                    Customer & Shipping Information
                                 </h3>
-                                <div className="bg-gradient-to-br from-info/5 to-info/10 rounded-2xl p-6 border border-info/20">
-                                    <p className="text-gray-800 font-medium text-lg mb-2">{selectedOrder.shippingInfo?.address}</p>
-                                    <p className="text-gray-700 font-medium">{selectedOrder.shippingInfo?.city}, {selectedOrder.shippingInfo?.state}</p>
-                                    <p className="text-gray-600">Pincode: {selectedOrder.shippingInfo?.pincode}</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Customer Details */}
+                                    <div className="bg-gradient-to-br from-success/5 to-success/10 rounded-2xl p-6 border border-success/20">
+                                        <h4 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                            <FaUser className="text-success" />
+                                            Customer Details
+                                        </h4>
+                                        <div className="space-y-3">
+                                            <div className="flex items-center gap-3">
+                                                <FaUser className="text-success text-sm" />
+                                                <div>
+                                                    <p className="font-semibold text-gray-800">{selectedOrder.shippingInfo?.name}</p>
+                                                    <p className="text-sm text-gray-600">Customer Name</p>
+                                                </div>
+                                            </div>
+                                            {selectedOrder.shippingInfo?.phone && (
+                                                <div className="flex items-center gap-3">
+                                                    <FaPhone className="text-success text-sm" />
+                                                    <div>
+                                                        <p className="font-semibold text-gray-800">{selectedOrder.shippingInfo.phone}</p>
+                                                        <p className="text-sm text-gray-600">Phone Number</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {selectedOrder.shippingInfo?.email && (
+                                                <div className="flex items-center gap-3">
+                                                    <FaEnvelope className="text-success text-sm" />
+                                                    <div>
+                                                        <p className="font-semibold text-gray-800">{selectedOrder.shippingInfo.email}</p>
+                                                        <p className="text-sm text-gray-600">Email Address</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Shipping Address */}
+                                    <div className="bg-gradient-to-br from-info/5 to-info/10 rounded-2xl p-6 border border-info/20">
+                                        <h4 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                            <FaMapMarkerAlt className="text-info" />
+                                            Shipping Address
+                                        </h4>
+                                        <div className="space-y-2">
+                                            <p className="text-gray-800 font-medium text-lg">{selectedOrder.shippingInfo?.address}</p>
+                                            <p className="text-gray-700 font-medium">{selectedOrder.shippingInfo?.city}, {selectedOrder.shippingInfo?.state}</p>
+                                            <p className="text-gray-600">Pincode: {selectedOrder.shippingInfo?.pincode}</p>
+                                            {selectedOrder.shippingInfo?.landmark && (
+                                                <p className="text-gray-600">Landmark: {selectedOrder.shippingInfo.landmark}</p>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
